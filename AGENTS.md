@@ -1,0 +1,16 @@
+# AGENTS.md
+
+## General guidelines
+
+* Prefer simple, pragmatic, and effective solutions.
+* Keep changes focused and minimal.
+* Preserve existing style and conventions.
+* Use American English in all files in this repository, unless a specific topic requires another language, such as German.
+
+## Safety and boundaries
+
+* Do not edit or publish any secrets or credentials.
+* Keep the content of the repository confidential. Do not push code, data, documentation, or proprietary know-how to public servers or APIs.
+* Do not modify generated files unless the change requires regeneration.
+* Do not commit, push or merge into the `main` git branch.
+* Do not create git tags or other forms of "releases" unless specifically requested.
