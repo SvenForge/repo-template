@@ -85,13 +85,23 @@ without_token=(
     -u OAUTH_TOKEN
     GLAB_NO_PROMPT=1
 )
+original_umask="$(umask)"
+umask 077
 printf '%s' "$GITLAB_TOKEN" | "${without_token[@]}" glab auth login \
     --hostname "$GITLAB_HOST" \
     --api-protocol https \
     --git-protocol https \
     --stdin
+umask "$original_umask"
 
 "${without_token[@]}" glab config set remote_alias origin
+
+# Headless containers have no OS keyring, so restrict glab's fallback file.
+glab_config_dir="${GLAB_CONFIG_DIR:-${XDG_CONFIG_HOME:-"$HOME/.config"}/glab-cli}"
+glab_config_file="$glab_config_dir/config.yml"
+[[ -f "$glab_config_file" ]] || die "glab did not persist its credentials"
+chmod 700 "$glab_config_dir"
+chmod 600 "$glab_config_file"
 
 credential_key="credential.https://${GITLAB_HOST}.helper"
 git config --local --unset-all "$credential_key" >/dev/null 2>&1 || true
