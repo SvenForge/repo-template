@@ -1,0 +1,30 @@
+{
+    "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+    "features": {
+        "ghcr.io/devcontainers/features/node:2": {},
+        "ghcr.io/dirien/devcontainer-feature-codex/codex:0": {}
+    },
+    "remoteUser": "vscode",
+    "mounts": [
+        "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
+    ],
+    "initializeCommand": {
+        "exportGitIdentity": ["git", "-C", "${localWorkspaceFolder}", "-c", "alias.export-identity=!f() { git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null) || exit 0; name=$(git config --get user.name 2>/dev/null) || exit 0; email=$(git config --get user.email 2>/dev/null) || exit 0; file=\"$git_dir/devcontainer-identity.gitconfig\"; git config --file \"$file\" user.name \"$name\"; git config --file \"$file\" user.email \"$email\"; }; f", "export-identity"]
+    },
+    "onCreateCommand": {
+        "setupGit": "set -eu; identity='${containerWorkspaceFolder}/.git/devcontainer-identity.gitconfig'; if [ -f \"$identity\" ]; then git config --global --add include.path \"$identity\" || true; fi; git config --global --add safe.directory '${containerWorkspaceFolder}'; git config --local core.autocrlf input"
+    },
+    "postCreateCommand": {
+        "setupCodex": "set -eu; config_dir=\"$HOME/.codex\"; config=\"$config_dir/config.toml\"; mkdir -p \"$config_dir\"; sudo chown -R \"$(id -u):$(id -g)\" \"$config_dir\"; chmod 700 \"$config_dir\"; touch \"$config\"; if grep -q \"^[[:space:]]*\\\\[analytics\\\\][[:space:]]*$\" \"$config\"; then sed -i -e \"/^[[:space:]]*\\\\[analytics\\\\][[:space:]]*$/,/^[[:space:]]*\\\\[/{/^[[:space:]]*enabled[[:space:]]*=/d;}\" -e \"/^[[:space:]]*\\\\[analytics\\\\][[:space:]]*$/a enabled = false\" \"$config\"; else printf \"\\n[analytics]\\nenabled = false\\n\" >> \"$config\"; fi"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "openai.chatgpt"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    }
+}
