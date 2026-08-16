@@ -91,12 +91,6 @@ printf '%s' "$GITLAB_TOKEN" | "${without_token[@]}" glab auth login \
     --git-protocol https \
     --stdin
 
-username="$("${without_token[@]}" glab api user \
-    --hostname "$GITLAB_HOST" --jq .username)"
-[[ -n "$username" && "$username" != "null" ]] ||
-    die "could not determine the authenticated GitLab username"
-
-"${without_token[@]}" glab config set user "$username" --host "$GITLAB_HOST"
 "${without_token[@]}" glab config set remote_alias origin
 
 credential_key="credential.https://${GITLAB_HOST}.helper"
