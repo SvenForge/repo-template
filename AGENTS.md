@@ -9,7 +9,7 @@
 
 ## GitLab development workflow
 
-Follow these workflow stages in order: **plan**, **create**, **verify**, and **deploy**. Use the corresponding `workflow::plan`, `workflow::create`, `workflow::verify`, or `workflow::deploy` label to show an issue's current stage. Also apply one appropriate `type::*` label and one `priority::*` label. An agent may act as an issue owner, merge request author, or merge request reviewer.
+Follow these workflow stages in order: **plan**, **create**, **verify**, and **deploy**. Keep the issue's workflow label synchronized with its current stage by replacing the previous label with `workflow::plan`, `workflow::create`, `workflow::verify`, or `workflow::deploy`. Also apply one appropriate `type::*` label and one `priority::*` label. An agent may act as an issue owner, merge request author, or merge request reviewer.
 
 * Work exclusively in GitLab. The GitHub repository is only a source for cloning into the remote agent environment; do not push to or otherwise interact with GitHub.
 * Push branches and commits only to the GitLab remote.
@@ -20,8 +20,8 @@ Follow these workflow stages in order: **plan**, **create**, **verify**, and **d
 * Document every observed difference between the repository's current and desired state in a GitLab issue. Create an issue for a new observation, or update and refine an existing relevant issue.
 * Use the default issue template. Describe the problem or deviation first, then research, discuss, and document a proposed solution.
 * Assign the issue to the person responsible for planning and, when practical, implementation.
-* Triage duplicate or obsolete issues. Split issues whose scope is too broad, and merge issues that are unnecessarily narrow or overlapping.
-* When closing, splitting, or merging an issue, leave a short comment explaining why.
+* Triage duplicate or obsolete issues. Split issues whose scope is too broad. Consolidate unnecessarily narrow or overlapping issues, cross-reference the retained issue, and close those it supersedes.
+* When closing, splitting, or consolidating an issue, leave a short comment explaining why.
 * Move to **create** only after the problem has a clear, appropriately scoped implementation plan.
 
 ### 2. Create
@@ -37,7 +37,7 @@ Follow these workflow stages in order: **plan**, **create**, **verify**, and **d
 ### 3. Verify
 
 * Self-review the completed merge request for compliance with repository guidelines, correctness, and scope.
-* Confirm that all relevant tests and quality checks pass and that the feature branch has no conflicts with the latest `main`. Merge the latest `main` into the feature branch when necessary.
+* Fetch the latest `main`, confirm that all relevant tests and quality checks pass, and verify that the feature branch has no conflicts. Merge `main` into the feature branch when it has diverged.
 * Assign an appropriate independent reviewer, such as a code owner or maintainer, and tag them in a comment requesting review.
 * Keep review discussions in GitLab threads. Answer questions, or implement requested improvements and briefly explain the response. Resolve each thread after its concern is addressed.
 * When acting as a reviewer, inspect the changes and leave clear questions or actionable improvement requests in the merge request.
