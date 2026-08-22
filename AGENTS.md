@@ -11,6 +11,10 @@
 
 Follow these workflow stages in order: **plan**, **create**, **verify**, and **deploy**. Use the corresponding GitLab workflow label to show an issue's current stage. Also apply the appropriate issue type and priority labels. An agent may act as an issue owner, merge request author, or merge request reviewer.
 
+* Work exclusively in GitLab. The GitHub repository is only a source for cloning into the remote agent environment; do not push to or otherwise interact with GitHub.
+* Push branches and commits only to the GitLab remote.
+* Use the `glab` CLI for all GitLab interactions, including issues, merge requests, comments, labels, assignments, reviews, and merges.
+
 ### 1. Plan
 
 * Document every observed difference between the repository's current and desired state in a GitLab issue. Create an issue for a new observation, or update and refine an existing relevant issue.
