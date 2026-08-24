@@ -20,24 +20,10 @@ Render the template interactively from this repository:
 copier copy . path/to/new-project
 ```
 
-The root questionnaire is the only Copier entry point. Its `features` question
-selects independently maintained modules. Each module keeps its conditional
-questions and template content together under `template/modules/<feature>/`;
-output paths in `template/` conditionally include that content. Question names
-and output paths must be unique across modules.
-
 ## Documentation
 *TBW*
 
 ## Contributing
-
-Install the development dependencies and run the smoke tests:
-
-```shell
-python -m pip install --requirement requirements-dev.txt
-pytest
-```
-
 ### Maintainer
 * [Sven Krummen](sven@nichtgerade.de) - @krum_sv
 

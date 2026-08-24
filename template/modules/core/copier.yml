@@ -1,5 +1,5 @@
-core_project_name:
+core_repository_name:
   type: str
-  help: What is the project name?
-  default: My Project
+  help: What is the repository name?
+  default: My Repository
   when: "{{ 'core' in features }}"

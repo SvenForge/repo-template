@@ -10,6 +10,7 @@ features:
   multiselect: true
   choices:
     - core
-  default: []
+  default:
+    - core
 ---
 !include template/modules/core/copier.yml
