@@ -6,12 +6,21 @@ set -euo pipefail
 
 readonly GITLAB_HOST="gitlab.com"
 
-# Validate the repository.
+# Restore the origin removed by Codex bootstrap after setup.
 origin="$(git remote get-url origin 2>/dev/null || true)"
-[[ "$origin" =~ ^https://gitlab\.com/[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+/?$ ]] || {
-    printf 'maintenance: origin must be an HTTPS GitLab.com repository URL\n' >&2
+saved_repo="$(git config --local --get codex.gitlabRepo 2>/dev/null || true)"
+gitlab_repo="${GITLAB_REPO:-${saved_repo:-$origin}}"
+[[ "$gitlab_repo" =~ ^https://gitlab\.com/[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+/?$ ]] || {
+    printf 'maintenance: setup did not preserve an HTTPS GitLab.com repository URL\n' >&2
     exit 1
 }
+if [[ -n "$origin" && "$origin" != "$gitlab_repo" ]]; then
+    printf 'maintenance: origin does not match the repository preserved by setup\n' >&2
+    exit 1
+fi
+if [[ -z "$origin" ]]; then
+    git remote add origin "$gitlab_repo"
+fi
 
 # Install Python dependencies when needed.
 repo_root="$(git rev-parse --show-toplevel)"

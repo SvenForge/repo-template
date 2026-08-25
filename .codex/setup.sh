@@ -73,6 +73,8 @@ if git remote get-url origin >/dev/null 2>&1; then
 else
     git remote add origin "$gitlab_repo"
 fi
+# Codex bootstrap removes origin after setup, so retain the URL for maintenance.
+git config --local codex.gitlabRepo "$gitlab_repo"
 git config --local --unset-all remote.origin.pushurl >/dev/null 2>&1 || true
 git config --local remote.pushDefault origin
 git config --local checkout.defaultRemote origin
