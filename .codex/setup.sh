@@ -3,7 +3,6 @@
 set -euo pipefail
 
 : "${GITLAB_TOKEN:?GITLAB_TOKEN is required}"
-: "${GITLAB_REPO:?GITLAB_REPO is required}"
 
 readonly GLAB_VERSION="1.113.0"
 readonly GITLAB_HOST="gitlab.com"
@@ -19,17 +18,18 @@ glab_version() {
 }
 
 # Validate the repository before changing anything.
-[[ "$GITLAB_REPO" =~ ^https://gitlab\.com/[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+/?$ ]] ||
-    die "GITLAB_REPO must be an HTTPS GitLab.com repository URL"
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
     die "the setup script must run inside a Git worktree"
 repo_root="$(git rev-parse --show-toplevel)"
+origin="$(git remote get-url origin 2>/dev/null || true)"
+gitlab_repo="${GITLAB_REPO:-$origin}"
+[[ "$gitlab_repo" =~ ^https://gitlab\.com/[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+/?$ ]] ||
+    die "GITLAB_REPO must specify an HTTPS GitLab.com URL when origin does not"
 
 python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
 
-origin="$(git remote get-url origin 2>/dev/null || true)"
 mirror="$(git remote get-url mirror 2>/dev/null || true)"
-if [[ -n "$origin" && "$origin" != "$GITLAB_REPO" &&
+if [[ -n "$origin" && "$origin" != "$gitlab_repo" &&
     -n "$mirror" && "$mirror" != "$origin" ]]; then
     die "remote 'mirror' already exists with a different URL"
 fi
@@ -63,13 +63,13 @@ if [[ "$(glab_version)" != "$GLAB_VERSION" ]]; then
 fi
 
 # DEPRECATED: Preserve a different origin as "mirror" for compatibility with legacy GitHub clones. Remove this fallback once those clones are retired.
-if [[ -n "$origin" && "$origin" != "$GITLAB_REPO" && -z "$mirror" ]]; then
+if [[ -n "$origin" && "$origin" != "$gitlab_repo" && -z "$mirror" ]]; then
     git remote rename origin mirror
 fi
 if git remote get-url origin >/dev/null 2>&1; then
-    git config --local --replace-all remote.origin.url "$GITLAB_REPO"
+    git config --local --replace-all remote.origin.url "$gitlab_repo"
 else
-    git remote add origin "$GITLAB_REPO"
+    git remote add origin "$gitlab_repo"
 fi
 git config --local --unset-all remote.origin.pushurl >/dev/null 2>&1 || true
 git config --local remote.pushDefault origin
@@ -113,10 +113,10 @@ git config --local --add "$credential_key" \
     "!$(command -v glab) auth git-credential"
 
 # Verify persisted authentication and read access without performing a push.
-[[ "$(git remote get-url origin)" == "$GITLAB_REPO" ]]
-[[ "$(git remote get-url --push origin)" == "$GITLAB_REPO" ]]
+[[ "$(git remote get-url origin)" == "$gitlab_repo" ]]
+[[ "$(git remote get-url --push origin)" == "$gitlab_repo" ]]
 "${without_token[@]}" glab auth status --hostname "$GITLAB_HOST" >/dev/null
 "${without_token[@]}" git ls-remote --exit-code origin HEAD >/dev/null
 
 printf 'Verified glab %s, GitLab authentication, and origin %s.\n' \
-    "$GLAB_VERSION" "$GITLAB_REPO"
+    "$GLAB_VERSION" "$gitlab_repo"
