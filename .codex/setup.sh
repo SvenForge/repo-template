@@ -23,6 +23,9 @@ glab_version() {
     die "GITLAB_REPO must be an HTTPS GitLab.com repository URL"
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
     die "the setup script must run inside a Git worktree"
+repo_root="$(git rev-parse --show-toplevel)"
+
+python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
 
 origin="$(git remote get-url origin 2>/dev/null || true)"
 mirror="$(git remote get-url mirror 2>/dev/null || true)"

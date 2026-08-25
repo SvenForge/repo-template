@@ -15,6 +15,7 @@
         "setupGit": "set -eu; identity='${containerWorkspaceFolder}/.git/devcontainer-identity.gitconfig'; if [ -f \"$identity\" ]; then git config --global --add include.path \"$identity\" || true; fi; git config --global --add safe.directory '${containerWorkspaceFolder}'; git config --local core.autocrlf input"
     },
     "postCreateCommand": {
+        "setupPython": "python -m pip install --requirement env/dev/requirements.txt",
         "setupCodex": "set -eu; config_dir=\"$HOME/.codex\"; config=\"$config_dir/config.toml\"; mkdir -p \"$config_dir\"; sudo chown -R \"$(id -u):$(id -g)\" \"$config_dir\"; chmod 700 \"$config_dir\"; touch \"$config\"; if grep -q \"^[[:space:]]*\\\\[analytics\\\\][[:space:]]*$\" \"$config\"; then sed -i -e \"/^[[:space:]]*\\\\[analytics\\\\][[:space:]]*$/,/^[[:space:]]*\\\\[/{/^[[:space:]]*enabled[[:space:]]*=/d;}\" -e \"/^[[:space:]]*\\\\[analytics\\\\][[:space:]]*$/a enabled = false\" \"$config\"; else printf \"\\n[analytics]\\nenabled = false\\n\" >> \"$config\"; fi"
     },
     "customizations": {

@@ -6,6 +6,9 @@ set -euo pipefail
 
 readonly GITLAB_HOST="gitlab.com"
 
+repo_root="$(git rev-parse --show-toplevel)"
+python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
+
 # The task branch may have been created after setup.sh configured existing branches.
 branch="$(git symbolic-ref --quiet --short HEAD || true)"
 if [[ -n "$branch" ]]; then
