@@ -12,3 +12,13 @@ core_owner_name:
   type: str
   help: Who owns the repository?
   default: Repository Owner
+
+core_owner_email:
+  type: str
+  help: What is the repository owner's email address?
+  default: ""
+
+core_owner_user:
+  type: str
+  help: What is the repository owner's username?
+  default: ""
