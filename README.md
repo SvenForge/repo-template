@@ -22,7 +22,10 @@ copier copy . path/to/new-project
 
 ### Development
 
-_TODO: Add a short note how to initialize a development environment._
+Use one of the supported development environments:
+
+* Open this repository in its included [development container](.devcontainer/devcontainer.json). VS Code with the Dev Containers extension is recommended for creating and accessing the container.
+* Start a task in [Codex Cloud](https://chatgpt.com/codex/cloud) using the preconfigured environment for this repository.
 
 ## Documentation
 
