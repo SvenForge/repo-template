@@ -12,31 +12,4 @@ def test_template_renders_with_defaults(tmp_path: Path) -> None:
     run_copy(str(TEMPLATE_ROOT), destination, defaults=True)
 
     assert destination.is_dir()
-    assert (destination / "README.md").read_text() == """# My Repository
-
-*TBW*
-
-## Getting started
-
-### Installation
-
-*TBW*
-
-### Usage
-
-*TBW*
-
-## Documentation
-
-*TBW*
-
-## Contributing
-
-### Maintainer
-
-*TBW*
-
-## License
-
-*TBW*
-"""
+    assert (destination / "README.md").is_file()

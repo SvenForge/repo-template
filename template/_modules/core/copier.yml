@@ -2,3 +2,13 @@ core_repository_name:
   type: str
   help: What is the repository name?
   default: My Repository
+
+core_owner_name:
+  type: str
+  help: Who owns the repository?
+  default: Repository Owner
+
+core_year:
+  type: int
+  help: What is the copyright year?
+  default: 2026
