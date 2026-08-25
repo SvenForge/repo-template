@@ -6,11 +6,14 @@ set -euo pipefail
 
 readonly GITLAB_HOST="gitlab.com"
 
-# Validate the repository
+# Validate the repository.
 origin="$(git remote get-url origin 2>/dev/null || true)"
-[[ "$origin" =~ ^https://gitlab\.com/[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+/?$ ]]
+[[ "$origin" =~ ^https://gitlab\.com/[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+/?$ ]] || {
+    printf 'maintenance: origin must be an HTTPS GitLab.com repository URL\n' >&2
+    exit 1
+}
 
-# Install python depencencies (if needed)
+# Install Python dependencies when needed.
 repo_root="$(git rev-parse --show-toplevel)"
 python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
 
