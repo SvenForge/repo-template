@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Set up GitLab access for a Codex Cloud environment.
+# Add the following setup command to the Codex Cloud Environment configuration:
+#   bash .codex/setup.sh
 set -euo pipefail
 
-: "${GITLAB_TOKEN:?GITLAB_TOKEN is required}"
+: "${GITLAB_TOKEN:?GITLAB_TOKEN must be provided as a Codex Cloud Environment Secret.}"
 
 readonly GLAB_VERSION="1.113.0"
 readonly GITLAB_HOST="gitlab.com"
