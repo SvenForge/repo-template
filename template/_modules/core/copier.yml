@@ -1,4 +1,30 @@
 core_repository_name:
   type: str
-  help: What is the repository name?
+  help: What is the name of the repository?
   default: My Repository
+
+core_repository_url:
+  type: str
+  help: At which URL is the repository hosted?
+  default: https://gitlab.com/repository-owner/my-repository.git
+
+core_owner_name:
+  type: str
+  help: Who is the repository owner?
+  default: Repository Owner
+
+core_owner_email:
+  type: str
+  help: What is the repository owner's email address? (optional)
+  default: ""
+
+core_owner_user:
+  type: str
+  help: What is the repository owner's username? (optional)
+  default: ""
+
+core_year:
+  type: int
+  help: What is the current year?
+  default: "{{ '%Y' | strftime }}"
+  when: false
