@@ -3,11 +3,22 @@
 Common [copier](https://copier.readthedocs.io/en/stable/) template to setup new or update existing Git repositories. Batteries included.
 
 ## Getting started
+
 ### Installation
-*TBW*
+
+Install the supported Copier release:
+
+```shell
+python -m pip install "copier==9.17.2"
+```
 
 ### Usage
-*TBW*
+
+Render the template interactively from this repository:
+
+```shell
+copier copy . path/to/new-project
+```
 
 ## Documentation
 *TBW*
