@@ -2,7 +2,7 @@
 _min_copier_version: "9.17"
 _subdirectory: template
 _exclude:
-  - modules
+  - _modules
 
 features:
   type: str
@@ -13,4 +13,4 @@ features:
   default:
     - core
 ---
-!include template/modules/core/copier.yml
+!include template/_modules/core/copier.yml
