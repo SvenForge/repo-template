@@ -2,4 +2,3 @@ core_repository_name:
   type: str
   help: What is the repository name?
   default: My Repository
-  when: "{{ 'core' in features }}"
