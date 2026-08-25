@@ -1,24 +1,24 @@
 core_repository_name:
   type: str
-  help: What is the repository name?
+  help: What is the name of the repository?
   default: My Repository
 
 core_repository_url:
   type: str
-  help: Where is the repository hosted?
-  default: https://gitlab.com/repository-owner/my-repository
+  help: At which URL is the repository hosted?
+  default: https://gitlab.com/repository-owner/my-repository.git
 
 core_owner_name:
   type: str
-  help: Who owns the repository?
+  help: Who is the repository owner?
   default: Repository Owner
 
 core_owner_email:
   type: str
-  help: What is the repository owner's email address?
+  help: What is the repository owner's email address? (optional)
   default: ""
 
 core_owner_user:
   type: str
-  help: What is the repository owner's username?
+  help: What is the repository owner's username? (optional)
   default: ""
