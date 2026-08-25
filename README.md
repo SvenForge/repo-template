@@ -20,10 +20,16 @@ Render the template interactively from this repository:
 copier copy . path/to/new-project
 ```
 
+### Development
+
+_TODO: Add a short note how to initialize a development environment._
+
 ## Documentation
+
 *TBW*
 
 ## Contributing
+
 ### Maintainer
 * [Sven Krummen](sven@nichtgerade.de) - @krum_sv
 
