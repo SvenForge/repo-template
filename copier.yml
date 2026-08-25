@@ -3,5 +3,12 @@ _min_copier_version: "9.17"
 _subdirectory: template
 _exclude:
   - _modules
+
+features:
+  type: str
+  help: Which features should be included?
+  multiselect: true
+  choices: []
+  default: []
 ---
 !include template/_modules/core/copier.yml
