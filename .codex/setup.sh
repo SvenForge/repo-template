@@ -59,7 +59,7 @@ if [[ "$(glab_version)" != "$GLAB_VERSION" ]]; then
     tmpdir=""
 fi
 
-# Preserve a different origin as mirror, then make GitLab authoritative.
+# DEPRECATED: Preserve a different origin as "mirror" for compatibility with legacy GitHub clones. Remove this fallback once those clones are retired.
 if [[ -n "$origin" && "$origin" != "$GITLAB_REPO" && -z "$mirror" ]]; then
     git remote rename origin mirror
 fi
