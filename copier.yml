@@ -8,9 +8,7 @@ features:
   type: str
   help: Which features should be included?
   multiselect: true
-  choices:
-    - core
-  default:
-    - core
+  choices: []
+  default: []
 ---
 !include template/_modules/core/copier.yml
