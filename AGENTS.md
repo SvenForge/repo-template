@@ -14,12 +14,12 @@ Follow these workflow stages in order: **plan**, **create**, **verify**, and **d
 * Treat the GitLab project linked in the title of `README.md` as the authoritative source of truth.
 * Other remotes, such as GitHub mirrors, may be used only to clone the repository. Do not push to or make changes on those services.
 * Work exclusively in GitLab. Push branches and commits only to the authoritative GitLab remote.
-* An agent shall use the `glab` CLI for all GitLab interactions, including issues, merge requests, comments, labels, assignments, reviews, and merges.
+* Agents must use the `glab` CLI for all GitLab interactions, including issues, merge requests, comments, labels, assignments, reviews, and merges.
 
 ### Workflow stage transitions
 
-* A maintainer must perform or explicitly instruct or confirm the transition from **plan** to **create** and from **create** to **verify**.
-* Only a maintainer may transition an issue from **verify** to **deploy**. This usually happens when the maintainer clicks **Merge** in the merge request.
+* A maintainer must perform or explicitly authorize transitions from **plan** to **create** and from **create** to **verify**.
+* Only a maintainer may transition an issue from **verify** to **deploy**.
 * An agent must respect the scope of the current workflow stage and may ask a maintainer to transition the issue when the current stage is complete.
 * The `workflow::*` label on the issue is the authoritative indicator of the current workflow stage. Do not apply `workflow::*` labels to merge requests.
 
@@ -34,9 +34,8 @@ Follow these workflow stages in order: **plan**, **create**, **verify**, and **d
 
 ### 2. Create
 
-* Decide whether to contribute directly to an existing merge request and its feature branch or to create a new feature branch and merge request.
-* Do not open an additional merge request merely to contribute to an existing merge request or feature branch. Commit directly to the existing feature branch instead; merge requests prepare feature branches for merging into `main`.
-* When creating a feature branch, also create a corresponding merge request targeting `main`. Prefix its title with `Draft:` throughout the **create** stage; the prefix may be removed when the issue transitions to **verify**.
+* Contribute directly to an existing merge request's feature branch when appropriate; do not open another merge request targeting that branch.
+* Otherwise, create a feature branch and corresponding merge request targeting `main`. Keep the `Draft:` prefix throughout **create**; it may be removed when transitioning to **verify**.
 * Keep the changes in each merge request and feature branch focused and logically connected so that they are easy to understand and review.
 * Link the merge request to every issue it addresses. Usually, one merge request closes one or more related issues; an issue may require multiple merge requests when its work cannot remain logically connected.
 * Use the default merge request template and keep its content current as the implementation changes.
