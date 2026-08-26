@@ -34,9 +34,11 @@ Follow these workflow stages in order: **plan**, **create**, **verify**, and **d
 
 ### 2. Create
 
-* Implement changes on a feature branch and open a merge request; never push changes directly to `main`.
-* Link the merge request to every issue it addresses. A merge request may resolve multiple closely related issues, and an issue may require multiple merge requests.
-* Keep each merge request focused on one clear topic so that it is easy to understand and review.
+* Decide whether to contribute directly to an existing merge request and its feature branch or to create a new feature branch and merge request.
+* Do not open an additional merge request merely to contribute to an existing merge request or feature branch. Commit directly to the existing feature branch instead; merge requests prepare feature branches for merging into `main`.
+* When creating a feature branch, also create a corresponding merge request targeting `main`. Prefix its title with `Draft:` throughout the **create** stage; the prefix may be removed when the issue transitions to **verify**.
+* Keep the changes in each merge request and feature branch focused and logically connected so that they are easy to understand and review.
+* Link the merge request to every issue it addresses. Usually, one merge request closes one or more related issues; an issue may require multiple merge requests when its work cannot remain logically connected.
 * Use the default merge request template and keep its content current as the implementation changes.
 * Make atomic, logically connected commits. Each commit should represent an understandable development step and be independently revertible when practical.
 * Write each commit message as a short sentence that describes the purpose and logical content of the change.
