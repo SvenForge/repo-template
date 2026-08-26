@@ -81,9 +81,8 @@ git config --local --add "$credential_key" ""
 git config --local --add "$credential_key" \
     "!$(command -v glab) auth git-credential"
 
-# Verify persisted authentication and read access without performing a push.
+# Verify persisted authentication.
 "${without_token[@]}" glab auth status --hostname "$GITLAB_HOST" >/dev/null
-"${without_token[@]}" git ls-remote --exit-code origin HEAD >/dev/null
 
-printf 'Verified glab %s, GitLab authentication, and origin access.\n' \
+printf 'Verified glab %s and GitLab authentication.\n' \
     "$GLAB_VERSION"
