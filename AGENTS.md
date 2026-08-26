@@ -11,13 +11,14 @@
 
 Follow these workflow stages in order: **plan**, **create**, **verify**, and **deploy**. Keep the issue's workflow label synchronized with its current stage by replacing the previous label with `workflow::plan`, `workflow::create`, `workflow::verify`, or `workflow::deploy`. Also apply one appropriate `type::*` label and one `priority::*` label. An agent may act as an issue owner, merge request author, or merge request reviewer.
 
-* Work exclusively in GitLab. The GitHub repository is only a source for cloning into the remote agent environment; do not push to or otherwise interact with GitHub.
-* Push branches and commits only to the GitLab remote.
+* Treat the GitLab project linked in the title of `README.md` as the authoritative source of truth.
+* Other remotes, such as GitHub mirrors, may be used only to clone the repository. Do not push to or make changes on those services.
+* Work exclusively in GitLab. Push branches and commits only to the authoritative GitLab remote.
 * Use the `glab` CLI for all GitLab interactions, including issues, merge requests, comments, labels, assignments, reviews, and merges.
 
 ### 1. Plan
 
-* Document every observed difference between the repository's current and desired state in a GitLab issue. Create an issue for a new observation, or update and refine an existing relevant issue.
+* Document every in-scope difference between the repository's current and desired state in a GitLab issue. Create an issue when no relevant issue exists; otherwise update and refine the existing issue.
 * Use the default issue template. Describe the problem or deviation first, then research, discuss, and document a proposed solution.
 * Assign the issue to the person responsible for planning and, when practical, implementation.
 * Triage duplicate or obsolete issues. Split issues whose scope is too broad. Consolidate unnecessarily narrow or overlapping issues, cross-reference the retained issue, and close those it supersedes.
