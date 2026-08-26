@@ -14,7 +14,14 @@ Follow these workflow stages in order: **plan**, **create**, **verify**, and **d
 * Treat the GitLab project linked in the title of `README.md` as the authoritative source of truth.
 * Other remotes, such as GitHub mirrors, may be used only to clone the repository. Do not push to or make changes on those services.
 * Work exclusively in GitLab. Push branches and commits only to the authoritative GitLab remote.
-* Use the `glab` CLI for all GitLab interactions, including issues, merge requests, comments, labels, assignments, reviews, and merges.
+* An agent shall use the `glab` CLI for all GitLab interactions, including issues, merge requests, comments, labels, assignments, reviews, and merges.
+
+### Workflow stage transitions
+
+* A maintainer must perform or explicitly instruct or confirm the transition from **plan** to **create** and from **create** to **verify**.
+* Only a maintainer may transition an issue from **verify** to **deploy**. This usually happens when the maintainer clicks **Merge** in the merge request.
+* An agent must respect the scope of the current workflow stage and may ask a maintainer to transition the issue when the current stage is complete.
+* The `workflow::*` label on the issue is the authoritative indicator of the current workflow stage. Do not apply `workflow::*` labels to merge requests.
 
 ### 1. Plan
 
@@ -46,7 +53,7 @@ Follow these workflow stages in order: **plan**, **create**, **verify**, and **d
 
 ### 4. Deploy
 
-* The maintainer enters this stage by using `glab` to merge the approved merge request into `main`.
+* A maintainer enters this stage by merging the approved merge request into `main`, usually by clicking **Merge** in GitLab.
 * Allow the CI/CD pipeline to perform the deployment, and complete any required manual deployment actions.
 * Treat the workflow as complete only after the merged change is deployed as required. Close a linked issue only when all work needed to resolve it is complete.
 
