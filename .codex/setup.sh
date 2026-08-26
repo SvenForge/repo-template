@@ -19,14 +19,7 @@ glab_version() {
         sed -nE '1s/^glab( version)? ([^[:space:]]+).*/\2/p'
 }
 
-# Validate the repository before changing anything.
-git rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
-    die "the setup script must run inside a Git worktree"
 repo_root="$(git rev-parse --show-toplevel)"
-gitlab_repo="$(git remote get-url origin 2>/dev/null || true)"
-[[ "$gitlab_repo" =~ ^https://gitlab\.com/[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+/?$ ]] ||
-    die "origin must specify an HTTPS GitLab.com URL"
-
 python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
 
 # Install the pinned glab release when needed.
@@ -56,12 +49,6 @@ if [[ "$(glab_version)" != "$GLAB_VERSION" ]]; then
     rm -rf -- "$tmpdir"
     tmpdir=""
 fi
-
-# Codex bootstrap removes origin after setup, so retain the URL for maintenance.
-git config --local codex.gitlabRepo "$gitlab_repo"
-git config --local --unset-all remote.origin.pushurl >/dev/null 2>&1 || true
-git config --local remote.pushDefault origin
-git config --local checkout.defaultRemote origin
 
 # Persist the PAT, then use glab as this repository's HTTPS credential helper.
 without_token=(
@@ -94,10 +81,8 @@ git config --local --add "$credential_key" \
     "!$(command -v glab) auth git-credential"
 
 # Verify persisted authentication and read access without performing a push.
-[[ "$(git remote get-url origin)" == "$gitlab_repo" ]]
-[[ "$(git remote get-url --push origin)" == "$gitlab_repo" ]]
 "${without_token[@]}" glab auth status --hostname "$GITLAB_HOST" >/dev/null
 "${without_token[@]}" git ls-remote --exit-code origin HEAD >/dev/null
 
-printf 'Verified glab %s, GitLab authentication, and origin %s.\n' \
-    "$GLAB_VERSION" "$gitlab_repo"
+printf 'Verified glab %s, GitLab authentication, and origin access.\n' \
+    "$GLAB_VERSION"
