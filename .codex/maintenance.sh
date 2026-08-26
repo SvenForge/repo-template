@@ -6,7 +6,7 @@ set -euo pipefail
 
 readonly GITLAB_HOST="gitlab.com"
 
-# Install Python dependencies when needed.
+# Install Python dependencies (if not already available).
 repo_root="$(git rev-parse --show-toplevel)"
 python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
 

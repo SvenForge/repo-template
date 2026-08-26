@@ -19,6 +19,7 @@ glab_version() {
         sed -nE '1s/^glab( version)? ([^[:space:]]+).*/\2/p'
 }
 
+# Install Python dependencies.
 repo_root="$(git rev-parse --show-toplevel)"
 python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
 
