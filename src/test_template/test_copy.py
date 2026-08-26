@@ -10,25 +10,24 @@ from .conftest import TEMPLATE_ROOT
 @dataclass(frozen=True)
 class CopyCase:
     answers: dict[str, str]
+    expected_files: set[Path]
     expected_readme: tuple[str, ...]
 
 
 COPY_CASES = {
     "defaults": CopyCase(
         answers={},
-        expected_readme=("# [My Repository]", "* Repository Owner"),
+        expected_files={Path(".gitignore"), Path("LICENSE.md"), Path("README.md")},
+        expected_readme=("# My Repository", "_TODO: Add contact information._"),
     ),
     "empty-repository": CopyCase(
         answers={
-            "features": "[]",
-            "core_repository_name": "Empty Repository",
-            "core_repository_url": "https://example.com/empty.git",
-            "core_owner_name": "Example Owner",
+            "core_include_readme": "false",
+            "core_license": "NOASSERTION",
+            "core_include_gitignore": "false",
         },
-        expected_readme=(
-            "# [Empty Repository](https://example.com/empty.git)",
-            "* Example Owner",
-        ),
+        expected_files=set(),
+        expected_readme=(),
     ),
 }
 
@@ -54,8 +53,9 @@ def test_copy(tmp_path: Path, case: CopyCase) -> None:
         for path in destination.rglob("*")
         if path.is_file()
     }
-    assert files == {Path("README.md")}
+    assert files == case.expected_files
 
-    readme = (destination / "README.md").read_text()
-    for expected in case.expected_readme:
-        assert expected in readme
+    if case.expected_readme:
+        readme = (destination / "README.md").read_text()
+        for expected in case.expected_readme:
+            assert expected in readme

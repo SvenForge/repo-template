@@ -2,29 +2,62 @@ core_repository_name:
   type: str
   help: What is the name of the repository?
   default: My Repository
+  when: "{{ 'core' in modules }}"
 
 core_repository_url:
   type: str
-  help: At which URL is the repository hosted?
-  default: https://gitlab.com/repository-owner/my-repository.git
+  help: At which URL is the repository hosted? (optional)
+  default: ""
+  when: "{{ 'core' in modules }}"
 
 core_owner_name:
   type: str
-  help: Who is the repository owner?
-  default: Repository Owner
+  help: Who is the repository owner? (optional)
+  default: ""
+  when: "{{ 'core' in modules }}"
 
 core_owner_email:
   type: str
-  help: What is the repository owner's email address? (optional)
+  help: What is the owner's email address? (optional)
   default: ""
+  when: "{{ 'core' in modules and core_owner_name }}"
 
 core_owner_user:
   type: str
-  help: What is the repository owner's username? (optional)
+  help: What is the owner's username? (optional)
   default: ""
+  when: "{{ 'core' in modules and core_owner_name }}"
 
 core_year:
   type: int
   help: What is the current year?
   default: "{{ '%Y' | strftime }}"
   when: false
+
+core_include_readme:
+  type: bool
+  help: Create README.md file?
+  default: true
+  when: "{{ 'core' in modules }}"
+
+core_license:
+  type: str
+  help: Under which license shall this repository provided?
+  choices:
+    All rights reserved: NONE
+    MIT License: MIT
+    No license defined: NOASSERTION
+  default: NONE
+  when: "{{ 'core' in modules }}"
+
+core_include_license:
+  type: bool
+  help: Create LICENSE.md file?
+  default: "{{ core_license != 'NOASSERTION' }}"
+  when: false
+
+core_include_gitignore:
+  type: bool
+  help: Create .gitignore file?
+  default: true
+  when: "{{ 'core' in modules }}"

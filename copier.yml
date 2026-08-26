@@ -6,9 +6,15 @@ _exclude:
 
 features:
   type: str
-  help: Which features should be included?
+  help: Which template features shall be used?
   multiselect: true
   choices: []
   default: []
+
+modules:
+  type: yaml
+  help: Which template modules shall be used?
+  default: "{{ ['core'] + features }}"
+  when: false
 ---
 !include template/_modules/core/copier.yml

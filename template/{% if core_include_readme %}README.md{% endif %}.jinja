@@ -1,0 +1,39 @@
+# {% if core_repository_url %}[{{ core_repository_name }}]({{ core_repository_url }}){% else %}{{ core_repository_name }}{% endif %}
+
+_TODO: Describe the repository._
+
+## Getting started
+
+### Installation
+
+_TODO: Add installation instructions._
+
+### Usage
+
+_TODO: Add usage instructions._
+
+### Development
+
+_TODO: Add development instructions._
+
+## Documentation
+
+_TODO: Link or add documentation._
+
+## Contributing
+
+### Maintainer
+
+{% if core_owner_name -%}
+* {% if core_owner_email %}[{{ core_owner_name }}](mailto:{{ core_owner_email }}){% else %}{{ core_owner_name }}{% endif %}{% if core_owner_user %} - @{{ core_owner_user }}{% endif %}
+{% else -%}
+_TODO: Add contact information._
+{% endif %}
+
+## License
+
+{% if core_include_license -%}
+Please see: [LICENSE.md](LICENSE.md)
+{% else -%}
+_TODO: Add license information._
+{% endif %}
