@@ -18,9 +18,9 @@
 ### Workflow stage transitions
 
 * A maintainer must perform or explicitly authorize transitions from **plan** to **create** and from **create** to **verify**.
-* Only a maintainer may transition an issue from **verify** to **deploy**.
+* Only a maintainer may transition an issue from **verify** to **deploy**, normally by merging the approved merge request. If GitLab automatically closes the issue on merge, assigning `workflow::deploy` is optional.
 * An agent must respect the scope of the current workflow stage and may ask a maintainer to transition the issue when the current stage is complete.
-* The `workflow::*` label on the issue is the authoritative indicator of the current workflow stage. Do not apply `workflow::*` labels to merge requests.
+* For open issues, the `workflow::*` label is the authoritative indicator of the current workflow stage. When an issue is automatically closed by merging its merge request, the closed state takes precedence over a stale workflow label. Do not apply `workflow::*` labels to merge requests.
 
 ### 1. Plan
 
@@ -59,7 +59,7 @@
 
 * A maintainer enters this stage by merging the approved merge request into `main`, usually by clicking **Merge** in GitLab.
 * Allow the CI/CD pipeline to perform the deployment, and complete any required manual deployment actions.
-* Treat the workflow as complete only after the merged change is deployed as required. Close a linked issue only when all work needed to resolve it is complete.
+* Treat the workflow as complete only after the merged change is deployed as required. Issues automatically closed on merge may remain closed while deployment completes; close other linked issues only when all required work is complete.
 
 ## Safety and boundaries
 
