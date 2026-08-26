@@ -1,24 +1,28 @@
+{% if core_repository_url -%}
 # [{{ core_repository_name }}]({{ core_repository_url }})
+{% else -%}
+# {{ core_repository_name }}
+{% endif %}
 
-*TBW*
+_TODO: Describe the repository._
 
 ## Getting started
 
 ### Installation
 
-*TBW*
+_TODO: Add installation instructions._
 
 ### Usage
 
-*TBW*
+_TODO: Add usage instructions._
 
 ### Development
 
-*TBW*
+_TODO: Add development instructions._
 
 ## Documentation
 
-*TBW*
+_TODO: Link or add documentation._
 
 ## Contributing
 
@@ -28,4 +32,12 @@
 
 ## License
 
+{% if core_include_license -%}
+{% if core_license == "mit" -%}
+Copyright © {{ core_year }} {{ core_owner_name }}. Licensed under the MIT License.
+{% else -%}
 Copyright © {{ core_year }} {{ core_owner_name }}. All rights reserved.
+{% endif %}
+{% else -%}
+_TODO: Add license information._
+{% endif %}
