@@ -27,7 +27,9 @@ def test_template_renders_core_defaults(tmp_path: Path) -> None:
     }
     readme = (destination / "README.md").read_text()
     assert "# My Repository" in readme
-    assert "## Contributing" not in readme
+    assert "### Maintainer" in readme
+    assert "_TODO: Add contact information._" in readme
+    assert "Please see: [LICENSE.md](LICENSE.md)" in readme
     assert "All rights reserved." in (destination / "LICENSE.md").read_text()
     assert "Created by https://www.toptal.com/developers/gitignore/api/" in (
         destination / ".gitignore"
@@ -93,7 +95,7 @@ def test_template_renders_custom_metadata(tmp_path: Path) -> None:
 
     readme = (destination / "README.md").read_text()
     assert "# [Example Project](https://example.com/example-project)" in readme
-    assert "### Owner" in readme
+    assert "### Maintainer" in readme
     assert "[Ada Lovelace](mailto:ada@example.com) - @ada" in readme
     assert_no_template_expressions(destination)
 
@@ -101,8 +103,13 @@ def test_template_renders_custom_metadata(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("license_name", "expected_readme", "expected_license", "has_license"),
     [
-        ("NONE", "All rights reserved.", "All rights reserved.", True),
-        ("MIT", "Licensed under the MIT License.", "MIT License", True),
+        (
+            "NONE",
+            "Please see: [LICENSE.md](LICENSE.md)",
+            "All rights reserved.",
+            True,
+        ),
+        ("MIT", "Please see: [LICENSE.md](LICENSE.md)", "MIT License", True),
         ("NOASSERTION", "_TODO: Add license information._", "", False),
     ],
 )
