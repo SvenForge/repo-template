@@ -2,53 +2,60 @@ core_repository_name:
   type: str
   help: What is the name of the repository?
   default: My Repository
-
-core_repository_slug:
-  type: str
-  help: What slug should be used for the repository?
-  default: "{{ core_repository_name | lower | replace('_', '-') | replace(' ', '-') }}"
+  when: "{{ 'core' in modules }}"
 
 core_repository_url:
   type: str
   help: At which URL is the repository hosted? (optional)
   default: ""
+  when: "{{ 'core' in modules }}"
 
 core_owner_name:
   type: str
-  help: Who is the repository owner or maintainer?
-  default: Repository Owner
+  help: Who is the repository owner? (optional)
+  default: ""
+  when: "{{ 'core' in modules }}"
 
 core_owner_email:
   type: str
   help: What is the owner's email address? (optional)
   default: ""
+  when: "{{ 'core' in modules and core_owner_name }}"
 
 core_owner_user:
   type: str
   help: What is the owner's hosting username? (optional)
   default: ""
+  when: "{{ 'core' in modules and core_owner_name }}"
 
 core_year:
   type: int
-  help: What is the current year?
   default: "{{ '%Y' | strftime }}"
   when: false
 
-core_include_license:
+core_include_readme:
   type: bool
-  help: Create LICENSE.md?
+  help: Create README.md?
   default: true
+  when: "{{ 'core' in modules }}"
 
 core_license:
   type: str
-  help: Which license should be used?
+  help: Under which license is this repository provided?
   choices:
-    All rights reserved: all-rights-reserved
-    MIT: mit
-  default: all-rights-reserved
-  when: "{{ core_include_license }}"
+    All rights reserved: NONE
+    MIT License: MIT
+    No license defined: NOASSERTION
+  default: NONE
+  when: "{{ 'core' in modules }}"
+
+core_include_license:
+  type: bool
+  default: "{{ core_license != 'NOASSERTION' }}"
+  when: false
 
 core_include_gitignore:
   type: bool
   help: Create .gitignore?
   default: true
+  when: "{{ 'core' in modules }}"

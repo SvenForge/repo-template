@@ -24,20 +24,20 @@ _TODO: Add development instructions._
 
 _TODO: Link or add documentation._
 
+{% if core_owner_name -%}
 ## Contributing
 
-### Maintainer
+### Owner
 
 * {% if core_owner_email %}[{{ core_owner_name }}](mailto:{{ core_owner_email }}){% else %}{{ core_owner_name }}{% endif %}{% if core_owner_user %} - @{{ core_owner_user }}{% endif %}
 
+{% endif -%}
 ## License
 
-{% if core_include_license -%}
-{% if core_license == "mit" -%}
-Copyright © {{ core_year }} {{ core_owner_name }}. Licensed under the MIT License.
-{% else -%}
-Copyright © {{ core_year }} {{ core_owner_name }}. All rights reserved.
-{% endif %}
+{% if core_license == "MIT" -%}
+Copyright © {{ core_year }}{% if core_owner_name %} {{ core_owner_name }}{% endif %}. Licensed under the MIT License.
+{% elif core_license == "NONE" -%}
+Copyright © {{ core_year }}{% if core_owner_name %} {{ core_owner_name }}{% endif %}. All rights reserved.
 {% else -%}
 _TODO: Add license information._
 {% endif %}

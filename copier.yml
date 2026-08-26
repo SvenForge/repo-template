@@ -10,5 +10,10 @@ features:
   multiselect: true
   choices: []
   default: []
+
+modules:
+  type: yaml
+  default: "{{ features + ['core'] }}"
+  when: false
 ---
 !include template/_modules/core/copier.yml

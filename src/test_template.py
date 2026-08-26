@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pytest
 from copier import run_copy
-from copier._main import Worker
 
 
 TEMPLATE_ROOT = Path(__file__).parents[1]
@@ -19,14 +18,16 @@ def assert_no_template_expressions(destination: Path) -> None:
 def test_template_renders_core_defaults(tmp_path: Path) -> None:
     destination = tmp_path / "repository"
 
-    run_copy(str(TEMPLATE_ROOT), destination, defaults=True)
+    run_copy(str(TEMPLATE_ROOT), destination, defaults=True, vcs_ref="HEAD")
 
     assert {path.name for path in destination.iterdir()} == {
         ".gitignore",
         "LICENSE.md",
         "README.md",
     }
-    assert "# My Repository" in (destination / "README.md").read_text()
+    readme = (destination / "README.md").read_text()
+    assert "# My Repository" in readme
+    assert "## Contributing" not in readme
     assert "All rights reserved." in (destination / "LICENSE.md").read_text()
     assert "Created by https://www.toptal.com/developers/gitignore/api/" in (
         destination / ".gitignore"
@@ -42,23 +43,43 @@ def test_template_renders_readme_only(tmp_path: Path) -> None:
         destination,
         data={
             "core_include_gitignore": False,
-            "core_include_license": False,
+            "core_license": "NOASSERTION",
         },
         defaults=True,
+        vcs_ref="HEAD",
     )
 
     assert {path.name for path in destination.iterdir()} == {"README.md"}
-    readme = (destination / "README.md").read_text()
-    assert "_TODO: Add license information._" in readme
+    assert "_TODO: Add license information._" in (
+        destination / "README.md"
+    ).read_text()
     assert_no_template_expressions(destination)
+
+
+def test_template_can_render_empty_repository(tmp_path: Path) -> None:
+    destination = tmp_path / "repository"
+
+    run_copy(
+        str(TEMPLATE_ROOT),
+        destination,
+        data={
+            "core_include_gitignore": False,
+            "core_include_readme": False,
+            "core_license": "NOASSERTION",
+        },
+        defaults=True,
+        vcs_ref="HEAD",
+    )
+
+    assert not destination.exists() or list(destination.iterdir()) == []
 
 
 def test_template_renders_custom_metadata(tmp_path: Path) -> None:
     destination = tmp_path / "repository"
 
-    with Worker(
-        src_path=str(TEMPLATE_ROOT),
-        dst_path=destination,
+    run_copy(
+        str(TEMPLATE_ROOT),
+        destination,
         data={
             "core_repository_name": "Example Project",
             "core_repository_url": "https://example.com/example-project",
@@ -67,21 +88,22 @@ def test_template_renders_custom_metadata(tmp_path: Path) -> None:
             "core_owner_user": "ada",
         },
         defaults=True,
-    ) as worker:
-        worker.run_copy()
-        assert worker.answers.combined["core_repository_slug"] == "example-project"
+        vcs_ref="HEAD",
+    )
 
     readme = (destination / "README.md").read_text()
     assert "# [Example Project](https://example.com/example-project)" in readme
+    assert "### Owner" in readme
     assert "[Ada Lovelace](mailto:ada@example.com) - @ada" in readme
     assert_no_template_expressions(destination)
 
 
 @pytest.mark.parametrize(
-    ("license_name", "expected_readme", "expected_license"),
+    ("license_name", "expected_readme", "expected_license", "has_license"),
     [
-        ("all-rights-reserved", "All rights reserved.", "All rights reserved."),
-        ("mit", "Licensed under the MIT License.", "MIT License"),
+        ("NONE", "All rights reserved.", "All rights reserved.", True),
+        ("MIT", "Licensed under the MIT License.", "MIT License", True),
+        ("NOASSERTION", "_TODO: Add license information._", "", False),
     ],
 )
 def test_template_renders_selected_license(
@@ -89,6 +111,7 @@ def test_template_renders_selected_license(
     license_name: str,
     expected_readme: str,
     expected_license: str,
+    has_license: bool,
 ) -> None:
     destination = tmp_path / license_name
 
@@ -97,8 +120,12 @@ def test_template_renders_selected_license(
         destination,
         data={"core_license": license_name},
         defaults=True,
+        vcs_ref="HEAD",
     )
 
     assert expected_readme in (destination / "README.md").read_text()
-    assert expected_license in (destination / "LICENSE.md").read_text()
+    license_path = destination / "LICENSE.md"
+    assert license_path.exists() is has_license
+    if has_license:
+        assert expected_license in license_path.read_text()
     assert_no_template_expressions(destination)
