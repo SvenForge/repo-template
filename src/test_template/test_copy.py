@@ -10,15 +10,20 @@ from .conftest import TEMPLATE_ROOT
 @dataclass(frozen=True)
 class CopyCase:
     answers: dict[str, str]
-    expected_files: set[Path]
-    expected_readme: tuple[str, ...]
+    expected_files: dict[Path, list[str]]
 
 
 COPY_CASES = {
     "defaults": CopyCase(
         answers={},
-        expected_files={Path(".gitignore"), Path("LICENSE.md"), Path("README.md")},
-        expected_readme=("# My Repository", "_TODO: Add contact information._"),
+        expected_files={
+            Path(".gitignore"): [],
+            Path("LICENSE.md"): [],
+            Path("README.md"): [
+                "# My Repository",
+                "_TODO: Add contact information._",
+            ],
+        },
     ),
     "empty-repository": CopyCase(
         answers={
@@ -26,8 +31,7 @@ COPY_CASES = {
             "core_license": "NOASSERTION",
             "core_include_gitignore": "false",
         },
-        expected_files=set(),
-        expected_readme=(),
+        expected_files={},
     ),
 }
 
@@ -53,9 +57,9 @@ def test_copy(tmp_path: Path, case: CopyCase) -> None:
         for path in destination.rglob("*")
         if path.is_file()
     }
-    assert files == case.expected_files
+    assert files == set(case.expected_files)
 
-    if case.expected_readme:
-        readme = (destination / "README.md").read_text()
-        for expected in case.expected_readme:
-            assert expected in readme
+    for path, expected_content in case.expected_files.items():
+        content = (destination / path).read_text()
+        for expected in expected_content:
+            assert expected in content
