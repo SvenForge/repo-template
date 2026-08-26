@@ -40,15 +40,17 @@
 * Use the default merge request template and keep its content current as the implementation changes.
 * Make atomic, logically connected commits. Each commit should represent an understandable development step and be independently revertible when practical.
 * Write each commit message as a short sentence that describes the purpose and logical content of the change.
-* Use the CI/CD pipeline's static analysis, code quality checks, and automated tests throughout implementation.
+* Run relevant local checks throughout implementation and use CI/CD feedback to catch issues early.
 
 ### 3. Verify
 
 * Self-review the completed merge request for compliance with repository guidelines, correctness, and scope.
-* Fetch the latest `main`, confirm that all relevant tests and quality checks pass, and verify that the feature branch has no conflicts. Merge `main` into the feature branch when it has diverged.
+* Fetch the latest `main` and verify that the feature branch has no conflicts. Merge `main` into the feature branch when it has diverged.
 * Assign an appropriate independent reviewer, such as a code owner or maintainer, and tag them in a comment requesting review.
 * Keep review discussions in GitLab threads. Answer questions, or implement requested improvements and briefly explain the response. Resolve each thread after its concern is addressed.
 * When acting as a reviewer, inspect the changes and leave clear questions or actionable improvement requests in the merge request.
+* Confirm that all relevant local checks and the latest merge request CI/CD pipeline pass, including static analysis, code quality checks, builds, and tests.
+* Report checks that could not be run and any non-blocking failures or warnings in the merge request. Required checks must pass before approval.
 * Iterate until the responsible code owner or maintainer approves the merge request.
 
 ### 4. Deploy
