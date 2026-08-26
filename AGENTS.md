@@ -37,6 +37,8 @@
 * Otherwise, create a feature branch and corresponding merge request targeting `main`. Keep the `Draft:` prefix throughout **create**; it may be removed when transitioning to **verify**.
 * Keep the changes in each merge request and feature branch focused and logically connected so that they are easy to understand and review.
 * Link the merge request to every issue it addresses. Usually, one merge request closes one or more related issues; an issue may require multiple merge requests when its work cannot remain logically connected.
+* Use `Closes` only when merging the merge request completes all work required for the issue. Otherwise, use `Related`.
+* When an issue requires multiple merge requests, transition the issue only after every required merge request completes the current stage. Keep all issues addressed by one merge request in the same workflow stage.
 * Use the default merge request template and keep its content current as the implementation changes.
 * Make atomic, logically connected commits. Each commit should represent an understandable development step and be independently revertible when practical.
 * Write each commit message as a short sentence that describes the purpose and logical content of the change.
@@ -49,7 +51,7 @@
 * Assign an appropriate independent reviewer, such as a code owner or maintainer, and tag them in a comment requesting review.
 * Keep review discussions in GitLab threads. Answer questions, or implement requested improvements and briefly explain the response. Resolve each thread after its concern is addressed.
 * When acting as a reviewer, inspect the changes and leave clear questions or actionable improvement requests in the merge request.
-* Confirm that all relevant local checks and the latest merge request CI/CD pipeline pass, including static analysis, code quality checks, builds, and tests.
+* Run all relevant local checks when feasible and confirm that the latest merge request CI/CD pipeline and all required jobs pass.
 * Report checks that could not be run and any non-blocking failures or warnings in the merge request. Required checks must pass before approval.
 * Iterate until the responsible code owner or maintainer approves the merge request.
 
