@@ -44,6 +44,7 @@ def test_copy(tmp_path: Path, case: CopyCase) -> None:
         "copy",
         "--defaults",
         "--quiet",
+        "--vcs-ref=HEAD",
         str(TEMPLATE_ROOT),
         str(destination),
     ]

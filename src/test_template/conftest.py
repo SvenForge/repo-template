@@ -31,6 +31,7 @@ def copier_case(tmp_path: Path):
         with Worker(
             src_path=str(TEMPLATE_ROOT),
             dst_path=tmp_path / "unused",
+            vcs_ref="HEAD",
             data=answers,
             defaults=True,
             skip_tasks=True,
