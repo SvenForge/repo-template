@@ -23,6 +23,10 @@ glab_version() {
 repo_root="$(git rev-parse --show-toplevel)"
 python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
 
+# Codex removes origin after setup, so retain its URL for maintenance.
+gitlab_repo="$(git remote get-url origin | sed -E 's#^(https?://)[^/@]+@#\1#')"
+git config --local --replace-all codex.gitlabRepo "$gitlab_repo"
+
 # Install the pinned glab release when needed.
 if [[ "$(glab_version)" != "$GLAB_VERSION" ]]; then
     architecture="$(dpkg --print-architecture)"
