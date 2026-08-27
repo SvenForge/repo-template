@@ -12,13 +12,7 @@ copier:check:
   needs: []
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      exists:
-        - .copier-answers.yml
     - if: $CI_PIPELINE_SOURCE == "schedule"
-      exists:
-        - .copier-answers.yml
-    - exists:
-        - .copier-answers.yml
-      when: manual
+    - when: manual
   script:
     - copier check-update
