@@ -27,10 +27,10 @@ Use one of the supported development environments:
 * Open this repository in its included [development container](.devcontainer/devcontainer.json). VS Code with the Dev Containers extension is recommended for creating and accessing the container. Please note that a Docker-compliant CLI must be installed on your machine to start the Dev Container.
 * Start an AI task in [Codex Cloud](https://chatgpt.com/codex/cloud) using the preconfigured environment for this repository.
 
-Update this repository from its own template, then reconcile overwritten files:
+To update this repository from its own template simply run the following command:
 
 ```shell
-copier copy --overwrite . .
+copier update
 ```
 
 ## Documentation
