@@ -33,6 +33,22 @@ COPY_CASES = {
         },
         expected_files={},
     ),
+    "gitlab": CopyCase(
+        answers={"features": "[gitlab]"},
+        expected_files={
+            Path(".gitignore"): [],
+            Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
+            Path(".gitlab/ci/gitlab.yml"): [
+                ".gitlab:base:",
+                "gitlab:copier-update:",
+                "needs: []",
+            ],
+            Path(".gitlab/issue_templates/default.md"): ["## Problem"],
+            Path(".gitlab/merge_request_templates/default.md"): ["## Verification"],
+            Path("LICENSE.md"): [],
+            Path("README.md"): [],
+        },
+    ),
 }
 
 

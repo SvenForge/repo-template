@@ -1,0 +1,31 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - when: never
+
+stages:
+  - test
+
+.gitlab:base:
+  image: python:3.12-slim
+  interruptible: true
+
+gitlab:copier-update:
+  extends: .gitlab:base
+  stage: test
+  needs: []
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      exists:
+        - .copier-answers.yml
+    - if: $CI_PIPELINE_SOURCE == "web"
+      exists:
+        - .copier-answers.yml
+      when: manual
+  before_script:
+    - python -m pip install "copier==9.17.2"
+  script:
+    - copier update --pretend --defaults --skip-tasks

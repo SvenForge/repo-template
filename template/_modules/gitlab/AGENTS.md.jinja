@@ -1,0 +1,39 @@
+## GitLab development workflow
+
+* Follow these workflow stages in order: **plan**, **create**, **verify**, and **deploy**.
+* Keep the issue's workflow label synchronized with its current stage by replacing the previous label with `workflow::plan`, `workflow::create`, `workflow::verify`, or `workflow::deploy`. Also apply one appropriate `type::*` label and one `priority::*` label.
+* Treat the GitLab project linked in the title of `README.md` as the authoritative source of truth. Push branches and commits only to this remote.
+* Use other remotes, such as GitHub mirrors, only to clone the repository. Do not push to or make changes on those services.
+* Use the `glab` CLI for all GitLab interactions, including issues, merge requests, comments, labels, assignments, reviews, and merges.
+
+### Workflow stage transitions
+
+* A maintainer must perform or explicitly authorize transitions from **plan** to **create** and from **create** to **verify**.
+* Only a maintainer may transition an issue from **verify** to **deploy**, normally by merging the approved merge request. If GitLab automatically closes the issue on merge, assigning `workflow::deploy` is optional.
+* Respect the scope of the current workflow stage and ask a maintainer to transition the issue when the current stage is complete.
+* For open issues, the `workflow::*` label is the authoritative indicator of the current workflow stage. When an issue is automatically closed by merging its merge request, the closed state takes precedence over a stale workflow label. Do not apply `workflow::*` labels to merge requests.
+
+### 1. Plan
+
+* Document every in-scope difference between the repository's current and desired state in a GitLab issue. Create an issue when no relevant issue exists; otherwise update and refine the existing issue.
+* Use the default issue template. Describe the problem or deviation first, then research, discuss, and document a proposed solution.
+* Assign the issue to the person responsible for planning and, when practical, implementation.
+* Move to **create** only after the problem has a clear, appropriately scoped implementation plan.
+
+### 2. Create
+
+* Contribute directly to an existing merge request's feature branch when appropriate; otherwise create a feature branch and merge request targeting `main`.
+* Keep the `Draft:` prefix throughout **create** and keep the changes focused and logically connected.
+* Link the merge request to every issue it addresses. Use `Closes` only when merging completes all work for an issue; otherwise use `Related`.
+* Make atomic, independently revertible commits when practical and run relevant local checks throughout implementation.
+
+### 3. Verify
+
+* Self-review the completed merge request for compliance, correctness, and scope.
+* Fetch the latest `main`, resolve conflicts, assign an independent reviewer, and keep review discussions in GitLab threads.
+* Run all relevant local checks when feasible and confirm that required CI/CD jobs pass before approval.
+
+### 4. Deploy
+
+* A maintainer enters this stage by merging the approved merge request into `main`.
+* Allow CI/CD to perform the deployment, complete required manual actions, and close linked issues only when all required work is complete.

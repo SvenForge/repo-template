@@ -8,7 +8,8 @@ features:
   type: str
   help: Which template features shall be used?
   multiselect: true
-  choices: []
+  choices:
+    GitLab: gitlab
   default: []
 
 modules:
