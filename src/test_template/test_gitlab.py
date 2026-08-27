@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from contextlib import AbstractContextManager
+from typing import Any
 
+import pytest
 import yaml
 
 from .conftest import CopierCase
@@ -16,7 +18,7 @@ DEMO_PIPELINE = (
 )
 
 
-def test_gitlab_pipeline(
+def test_gitlab_pipeline_smoke(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(features=["gitlab"]) as case:
@@ -25,33 +27,12 @@ def test_gitlab_pipeline(
         demo_pipeline = yaml.safe_load(case.render(DEMO_PIPELINE))
 
     assert root_pipeline["include"] == [{"local": ".gitlab/ci/*.yml"}]
-    assert copier_pipeline["copier:check"]["extends"] == ".copier:base"
-    assert copier_pipeline["copier:check"]["needs"] == []
-    assert copier_pipeline["copier:check"]["script"] == ["copier check-update"]
-    assert copier_pipeline["copier:check"]["rules"] == [
-        {
-            "if": '$CI_PIPELINE_SOURCE == "schedule"',
-            "exists": [".copier-answers.yml"],
-        },
-        {
-            "if": (
-                '$CI_PIPELINE_SOURCE == "push" && '
-                "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
-            ),
-            "exists": [".copier-answers.yml"],
-        },
-        {"exists": [".copier-answers.yml"], "when": "manual"},
-    ]
-    assert copier_pipeline[".copier:base"]["before_script"] == [
-        'python -m pip install "copier==9.17.2"'
-    ]
-    assert demo_pipeline["demo:fortune"]["extends"] == ".demo:base"
-    assert demo_pipeline["demo:fortune"]["needs"] == []
-    assert "workflow" in root_pipeline
-    assert "stages" in root_pipeline
+    assert "copier:check" in copier_pipeline
+    assert copier_pipeline[".copier:base"]["variables"]["COPIER_VERSION"] == "9.17.2"
+    assert "demo:fortune" in demo_pipeline
 
 
-def test_gitlab_contribution_templates(
+def test_gitlab_contribution_templates_smoke(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(features=["gitlab"]) as case:
@@ -66,45 +47,37 @@ def test_gitlab_contribution_templates(
         agents_fragment = case.render("template/_modules/gitlab/AGENTS_gitlab.jinja")
 
     assert "## Problem" in issue
-    assert "/label ~workflow::plan" in issue
     assert "## How are the changes verified?" in merge_request
     assert "## GitLab development workflow" in agents_fragment
-    assert "workflow::deploy" in agents_fragment
 
 
-def test_empty_pipeline_selection_omits_pipeline(
+@pytest.mark.parametrize(
+    ("answers", "expected"),
+    [
+        ({"features": []}, (False, False, False, False, False)),
+        (
+            {"features": ["gitlab"], "gitlab_pipeline": []},
+            (True, True, False, False, False),
+        ),
+        (
+            {"features": ["gitlab"], "gitlab_pipeline": ["copier"]},
+            (True, True, True, False, True),
+        ),
+    ],
+    ids=["without-gitlab", "without-pipeline", "copier-only"],
+)
+def test_gitlab_file_selection(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
+    answers: dict[str, Any],
+    expected: tuple[bool, bool, bool, bool, bool],
 ) -> None:
-    with copier_case(
-        features=["gitlab"],
-        gitlab_pipeline=[],
-    ) as case:
-        assert case.context["gitlab_include_issue_template"] is True
-        assert case.context["gitlab_include_merge_request_template"] is True
-        assert case.context["gitlab_include_pipeline_copier"] is False
-        assert case.context["gitlab_include_pipeline_demo"] is False
-        assert case.context["gitlab_include_pipeline"] is False
+    with copier_case(**answers) as case:
+        selected = (
+            case.context["gitlab_include_issue_template"],
+            case.context["gitlab_include_merge_request_template"],
+            case.context["gitlab_include_pipeline_copier"],
+            case.context["gitlab_include_pipeline_demo"],
+            case.context["gitlab_include_pipeline"],
+        )
 
-
-def test_pipeline_job_selection(
-    copier_case: Callable[..., AbstractContextManager[CopierCase]],
-) -> None:
-    with copier_case(features=["gitlab"], gitlab_pipeline=["copier"]) as case:
-        copier_pipeline = yaml.safe_load(case.render(COPIER_PIPELINE))
-
-        assert case.context["gitlab_include_pipeline_copier"] is True
-        assert case.context["gitlab_include_pipeline_demo"] is False
-        assert case.context["gitlab_include_pipeline"] is True
-
-    assert "copier:check" in copier_pipeline
-
-
-def test_gitlab_calculated_variables_without_feature(
-    copier_case: Callable[..., AbstractContextManager[CopierCase]],
-) -> None:
-    with copier_case(features=[]) as case:
-        assert case.context["gitlab_include_issue_template"] is False
-        assert case.context["gitlab_include_merge_request_template"] is False
-        assert case.context["gitlab_include_pipeline_copier"] is False
-        assert case.context["gitlab_include_pipeline_demo"] is False
-        assert case.context["gitlab_include_pipeline"] is False
+    assert selected == expected

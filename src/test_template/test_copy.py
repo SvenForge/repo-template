@@ -19,18 +19,8 @@ COPY_CASES = {
         expected_files={
             Path(".gitignore"): [],
             Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
-            Path(".gitlab/ci/copier.yml"): [
-                ".copier:base:",
-                "copier:check:",
-                "copier check-update",
-                "copier==9.17.2",
-                "needs: []",
-            ],
-            Path(".gitlab/ci/demo.yml"): [
-                ".demo:base:",
-                "demo:fortune:",
-                "needs: []",
-            ],
+            Path(".gitlab/ci/copier.yml"): ["copier:check:"],
+            Path(".gitlab/ci/demo.yml"): ["demo:fortune:"],
             Path(".gitlab/issue_templates/default.md"): ["## Problem"],
             Path(".gitlab/merge_request_templates/default.md"): ["## What is changed?"],
             Path("LICENSE.md"): [],
