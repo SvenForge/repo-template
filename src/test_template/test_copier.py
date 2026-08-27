@@ -1,11 +1,9 @@
 from collections.abc import Callable
 from contextlib import AbstractContextManager
-from pathlib import Path
-import subprocess
 
 import pytest
 
-from .conftest import CopierCase, TEMPLATE_ROOT
+from .conftest import CopierCase
 
 
 PATH_COPIER_CONFIG = (
@@ -37,14 +35,35 @@ def test_copier_configuration(
         root_config = case.render(PATH_COPIER_CONFIG)
         core_config = case.render(PATH_CORE_CONFIG)
         copier_version = case.context["copier_version"]
+        modules = case.context["modules"]
 
     assert root_config == f"""---
-_min_copier_version: "{copier_version}"
+_min_copier_version: &min_copier_version "{copier_version}"
 _subdirectory: template
 _exclude:
   - /_modules
+
+features:
+  type: str
+  help: Which template features shall be used?
+  multiselect: true
+  choices: []
+  default: []
+
+modules:
+  type: yaml
+  help: Which template modules shall be used?
+  default: "{modules}"
+  when: false
+
+copier_version:
+  type: str
+  help: Which Copier version does this template require?
+  default: *min_copier_version
+  when: false
+
 ---
 !include template/_modules/core/copier.yml
 """
     assert "{{" not in root_config
-    assert core_config == "---\n{}\n"
+    assert core_config == ""

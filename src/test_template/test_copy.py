@@ -52,7 +52,7 @@ COPY_CASES = {
                 "  - /_modules",
                 "!include template/_modules/core/copier.yml",
             ],
-            Path("template/_modules/core/copier.yml"): ["{}"],
+            Path("template/_modules/core/copier.yml"): [],
         },
     ),
 }
