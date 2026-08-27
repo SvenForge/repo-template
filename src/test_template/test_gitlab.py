@@ -28,6 +28,20 @@ def test_gitlab_pipeline(
     assert copier_pipeline["copier:check"]["extends"] == ".copier:base"
     assert copier_pipeline["copier:check"]["needs"] == []
     assert copier_pipeline["copier:check"]["script"] == ["copier check-update"]
+    assert copier_pipeline["copier:check"]["rules"] == [
+        {
+            "if": '$CI_PIPELINE_SOURCE == "schedule"',
+            "exists": [".copier-answers.yml"],
+        },
+        {
+            "if": (
+                '$CI_PIPELINE_SOURCE == "push" && '
+                "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+            ),
+            "exists": [".copier-answers.yml"],
+        },
+        {"exists": [".copier-answers.yml"], "when": "manual"},
+    ]
     assert copier_pipeline[".copier:base"]["before_script"] == [
         'python -m pip install "copier==9.17.2"'
     ]
