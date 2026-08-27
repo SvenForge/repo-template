@@ -1,21 +1,26 @@
-## Summary
+## What is changed?
 
-_TODO: Summarize the changes._
+_TODO: Summarize the changes in this merge request._
 
-## Verification
+## How are the changes verified?
 
-_TODO: List the checks that were run and their results._
+_TODO: List the checks that were performed and their results. Also provide information how reviewer can re-run the checks._
 
 ## Checklist
 
-- [ ] The changes are focused and follow the repository conventions.
-- [ ] Relevant tests and checks pass.
-- [ ] The linked issue and this description are current.
+<details><summary>For Contributor</summary>
+
+- [ ] ...
+- [ ] ...
+</details>
+
+<details><summary>For Reviewer</summary>
+
+- [ ] ...
+- [ ] ...
+</details>
+
+/assign me
 
 ## Issue references
-
-<!-- Use "Closes" only when this merge request completes the issue; otherwise use "Related". -->
-
-/unlabel ~"workflow::plan"
-/label ~workflow::create
-/assign me
+<!-- Use keywords: "Closes" only when this merge request completes the issue; "Related" otherwise. -->

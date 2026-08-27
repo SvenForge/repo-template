@@ -10,7 +10,8 @@ features:
   multiselect: true
   choices:
     GitLab: gitlab
-  default: []
+  default:
+    - gitlab
 
 modules:
   type: yaml
@@ -19,3 +20,5 @@ modules:
   when: false
 ---
 !include template/_modules/core/copier.yml
+---
+!include template/_modules/gitlab/copier.yml
