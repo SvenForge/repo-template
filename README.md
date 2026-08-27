@@ -1,4 +1,4 @@
-# [Repo Template](https://gitlab.com/sventerprise/repo-template)
+# [Repo Template](https://gitlab.com/sventerprise/repo-template.git)
 
 Common [copier](https://copier.readthedocs.io/en/stable/) template to setup new or update existing Git repositories. Batteries included.
 
@@ -27,14 +27,23 @@ Use one of the supported development environments:
 * Open this repository in its included [development container](.devcontainer/devcontainer.json). VS Code with the Dev Containers extension is recommended for creating and accessing the container. Please note that a Docker-compliant CLI must be installed on your machine to start the Dev Container.
 * Start an AI task in [Codex Cloud](https://chatgpt.com/codex/cloud) using the preconfigured environment for this repository.
 
+To update this repository from its own template simply run the following command:
+
+```shell
+copier update
+```
+
 ## Documentation
 
-*TBW*
+_TODO: Link or add documentation._
 
 ## Contributing
 
 ### Maintainer
-* [Sven Krummen](sven@nichtgerade.de) - @krum_sv
+
+* [Sven Krummen](mailto:sven@nichtgerade.de) - @krum_sv
+
 
 ## License
-Copyright © 2026 Sven Krummen. All rights reserved.
+
+Please see: [LICENSE.md](LICENSE.md)

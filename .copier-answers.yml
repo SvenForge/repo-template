@@ -1,0 +1,17 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 0.1.1
+_src_path: .
+core_include_gitignore: true
+core_include_readme: true
+core_license: NONE
+core_owner_email: sven@nichtgerade.de
+core_owner_name: Sven Krummen
+core_owner_user: krum_sv
+core_repository_name: Repo Template
+core_repository_url: https://gitlab.com/sventerprise/repo-template.git
+features:
+- copier
+- gitlab
+gitlab_pipeline:
+- copier
+- demo

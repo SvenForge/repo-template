@@ -1,0 +1,19 @@
+# Copier Pipeline Definition
+
+.copier:base:
+  image: python:3.12-bookworm
+  variables:
+    COPIER_VERSION: "9.17.2"
+  before_script:
+    - python -m pip install "copier==$COPIER_VERSION"
+
+copier:check:
+  extends: .copier:base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - when: manual
+  allow_failure: true
+  script:
+    - copier check-update
