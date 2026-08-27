@@ -48,7 +48,6 @@ COPY_CASES = {
         },
         expected_files={
             Path("copier.yml"): [
-                '_min_copier_version: "9.17.2"',
                 "_subdirectory: template",
                 "  - /_modules",
                 "!include template/_modules/core/copier.yml",
