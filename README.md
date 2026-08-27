@@ -1,4 +1,4 @@
-# [Repo Template](https://gitlab.com/sventerprise/repo-template)
+# [Repo Template](https://gitlab.com/sventerprise/repo-template.git)
 
 Common [copier](https://copier.readthedocs.io/en/stable/) template to setup new or update existing Git repositories. Batteries included.
 
@@ -29,12 +29,16 @@ Use one of the supported development environments:
 
 ## Documentation
 
-*TBW*
+_TODO: Link or add documentation._
 
 ## Contributing
 
 ### Maintainer
-* [Sven Krummen](sven@nichtgerade.de) - @krum_sv
+
+* [Sven Krummen](mailto:sven@nichtgerade.de) - @krum_sv
+
 
 ## License
-Copyright © 2026 Sven Krummen. All rights reserved.
+
+Please see: [LICENSE.md](LICENSE.md)
+
