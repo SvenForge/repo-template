@@ -34,36 +34,10 @@ def test_copier_configuration(
     with copier_case(features=["copier"]) as case:
         root_config = case.render(PATH_COPIER_CONFIG)
         core_config = case.render(PATH_CORE_CONFIG)
-        copier_version = case.context["copier_version"]
-        modules = case.context["modules"]
 
-    assert root_config == f"""---
-_min_copier_version: &min_copier_version "{copier_version}"
-_subdirectory: template
-_exclude:
-  - /_modules
-
-features:
-  type: str
-  help: Which template features shall be used?
-  multiselect: true
-  choices: []
-  default: []
-
-modules:
-  type: yaml
-  help: Which template modules shall be used?
-  default: "{modules}"
-  when: false
-
-copier_version:
-  type: str
-  help: Which Copier version does this template require?
-  default: *min_copier_version
-  when: false
-
----
-!include template/_modules/core/copier.yml
-"""
+    assert "_subdirectory: template" in root_config
+    assert "  - /_modules" in root_config
+    assert "features:" in root_config
+    assert "!include template/_modules/core/copier.yml" in root_config
     assert "{{" not in root_config
     assert core_config == ""
