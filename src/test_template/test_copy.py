@@ -17,6 +17,7 @@ COPY_CASES = {
     "defaults": CopyCase(
         answers={},
         expected_files={
+            Path(".copier-answers.yml"): [],
             Path(".gitignore"): [],
             Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
             Path(".gitlab/ci/copier.yml"): ["copier:check:"],
@@ -37,7 +38,9 @@ COPY_CASES = {
             "core_license": "NOASSERTION",
             "core_include_gitignore": "false",
         },
-        expected_files={},
+        expected_files={
+            Path(".copier-answers.yml"): [],
+        },
     ),
     "copier": CopyCase(
         answers={
@@ -47,6 +50,7 @@ COPY_CASES = {
             "core_include_gitignore": "false",
         },
         expected_files={
+            Path(".copier-answers.yml"): [],
             Path("copier.yml"): [
                 "_subdirectory: template",
                 "  - /_modules",
