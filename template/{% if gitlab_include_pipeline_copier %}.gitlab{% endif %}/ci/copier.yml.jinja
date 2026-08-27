@@ -1,0 +1,21 @@
+# Copier Pipeline Definition
+
+.copier:base:
+  image: python:3.12-slim
+  interruptible: true
+  before_script:
+    - python -m pip install "copier=={{ copier_version }}"
+
+copier:check:
+  extends: .copier:base
+  needs: []
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      exists:
+        - .copier-answers.yml
+    - if: $CI_PIPELINE_SOURCE == "web"
+      exists:
+        - .copier-answers.yml
+      when: manual
+  script:
+    - copier check-update
