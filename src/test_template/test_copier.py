@@ -6,12 +6,8 @@ import pytest
 from .conftest import CopierCase
 
 
-PATH_COPIER_CONFIG = (
-    "template/{% if copier_include_template %}copier.yml{% endif %}.jinja"
-)
-PATH_CORE_CONFIG = (
-    "template/{% if copier_include_template %}template{% endif %}/_modules/core/copier.yml"
-)
+PATH_COPIER_CONFIG = "template/{% if copier_include_template %}copier.yml{% endif %}.jinja"
+PATH_CORE_CONFIG = "template/{% if copier_include_template %}template{% endif %}/_modules/core/copier.yml"
 
 
 @pytest.mark.parametrize(
