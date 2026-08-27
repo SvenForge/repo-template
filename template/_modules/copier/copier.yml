@@ -1,0 +1,5 @@
+copier_include_template:
+  type: bool
+  help: Create the Copier template configuration?
+  default: "{{ 'copier' in modules }}"
+  when: false

@@ -39,6 +39,22 @@ COPY_CASES = {
         },
         expected_files={},
     ),
+    "copier": CopyCase(
+        answers={
+            "features": "[copier]",
+            "core_include_readme": "false",
+            "core_license": "NOASSERTION",
+            "core_include_gitignore": "false",
+        },
+        expected_files={
+            Path("copier.yml"): [
+                "_subdirectory: template",
+                "  - /_modules",
+                "!include template/_modules/core/copier.yml",
+            ],
+            Path("template/_modules/core/copier.yml"): [],
+        },
+    ),
 }
 
 

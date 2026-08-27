@@ -1,0 +1,27 @@
+---
+_min_copier_version: &min_copier_version "{{ copier_version }}"
+_subdirectory: template
+_exclude:
+  - /_modules
+
+features:
+  type: str
+  help: Which template features shall be used?
+  multiselect: true
+  choices: []
+  default: []
+
+modules:
+  type: yaml
+  help: Which template modules shall be used?
+  default: "{{ ['core'] + features }}"
+  when: false
+
+copier_version:
+  type: str
+  help: Which Copier version does this template require?
+  default: *min_copier_version
+  when: false
+
+---
+!include template/_modules/core/copier.yml
