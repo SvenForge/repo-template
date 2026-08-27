@@ -8,23 +8,19 @@ import yaml
 from .conftest import CopierCase
 
 
-ROOT_PIPELINE = "template/{% if gitlab_include_pipeline %}.gitlab-ci.yml{% endif %}"
-COPIER_PIPELINE = (
-    "template/{% if gitlab_include_pipeline_copier %}.gitlab{% endif %}/"
-    "ci/copier.yml.jinja"
-)
-DEMO_PIPELINE = (
-    "template/{% if gitlab_include_pipeline_demo %}.gitlab{% endif %}/ci/demo.yml"
-)
+PATH_ROOT_PIPELINE = "template/{% if gitlab_include_pipeline %}.gitlab-ci.yml{% endif %}"
+PATH_COPIER_PIPELINE = "template/{% if gitlab_include_pipeline_copier %}.gitlab{% endif %}/ci/copier.yml.jinja"
+PATH_DEMO_PIPELINE = "template/{% if gitlab_include_pipeline_demo %}.gitlab{% endif %}/ci/demo.yml"
+PATH_MR_TEMPLATE = "template/{% if gitlab_include_merge_request_template %}.gitlab{% endif %}/merge_request_templates/default.md"
+PATH_ISSUE_TEMPLATE = "template/{% if gitlab_include_issue_template %}.gitlab{% endif %}/issue_templates/default.md"
 
-
-def test_gitlab_pipeline_smoke(
+def test_gitlab_pipeline(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(features=["gitlab"]) as case:
-        root_pipeline = yaml.safe_load(case.render(ROOT_PIPELINE))
-        copier_pipeline = yaml.safe_load(case.render(COPIER_PIPELINE))
-        demo_pipeline = yaml.safe_load(case.render(DEMO_PIPELINE))
+        root_pipeline = yaml.safe_load(case.render(PATH_ROOT_PIPELINE))
+        copier_pipeline = yaml.safe_load(case.render(PATH_COPIER_PIPELINE))
+        demo_pipeline = yaml.safe_load(case.render(PATH_DEMO_PIPELINE))
 
     assert root_pipeline["include"] == [{"local": ".gitlab/ci/*.yml"}]
     assert "copier:check" in copier_pipeline
@@ -32,18 +28,12 @@ def test_gitlab_pipeline_smoke(
     assert "demo:fortune" in demo_pipeline
 
 
-def test_gitlab_contribution_templates_smoke(
+def test_gitlab_contribution_templates(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(features=["gitlab"]) as case:
-        issue = case.render(
-            "template/{% if gitlab_include_issue_template %}.gitlab{% endif %}/"
-            "issue_templates/default.md"
-        )
-        merge_request = case.render(
-            "template/{% if gitlab_include_merge_request_template %}.gitlab{% endif %}/"
-            "merge_request_templates/default.md"
-        )
+        issue = case.render(PATH_ISSUE_TEMPLATE)
+        merge_request = case.render(PATH_MR_TEMPLATE)
         agents_fragment = case.render("template/_modules/gitlab/AGENTS_gitlab.jinja")
 
     assert "## Problem" in issue
