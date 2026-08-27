@@ -1,5 +1,5 @@
 ---
-_min_copier_version: "9.17"
+_min_copier_version: "9.17.2"
 _subdirectory: template
 _exclude:
   - _modules

@@ -1,0 +1,29 @@
+gitlab_include_issue_template:
+  type: bool
+  help: Create a default GitLab issue template?
+  default: true
+  when: "{{ 'gitlab' in modules }}"
+
+gitlab_include_merge_request_template:
+  type: bool
+  help: Create a default GitLab merge request template?
+  default: true
+  when: "{{ 'gitlab' in modules }}"
+
+gitlab_include_pipeline:
+  type: bool
+  help: Create a GitLab CI/CD pipeline?
+  default: true
+  when: "{{ 'gitlab' in modules }}"
+
+gitlab_include_copier_job:
+  type: bool
+  help: Add a pipeline job that checks for Copier template updates?
+  default: true
+  when: "{{ 'gitlab' in modules and gitlab_include_pipeline }}"
+
+gitlab_include_demo_job:
+  type: bool
+  help: Add a pipeline job that demonstrates the GitLab pipeline?
+  default: true
+  when: "{{ 'gitlab' in modules and gitlab_include_pipeline }}"

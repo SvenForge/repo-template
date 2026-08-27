@@ -1,10 +1,12 @@
 # Gitlab Pipeline Definition
 
 .gitlab:base:
-  image: python:3.12-slim
+  interruptible: true
 
+{% if gitlab_include_copier_job %}
 gitlab:copier-update:
   extends: .gitlab:base
+  image: python:3.12-slim
   needs: []
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -17,4 +19,17 @@ gitlab:copier-update:
   before_script:
     - python -m pip install "copier==9.17.2"
   script:
-    - copier update --pretend --defaults --skip-tasks
+    - copier check-update
+{% endif %}
+{% if gitlab_include_demo_job %}
+gitlab:demo:
+  extends: .gitlab:base
+  image:
+    name: rancher/cowsay:latest
+    entrypoint: [""]
+  needs: []
+  before_script:
+    - apk add --no-cache fortune
+  script:
+    - fortune | cowsay
+{% endif %}
