@@ -49,15 +49,34 @@ def test_gitlab_contribution_templates(
     assert "workflow::deploy" in agents_fragment
 
 
-def test_optional_gitlab_files(
+def test_empty_pipeline_selection_omits_pipeline(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
         features=["gitlab"],
-        gitlab_include_issue_template=False,
-        gitlab_include_merge_request_template=False,
-        gitlab_include_pipeline=False,
+        gitlab_pipeline=[],
     ) as case:
+        assert case.context["gitlab_include_issue_template"] is True
+        assert case.context["gitlab_include_merge_request_template"] is True
+        assert case.context["gitlab_include_pipeline"] is False
+
+
+def test_pipeline_job_selection(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+) -> None:
+    with copier_case(features=["gitlab"], gitlab_pipeline=["copier"]) as case:
+        gitlab_pipeline = yaml.safe_load(case.render(GITLAB_PIPELINE))
+
+        assert case.context["gitlab_include_pipeline"] is True
+
+    assert "gitlab:copier-update" in gitlab_pipeline
+    assert "gitlab:demo" not in gitlab_pipeline
+
+
+def test_gitlab_calculated_variables_without_feature(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+) -> None:
+    with copier_case(features=[]) as case:
         assert case.context["gitlab_include_issue_template"] is False
         assert case.context["gitlab_include_merge_request_template"] is False
         assert case.context["gitlab_include_pipeline"] is False

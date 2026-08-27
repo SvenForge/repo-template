@@ -37,6 +37,7 @@ COPY_CASES = {
     ),
     "empty-repository": CopyCase(
         answers={
+            "features": "[]",
             "core_include_readme": "false",
             "core_license": "NOASSERTION",
             "core_include_gitignore": "false",

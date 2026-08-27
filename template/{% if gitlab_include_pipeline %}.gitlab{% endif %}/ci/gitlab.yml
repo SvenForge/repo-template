@@ -3,7 +3,7 @@
 .gitlab:base:
   interruptible: true
 
-{% if gitlab_include_copier_job %}
+{% if 'copier' in gitlab_pipeline %}
 gitlab:copier-update:
   extends: .gitlab:base
   image: python:3.12-slim
@@ -21,7 +21,7 @@ gitlab:copier-update:
   script:
     - copier check-update
 {% endif %}
-{% if gitlab_include_demo_job %}
+{% if 'demo' in gitlab_pipeline %}
 gitlab:demo:
   extends: .gitlab:base
   image:
