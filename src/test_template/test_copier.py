@@ -35,5 +35,6 @@ def test_copier_configuration(
     assert "  - /_modules" in root_config
     assert "features:" in root_config
     assert "!include template/_modules/core/copier.yml" in root_config
-    assert "{{" not in root_config
+    assert 'default: "{{ [\'core\'] + features }}"' in root_config
+    assert "{% raw %}" not in root_config
     assert core_config == ""
