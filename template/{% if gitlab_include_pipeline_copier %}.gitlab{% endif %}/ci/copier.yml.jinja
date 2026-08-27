@@ -1,0 +1,18 @@
+# Copier Pipeline Definition
+
+.copier:base:
+  image: python:3.12-slim
+  variables:
+    COPIER_VERSION: "{{ copier_version }}"
+  before_script:
+    - python -m pip install "copier==$COPIER_VERSION"
+
+copier:check:
+  extends: .copier:base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - when: manual
+  script:
+    - copier check-update

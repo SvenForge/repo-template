@@ -1,0 +1,16 @@
+# Demo Pipeline Definition
+
+.demo:base:
+  image:
+    name: rancher/cowsay:latest
+    entrypoint: [""]
+  before_script:
+    - apk add --no-cache fortune
+
+demo:fortune:
+  extends: .demo:base
+  needs: []
+  rules:
+    - when: manual
+  script:
+    - fortune | cowsay

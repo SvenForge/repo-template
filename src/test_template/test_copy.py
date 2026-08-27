@@ -18,6 +18,11 @@ COPY_CASES = {
         answers={},
         expected_files={
             Path(".gitignore"): [],
+            Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
+            Path(".gitlab/ci/copier.yml"): ["copier:check:"],
+            Path(".gitlab/ci/demo.yml"): ["demo:fortune:"],
+            Path(".gitlab/issue_templates/default.md"): ["## Problem"],
+            Path(".gitlab/merge_request_templates/default.md"): ["## What is changed?"],
             Path("LICENSE.md"): [],
             Path("README.md"): [
                 "# My Repository",
@@ -27,6 +32,7 @@ COPY_CASES = {
     ),
     "empty-repository": CopyCase(
         answers={
+            "features": "[]",
             "core_include_readme": "false",
             "core_license": "NOASSERTION",
             "core_include_gitignore": "false",

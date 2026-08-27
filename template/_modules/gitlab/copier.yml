@@ -1,0 +1,41 @@
+gitlab_include_issue_template:
+  type: bool
+  help: Create the default GitLab issue template?
+  default: "{{ 'gitlab' in modules }}"
+  when: false
+
+gitlab_include_merge_request_template:
+  type: bool
+  help: Create the default GitLab merge request template?
+  default: "{{ 'gitlab' in modules }}"
+  when: false
+
+gitlab_pipeline:
+  type: str
+  help: Which jobs shall be included in the GitLab pipeline?
+  multiselect: true
+  choices:
+    Check for Copier template updates: copier
+    Run the demonstration job: demo
+  default:
+    - copier
+    - demo
+  when: "{{ 'gitlab' in modules }}"
+
+gitlab_include_pipeline_copier:
+  type: bool
+  help: Create the Copier pipeline module?
+  default: "{{ 'gitlab' in modules and 'copier' in gitlab_pipeline }}"
+  when: false
+
+gitlab_include_pipeline_demo:
+  type: bool
+  help: Create the demonstration pipeline module?
+  default: "{{ 'gitlab' in modules and 'demo' in gitlab_pipeline }}"
+  when: false
+
+gitlab_include_pipeline:
+  type: bool
+  help: Create the GitLab CI/CD pipeline?
+  default: "{{ 'gitlab' in modules and gitlab_pipeline | length > 0 }}"
+  when: false
