@@ -1,10 +1,9 @@
-# Demonstration Pipeline Definition
+# Demo Pipeline Definition
 
 .demo:base:
   image:
     name: rancher/cowsay:latest
     entrypoint: [""]
-  interruptible: true
   before_script:
     - apk add --no-cache fortune
 
