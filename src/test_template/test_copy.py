@@ -42,6 +42,21 @@ COPY_CASES = {
             Path(".copier-answers.yml"): [],
         },
     ),
+    "devcontainer": CopyCase(
+        answers={
+            "features": "[devcontainer]",
+            "core_include_readme": "false",
+            "core_license": "NOASSERTION",
+            "core_include_gitignore": "false",
+        },
+        expected_files={
+            Path(".copier-answers.yml"): [],
+            Path(".devcontainer/devcontainer.json"): [
+                '"image": "mcr.microsoft.com/devcontainers/base:2-bookworm"',
+                '"remoteUser": "vscode"',
+            ],
+        },
+    ),
     "copier": CopyCase(
         answers={
             "features": "[copier]",

@@ -10,6 +10,7 @@ features:
   multiselect: true
   choices:
     Copier: copier
+    Dev Container: devcontainer
     GitLab: gitlab
   default:
     - gitlab
@@ -29,5 +30,7 @@ copier_version:
 !include template/_modules/core/copier.yml
 ---
 !include template/_modules/copier/copier.yml
+---
+!include template/_modules/devcontainer/copier.yml
 ---
 !include template/_modules/gitlab/copier.yml

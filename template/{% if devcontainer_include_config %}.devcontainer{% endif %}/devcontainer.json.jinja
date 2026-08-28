@@ -1,0 +1,25 @@
+{
+    "name": {{ core_repository_name | tojson }},
+    "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
+    "remoteUser": "vscode",
+    "initializeCommand": {
+        "exportGitIdentity": ["git", "-C", "${localWorkspaceFolder}", "-c", "alias.export-identity=!f() { git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null) || exit 0; name=$(git config --get user.name 2>/dev/null) || exit 0; email=$(git config --get user.email 2>/dev/null) || exit 0; file=\"$git_dir/devcontainer-identity.gitconfig\"; git config --file \"$file\" user.name \"$name\"; git config --file \"$file\" user.email \"$email\"; }; f", "export-identity"]
+    },
+    "onCreateCommand": {
+        "setupGit": "set -eu; identity='${containerWorkspaceFolder}/.git/devcontainer-identity.gitconfig'; if [ -f \"$identity\" ]; then git config --global --add include.path \"$identity\" || true; fi; git config --global --add safe.directory '${containerWorkspaceFolder}'; git config --local core.autocrlf input"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "mhutchie.git-graph",
+                "Gruntfuggly.todo-tree",
+                "mutantdino.resourcemonitor",
+                "streetsidesoftware.code-spell-checker"
+            ],
+            "settings": {
+                "telemetry.telemetryLevel": "off",
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    }
+}
