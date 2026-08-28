@@ -10,9 +10,10 @@ features:
   multiselect: true
   choices:
     Copier: copier
-    Dev Container: devcontainer
+    DevContainer: devcontainer
     GitLab: gitlab
   default:
+    - devcontainer
     - gitlab
 
 modules:
