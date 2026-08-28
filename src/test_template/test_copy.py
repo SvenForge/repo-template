@@ -18,6 +18,10 @@ COPY_CASES = {
         answers={},
         expected_files={
             Path(".copier-answers.yml"): [],
+            Path(".devcontainer/devcontainer.json"): [
+                '"image": "mcr.microsoft.com/devcontainers/base:2-bookworm"',
+                '"remoteUser": "vscode"',
+            ],
             Path(".gitignore"): [],
             Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
             Path(".gitlab/ci/copier.yml"): ["copier:check:"],
@@ -40,21 +44,6 @@ COPY_CASES = {
         },
         expected_files={
             Path(".copier-answers.yml"): [],
-        },
-    ),
-    "devcontainer": CopyCase(
-        answers={
-            "features": "[devcontainer]",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
-        },
-        expected_files={
-            Path(".copier-answers.yml"): [],
-            Path(".devcontainer/devcontainer.json"): [
-                '"image": "mcr.microsoft.com/devcontainers/base:2-bookworm"',
-                '"remoteUser": "vscode"',
-            ],
         },
     ),
     "copier": CopyCase(

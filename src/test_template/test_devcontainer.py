@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from .conftest import CopierCase, TEMPLATE_ROOT
+from .conftest import CopierCase
 
 
 PATH_DEVCONTAINER_CONFIG = "template/{% if devcontainer_include_config %}.devcontainer{% endif %}/devcontainer.json.jinja"
@@ -27,29 +27,16 @@ def test_devcontainer_file_selection(
 def test_devcontainer_configuration(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
-    repository_name = 'Example "Repository"\\Tools\nNext'
-    with copier_case(
-        features=["devcontainer"],
-        core_repository_name=repository_name,
-    ) as case:
+    with copier_case(features=["devcontainer"]) as case:
         rendered = case.render(PATH_DEVCONTAINER_CONFIG)
 
     config = json.loads(rendered)
-    reference = json.loads(
-        (TEMPLATE_ROOT / ".devcontainer/devcontainer.json").read_text()
-    )
 
-    assert config["name"] == repository_name
     assert config["image"] == "mcr.microsoft.com/devcontainers/base:2-bookworm"
+    assert config["features"] == {}
     assert config["remoteUser"] == "vscode"
-    assert (
-        config["initializeCommand"]["exportGitIdentity"]
-        == reference["initializeCommand"]["exportGitIdentity"]
-    )
-    assert (
-        config["onCreateCommand"]["setupGit"]
-        == reference["onCreateCommand"]["setupGit"]
-    )
+    assert config["mounts"] == []
+    assert config["postCreateCommand"] == {}
 
     vscode = config["customizations"]["vscode"]
     assert vscode["extensions"] == [
@@ -60,12 +47,11 @@ def test_devcontainer_configuration(
     ]
     assert vscode["settings"] == {
         "telemetry.telemetryLevel": "off",
+        "workbench.enableExperiments": False,
+        "telemetry.feedback.enabled": False,
         "terminal.integrated.defaultProfile.linux": "bash",
     }
 
-    assert "features" not in config
-    assert "mounts" not in config
-    assert "postCreateCommand" not in config
     assert "openai.chatgpt" not in rendered
     assert "env/dev/requirements.txt" not in rendered
     assert "setupCodex" not in rendered
