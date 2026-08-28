@@ -9,6 +9,7 @@ features:
   help: Which template features shall be used?
   multiselect: true
   choices:
+    Codex: codex
     Copier: copier
     DevContainer: devcontainer
     GitLab: gitlab
@@ -29,6 +30,8 @@ copier_version:
   when: false
 ---
 !include template/_modules/core/copier.yml
+---
+!include template/_modules/codex/copier.yml
 ---
 !include template/_modules/copier/copier.yml
 ---

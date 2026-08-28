@@ -1,0 +1,11 @@
+codex_include_config:
+  type: bool
+  help: Create the Codex configuration files?
+  default: "{{ 'codex' in modules }}"
+  when: false
+
+codex_include_devcontainer:
+  type: bool
+  help: Add Codex to the Dev Container?
+  default: "{{ 'codex' in modules and 'devcontainer' in modules }}"
+  when: false

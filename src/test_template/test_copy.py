@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+import stat
 import subprocess
 
 import pytest
@@ -11,6 +12,7 @@ from .conftest import TEMPLATE_ROOT
 class CopyCase:
     answers: dict[str, str]
     expected_files: dict[Path, list[str]]
+    executable_files: tuple[Path, ...] = ()
 
 
 COPY_CASES = {
@@ -63,6 +65,49 @@ COPY_CASES = {
             Path("template/_modules/core/copier.yml"): [],
         },
     ),
+    "codex": CopyCase(
+        answers={
+            "features": "[codex]",
+            "core_include_readme": "false",
+            "core_license": "NOASSERTION",
+            "core_include_gitignore": "false",
+        },
+        expected_files={
+            Path(".codex/maintenance.sh"): ["set -euo pipefail"],
+            Path(".codex/setup.sh"): ["set -euo pipefail"],
+            Path(".copier-answers.yml"): ["- codex"],
+            Path("AGENTS.md"): ["## General guidelines", "## Safety and boundaries"],
+        },
+        executable_files=(
+            Path(".codex/maintenance.sh"),
+            Path(".codex/setup.sh"),
+        ),
+    ),
+    "codex-devcontainer": CopyCase(
+        answers={
+            "features": "[codex, devcontainer]",
+            "core_include_readme": "false",
+            "core_license": "NOASSERTION",
+            "core_include_gitignore": "false",
+        },
+        expected_files={
+            Path(".codex/maintenance.sh"): ["set -euo pipefail"],
+            Path(".codex/setup.sh"): ["set -euo pipefail"],
+            Path(".copier-answers.yml"): ["- codex", "- devcontainer"],
+            Path(".devcontainer/devcontainer-lock.json"): [
+                "ghcr.io/dirien/devcontainer-feature-codex/codex:0"
+            ],
+            Path(".devcontainer/devcontainer.json"): [
+                "ghcr.io/dirien/devcontainer-feature-codex/codex:0",
+                "openai.chatgpt",
+            ],
+            Path("AGENTS.md"): ["## General guidelines", "## Safety and boundaries"],
+        },
+        executable_files=(
+            Path(".codex/maintenance.sh"),
+            Path(".codex/setup.sh"),
+        ),
+    ),
 }
 
 
@@ -94,3 +139,6 @@ def test_copy(tmp_path: Path, case: CopyCase) -> None:
         content = (destination / path).read_text()
         for expected in expected_content:
             assert expected in content
+
+    for path in case.executable_files:
+        assert (destination / path).stat().st_mode & stat.S_IXUSR
