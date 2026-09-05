@@ -4,6 +4,6 @@
 #   bash .codex/setup.sh
 set -euo pipefail
 
-{% if 'gitlab' in modules %}
-{% include "template/_modules/gitlab/setup.sh.jinja" %}
-{% endif %}
+{% if 'gitlab' in modules -%}
+{% include "template/_modules/gitlab/setup.sh.jinja" -%}
+{% endif -%}
