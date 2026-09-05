@@ -58,3 +58,30 @@ def test_devcontainer_configuration(
     assert "setupPython" not in rendered
     assert "{{" not in rendered
     assert "{%" not in rendered
+
+
+def test_python_devcontainer_integration(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+) -> None:
+    with copier_case(
+        features=["devcontainer", "python"],
+        python_version="3.13",
+    ) as case:
+        rendered = case.render(PATH_DEVCONTAINER_CONFIG)
+
+    config = json.loads(rendered)
+
+    assert config["image"] == "mcr.microsoft.com/devcontainers/python:3-3.13-bookworm"
+    assert config["features"] == {}
+    assert config["mounts"] == []
+    assert config["postCreateCommand"] == {
+        "setupPython": (
+            "python -m pip install --constraint env/dev/constraints.txt --upgrade pip"
+            " && python -m pip install --constraint env/dev/constraints.txt"
+            " --editable . --group dev"
+        )
+    }
+    assert "setupCodex" not in rendered
+    assert "openai.chatgpt" not in rendered
+    assert "{{" not in rendered
+    assert "{%" not in rendered

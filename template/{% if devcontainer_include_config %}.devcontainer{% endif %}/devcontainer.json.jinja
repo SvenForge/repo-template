@@ -1,5 +1,9 @@
 {
+{% if python_include_project %}
+    "image": "mcr.microsoft.com/devcontainers/python:3-{{ python_version }}-bookworm",
+{% else %}
     "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
+{% endif %}
     "features": {
 {% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
         "ghcr.io/devcontainers/features/node:2": {},
@@ -19,6 +23,9 @@
         "setupGit": "set -eu; identity='${containerWorkspaceFolder}/.git/devcontainer-identity.gitconfig'; if [ -f \"$identity\" ]; then git config --global --add include.path \"$identity\" || true; fi; git config --global --add safe.directory '${containerWorkspaceFolder}'; git config --local core.autocrlf input"
     },
     "postCreateCommand": {
+{% if python_include_project %}
+        "setupPython": "python -m pip install --constraint env/dev/constraints.txt --upgrade pip && python -m pip install --constraint env/dev/constraints.txt --editable . --group dev"{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %},{% endif %}
+{% endif %}
 {% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
         "setupCodex": "set -eu; config_dir=\"$HOME/.codex\"; mkdir -p \"$config_dir\"; sudo chown -R \"$(id -u):$(id -g)\" \"$config_dir\"; chmod 700 \"$config_dir\""
 {% endif %}

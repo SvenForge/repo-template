@@ -34,8 +34,14 @@ gitlab_include_pipeline_demo:
   default: "{{ 'gitlab' in modules and 'demo' in gitlab_pipeline }}"
   when: false
 
+gitlab_include_pipeline_python:
+  type: bool
+  help: Create the Python pipeline module?
+  default: "{{ 'gitlab' in modules and 'python' in modules }}"
+  when: false
+
 gitlab_include_pipeline:
   type: bool
   help: Create the GitLab CI/CD pipeline?
-  default: "{{ 'gitlab' in modules and gitlab_pipeline | length > 0 }}"
+  default: "{{ 'gitlab' in modules and (gitlab_pipeline | length > 0 or gitlab_include_pipeline_python) }}"
   when: false

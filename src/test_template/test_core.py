@@ -82,13 +82,36 @@ def test_license(
     assert expected in rendered
 
 
+@pytest.mark.parametrize(
+    ("features", "includes_python"),
+    [([], False), (["python"], True)],
+    ids=["without-python", "with-python"],
+)
 def test_gitignore(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
+    features: list[str],
+    includes_python: bool,
 ) -> None:
-    with copier_case() as case:
-        rendered = case.render("template/{% if core_include_gitignore %}.gitignore{% endif %}")
+    with copier_case(features=features) as case:
+        rendered = case.render(
+            "template/{% if core_include_gitignore %}.gitignore{% endif %}.jinja"
+        )
 
     assert "### Linux ###" in rendered
     assert "### macOS ###" in rendered
     assert "### VisualStudioCode ###" in rendered
     assert "### Windows ###" in rendered
+    assert ("### Python ###" in rendered) is includes_python
+    tracked_constraints = "\n".join(
+        [
+            "env/",
+            "!env/",
+            "env/*",
+            "!env/dev/",
+            "env/dev/*",
+            "!env/dev/constraints.txt",
+        ]
+    )
+    assert (tracked_constraints in rendered) is includes_python
+    assert "{{" not in rendered
+    assert "{%" not in rendered

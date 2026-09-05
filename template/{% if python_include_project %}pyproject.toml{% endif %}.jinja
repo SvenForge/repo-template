@@ -1,0 +1,77 @@
+[build-system]
+requires = [
+    "setuptools>=84",
+    "setuptools-scm>=10",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = {{ python_distribution_name | tojson }}
+dynamic = ["version"]
+requires-python = ">={{ python_version }}"
+dependencies = []
+{% if core_include_readme %}
+readme = "README.md"
+{% endif %}
+{% if core_include_license %}
+license = {% if core_license == 'NONE' %}"LicenseRef-Proprietary"{% else %}{{ core_license | tojson }}{% endif %}
+license-files = ["LICENSE.md"]
+{% endif %}
+{% if core_owner_name %}
+authors = [
+    { name = {{ core_owner_name | tojson }}{% if core_owner_email %}, email = {{ core_owner_email | tojson }}{% endif %} },
+]
+{% endif %}
+
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+lint = [
+    "mypy",
+    "ruff",
+]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["test_*"]
+namespaces = false
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--cov={{ python_package_name }}",
+    "--cov-report=term-missing",
+    "--cov-report=xml:coverage.xml",
+    "--junitxml=pytest.xml",
+]
+testpaths = ["src/test_{{ python_package_name }}"]
+
+[tool.coverage.run]
+branch = true
+source = ["{{ python_package_name }}"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.ruff]
+src = ["src"]
+target-version = "py{{ python_version | replace('.', '') }}"
+
+[tool.mypy]
+files = [
+    "src/{{ python_package_name }}",
+    "src/test_{{ python_package_name }}",
+]
+python_version = "{{ python_version }}"
+strict = true

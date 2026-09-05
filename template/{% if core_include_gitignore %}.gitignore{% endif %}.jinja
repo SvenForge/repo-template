@@ -67,6 +67,29 @@ Temporary Items
 .history
 .ionide
 
+{% if python_include_project %}
+### Python ###
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.coverage
+coverage.xml
+pytest.xml
+htmlcov/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+env/
+!env/
+env/*
+!env/dev/
+env/dev/*
+!env/dev/constraints.txt
+{% endif %}
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db

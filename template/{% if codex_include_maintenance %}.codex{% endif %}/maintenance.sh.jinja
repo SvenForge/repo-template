@@ -4,6 +4,9 @@
 #   bash .codex/maintenance.sh
 set -euo pipefail
 
+{% if python_include_project %}
+{% include "template/_modules/python/maintenance.sh.jinja" %}
+{% endif %}
 {% if 'gitlab' in modules %}
 {% include "template/_modules/gitlab/maintenance.sh.jinja" %}
 {% endif %}
