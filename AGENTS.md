@@ -13,7 +13,7 @@
 * Keep the issue's workflow label synchronized with its current stage by replacing the previous label with `workflow::plan`, `workflow::create`, `workflow::verify`, or `workflow::deploy`. Also apply one appropriate `type::*` label and one `priority::*` label.
 * Treat the GitLab project linked in the title of `README.md` as the authoritative source of truth. Push branches and commits only to this remote.
 * Use other remotes, such as GitHub mirrors, only to clone the repository. Do not push to or make changes on those services.
-* Agents must use the `glab` CLI for all GitLab interactions, including issues, merge requests, comments, labels, assignments, reviews, and merges.
+* Use the native `@GitLab` plugin for GitLab interactions when available. Otherwise, use the `glab` CLI if installed. If neither is available, interact only with the local Git repository.
 
 ### Workflow stage transitions
 
