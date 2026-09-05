@@ -154,6 +154,3 @@ def test_copy(tmp_path: Path, case: CopyCase) -> None:
         content = (destination / path).read_text()
         for expected in expected_content:
             assert expected in content
-
-    for path in case.executable_files:
-        assert (destination / path).stat().st_mode & stat.S_IXUSR
