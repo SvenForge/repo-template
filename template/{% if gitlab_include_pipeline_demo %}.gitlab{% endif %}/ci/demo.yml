@@ -12,5 +12,6 @@ demo:fortune:
   needs: []
   rules:
     - when: manual
+      allow_failure: true
   script:
     - fortune | cowsay
