@@ -13,13 +13,13 @@
 * Keep the issue's workflow label synchronized with its current stage by replacing the previous label with `workflow::plan`, `workflow::create`, `workflow::verify`, or `workflow::deploy`. Also apply one appropriate `type::*` label and one `priority::*` label.
 * Treat the GitLab project linked in the title of `README.md` as the authoritative source of truth. Push branches and commits only to this remote.
 * Use other remotes, such as GitHub mirrors, only to clone the repository. Do not push to or make changes on those services.
-* Use the native `@GitLab` plugin for GitLab interactions when available. Otherwise, use the `glab` CLI if installed. If neither is available, interact only with the local Git repository.
+* Use the native `@GitLab` plugin for GitLab interactions when available. Otherwise, use the `glab` CLI if installed. If neither is available, interact only with the local Git repository, remain in the current workflow stage, and report which required GitLab actions could not be completed.
 
 ### Workflow stage transitions
 
 * The user must perform or explicitly authorize transitions from **plan** to **create** and from **create** to **verify**.
 * Only a maintainer may transition an issue from **verify** to **deploy**, normally by merging the approved merge request. If GitLab automatically closes the issue on merge, assigning `workflow::deploy` is optional.
-* An agent must respect the scope of the current workflow stage and may ask the user to transition the issue when the current stage is complete.
+* An agent must remain within the scope of the current workflow stage. When that stage is complete, ask the user to perform or to authorize the next transition.
 * For open issues, the `workflow::*` label is the authoritative indicator of the current workflow stage. When an issue is automatically closed by merging its merge request, the closed state takes precedence over a stale workflow label. Do not apply `workflow::*` labels to merge requests.
 
 ### 1. Plan
