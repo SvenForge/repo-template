@@ -46,12 +46,19 @@
 
 ### 3. Verify
 
+* Adapt behavior to the role in the merge request. If the role is unclear, check whether the agent is assigned to the merge request as an `Assignee` or a `Reviewer`.
 * Review the completed merge request for compliance with repository guidelines, correctness, and scope.
-* Fetch the latest `main` and verify that the feature branch has no conflicts. Merge `main` into the feature branch when it has diverged.
-* Keep review discussions in GitLab threads. Answer questions, or implement requested improvements and briefly explain the response. Resolve each thread after its concern is addressed.
-* When acting as a reviewer, inspect the changes and leave clear questions or actionable improvement requests in the merge request.
 * Run all relevant local checks when feasible and confirm that the latest merge request CI/CD pipeline and all required jobs pass.
 * Report checks that could not be run and any non-blocking failures or warnings in the merge request. Required checks must pass before approval.
+* When acting as a reviewer:
+  * Report findings only as merge request comments. Prefer comments on the relevant lines and make every recommendation actionable.
+  * Keep follow-up discussions in GitLab threads and resolve each thread after its concern is addressed.
+  * Do not modify code or contribute commits unless explicitly instructed to do so.
+* When acting as an author:
+  * Fetch the latest `main` and verify that the feature branch has no conflicts. Merge `main` into the feature branch when it has diverged.
+  * Update the code as needed to address review comments, user feedback, or findings from your own review.
+  * Inspect the latest changes and review discussions before editing to avoid reverting work that addressed other feedback.
+  * Answer questions and briefly explain changes in GitLab threads. Resolve each thread after its concern is addressed.
 * Iterate until the responsible code owner or maintainer approves the merge request.
 
 ### 4. Deploy
