@@ -34,7 +34,7 @@ def test_gitlab_contribution_templates(
     with copier_case(features=["gitlab"]) as case:
         issue = case.render(PATH_ISSUE_TEMPLATE)
         merge_request = case.render(PATH_MR_TEMPLATE)
-        agents_fragment = case.render("template/_modules/gitlab/AGENTS_gitlab.jinja")
+        agents_fragment = case.render("template/_modules/gitlab/AGENTS.md.jinja")
 
     assert "## Problem" in issue
     assert "## How are the changes verified?" in merge_request

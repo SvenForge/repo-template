@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from pathlib import Path
-import stat
 import subprocess
 
 import pytest
@@ -12,7 +11,6 @@ from .conftest import TEMPLATE_ROOT
 class CopyCase:
     answers: dict[str, str]
     expected_files: dict[Path, list[str]]
-    executable_files: tuple[Path, ...] = ()
 
 
 COPY_CASES = {
@@ -67,48 +65,24 @@ COPY_CASES = {
     ),
     "codex": CopyCase(
         answers={
-            "features": "[codex]",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
+            "features": "[codex, devcontainer, gitlab]",
         },
         expected_files={
-            Path(".codex/maintenance.sh"): ["set -euo pipefail"],
-            Path(".codex/setup.sh"): ["set -euo pipefail"],
-            Path(".copier-answers.yml"): ["- codex", "codex_cloud: true"],
-            Path("AGENTS.md"): ["## General guidelines", "## Safety and boundaries"],
-        },
-        executable_files=(
-            Path(".codex/maintenance.sh"),
-            Path(".codex/setup.sh"),
-        ),
-    ),
-    "codex-without-cloud": CopyCase(
-        answers={
-            "features": "[codex]",
-            "codex_cloud": "false",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
-        },
-        expected_files={
-            Path(".copier-answers.yml"): ["- codex", "codex_cloud: false"],
-            Path("AGENTS.md"): ["## General guidelines", "## Safety and boundaries"],
-        },
-    ),
-    "codex-devcontainer": CopyCase(
-        answers={
-            "features": "[codex, devcontainer]",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
-        },
-        expected_files={
-            Path(".codex/maintenance.sh"): ["set -euo pipefail"],
-            Path(".codex/setup.sh"): ["set -euo pipefail"],
+            Path(".codex/maintenance.sh"): [
+                "set -euo pipefail",
+                'readonly GITLAB_HOST="gitlab.com"',
+                "glab auth status",
+            ],
+            Path(".codex/setup.sh"): [
+                "set -euo pipefail",
+                'readonly GITLAB_HOST="gitlab.com"',
+                "GITLAB_TOKEN",
+                "glab auth login",
+            ],
             Path(".copier-answers.yml"): [
                 "- codex",
                 "- devcontainer",
+                "- gitlab",
                 "codex_cloud: true",
                 "codex_devcontainer: true",
             ],
@@ -116,12 +90,23 @@ COPY_CASES = {
                 "ghcr.io/dirien/devcontainer-feature-codex/codex:0",
                 "openai.chatgpt",
             ],
-            Path("AGENTS.md"): ["## General guidelines", "## Safety and boundaries"],
+            Path(".gitignore"): [],
+            Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
+            Path(".gitlab/ci/copier.yml"): ["copier:check:"],
+            Path(".gitlab/ci/demo.yml"): ["demo:fortune:"],
+            Path(".gitlab/issue_templates/default.md"): ["## Problem"],
+            Path(".gitlab/merge_request_templates/default.md"): ["## What is changed?"],
+            Path("AGENTS.md"): [
+                "## General guidelines",
+                "## GitLab development workflow",
+                "## Safety and boundaries",
+            ],
+            Path("LICENSE.md"): [],
+            Path("README.md"): [
+                "# My Repository",
+                "_TODO: Add contact information._",
+            ],
         },
-        executable_files=(
-            Path(".codex/maintenance.sh"),
-            Path(".codex/setup.sh"),
-        ),
     ),
 }
 

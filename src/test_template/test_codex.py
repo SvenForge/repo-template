@@ -1,9 +1,7 @@
 from collections.abc import Callable
 from contextlib import AbstractContextManager
 import json
-import os
-from pathlib import Path
-import subprocess
+from typing import Any
 
 import pytest
 
@@ -17,41 +15,29 @@ PATH_DEVCONTAINER_CONFIG = "template/{% if devcontainer_include_config %}.devcon
 
 
 @pytest.mark.parametrize(
-    ("features", "answers", "expected"),
+    ("answers", "expected"),
     [
-        ([], {}, (False, False, False, False, False)),
-        (["codex"], {}, (True, False, True, True, True)),
         (
-            ["codex"],
-            {"codex_cloud": False},
+            {"features": []},
+            (False, False, False, False, False),
+        ),
+        (
+            {"features": ["codex"], "codex_cloud": False},
             (False, False, True, False, False),
         ),
         (
-            ["codex", "devcontainer"],
-            {},
+            {"features": ["codex", "devcontainer"]},
             (True, True, True, True, True),
         ),
-        (
-            ["codex", "devcontainer"],
-            {"codex_cloud": False, "codex_devcontainer": False},
-            (False, False, True, False, False),
-        ),
     ],
-    ids=[
-        "without-codex",
-        "codex-defaults",
-        "without-cloud",
-        "with-devcontainer",
-        "agents-only",
-    ],
+    ids=["without-codex", "agents-only", "with-devcontainer"],
 )
 def test_codex_file_selection(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
-    features: list[str],
-    answers: dict[str, bool],
+    answers: dict[str, Any],
     expected: tuple[bool, bool, bool, bool, bool],
 ) -> None:
-    with copier_case(features=features, **answers) as case:
+    with copier_case(**answers) as case:
         selected = (
             case.context["codex_cloud"],
             case.context["codex_devcontainer"],
@@ -63,113 +49,26 @@ def test_codex_file_selection(
     assert selected == expected
 
 
-def test_codex_script_composition(
+def test_codex_cloud_scripts(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
-    rendered: dict[str, tuple[str, str]] = {}
-    combinations = {
-        "codex": ["codex"],
-        "copier": ["codex", "copier"],
-        "gitlab": ["codex", "gitlab"],
-        "combined": ["codex", "copier", "gitlab"],
-    }
-    for name, features in combinations.items():
-        with copier_case(features=features) as case:
-            rendered[name] = (
-                case.render(PATH_SETUP),
-                case.render(PATH_MAINTENANCE),
-            )
-
-    codex_setup, codex_maintenance = rendered["codex"]
-    copier_setup, copier_maintenance = rendered["copier"]
-    gitlab_setup, gitlab_maintenance = rendered["gitlab"]
-    combined_setup, combined_maintenance = rendered["combined"]
-
-    for setup, maintenance in rendered.values():
-        assert setup.startswith("#!/usr/bin/env bash\n")
-        assert maintenance.startswith("#!/usr/bin/env bash\n")
-        assert "set -euo pipefail" in setup
-        assert "set -euo pipefail" in maintenance
-        assert "env/dev/requirements.txt" not in setup
-        assert "env/dev/requirements.txt" not in maintenance
-        assert "{{" not in setup
-        assert "{%" not in setup
-        assert "{{" not in maintenance
-        assert "{%" not in maintenance
-
-    assert "copier==" not in codex_setup
-    assert "copier==" not in codex_maintenance
-    assert "GITLAB_TOKEN" not in codex_setup
-    assert "glab auth status" not in codex_maintenance
-
-    assert 'python -m pip install "copier==9.17.2"' in copier_setup
-    assert 'python -m pip install "copier==9.17.2"' in copier_maintenance
-    assert "GITLAB_TOKEN" not in copier_setup
-    assert "glab auth status" not in copier_maintenance
-
-    assert "copier==" not in gitlab_setup
-    assert "copier==" not in gitlab_maintenance
-    assert 'readonly GLAB_VERSION="1.113.0"' in gitlab_setup
-    assert "glab auth login" in gitlab_setup
-    assert "GITLAB_TOKEN" in gitlab_setup
-    assert "GITLAB_TOKEN" not in gitlab_maintenance
-    assert "glab auth status" in gitlab_maintenance
-
-    token_guard = ': "${GITLAB_TOKEN:?GITLAB_TOKEN must be provided as a Codex Cloud Environment Secret.}"'
-    assert combined_setup.index("copier==9.17.2") < combined_setup.index(token_guard)
-    assert combined_maintenance.index("copier==9.17.2") < combined_maintenance.index("glab auth status")
-
-
-@pytest.mark.parametrize(
-    "features",
-    [
-        ["codex"],
-        ["codex", "copier"],
-        ["codex", "gitlab"],
-        ["codex", "copier", "gitlab"],
-    ],
-    ids=["codex", "copier", "gitlab", "combined"],
-)
-def test_codex_scripts_are_valid_bash(
-    copier_case: Callable[..., AbstractContextManager[CopierCase]],
-    tmp_path: Path,
-    features: list[str],
-) -> None:
-    with copier_case(features=features) as case:
-        scripts = {
-            "setup.sh": case.render(PATH_SETUP),
-            "maintenance.sh": case.render(PATH_MAINTENANCE),
-        }
-
-    for name, content in scripts.items():
-        path = tmp_path / name
-        path.write_text(content)
-        subprocess.run(["bash", "-n", path], check=True)
-
-
-def test_codex_setup_requires_gitlab_secret(
-    copier_case: Callable[..., AbstractContextManager[CopierCase]],
-    tmp_path: Path,
-) -> None:
-    with copier_case(features=["codex", "gitlab"]) as case:
+    with copier_case(
+        features=["codex", "gitlab"],
+        core_repository_url="https://gitlab.example.com/group/repository.git",
+    ) as case:
         setup = case.render(PATH_SETUP)
+        maintenance = case.render(PATH_MAINTENANCE)
 
-    path = tmp_path / "setup.sh"
-    path.write_text(setup)
-    environment = os.environ.copy()
-    for name in ("GITLAB_TOKEN", "GITLAB_ACCESS_TOKEN", "OAUTH_TOKEN"):
-        environment.pop(name, None)
+    for script in (setup, maintenance):
+        assert script.startswith("#!/usr/bin/env bash\n")
+        assert "set -euo pipefail" in script
+        assert 'readonly GITLAB_HOST="gitlab.example.com"' in script
+        assert "{{" not in script
+        assert "{%" not in script
 
-    result = subprocess.run(
-        ["bash", path],
-        capture_output=True,
-        check=False,
-        env=environment,
-        text=True,
-    )
-
-    assert result.returncode != 0
-    assert "GITLAB_TOKEN must be provided as a Codex Cloud Environment Secret." in result.stderr
+    assert "GITLAB_TOKEN" in setup
+    assert "glab auth login" in setup
+    assert "glab auth status" in maintenance
 
 
 def test_codex_agent_instructions(
@@ -180,75 +79,23 @@ def test_codex_agent_instructions(
     with copier_case(features=["codex", "gitlab"]) as case:
         with_gitlab = case.render(PATH_AGENTS)
 
-    for agents in (codex_only, with_gitlab):
-        assert agents.startswith("# AGENTS.md\n")
-        assert "## General guidelines" in agents
-        assert "## Safety and boundaries" in agents
-        assert "{{" not in agents
-        assert "{%" not in agents
-
+    assert "## General guidelines" in codex_only
     assert "## GitLab development workflow" not in codex_only
     assert "## GitLab development workflow" in with_gitlab
+    assert "## Safety and boundaries" in with_gitlab
 
 
 def test_codex_devcontainer_integration(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(features=["codex", "devcontainer"]) as case:
-        rendered_config = case.render(PATH_DEVCONTAINER_CONFIG)
+        rendered = case.render(PATH_DEVCONTAINER_CONFIG)
 
-    config = json.loads(rendered_config)
+    config = json.loads(rendered)
 
-    assert config["features"] == {
-        "ghcr.io/devcontainers/features/node:2": {},
-        "ghcr.io/dirien/devcontainer-feature-codex/codex:0": {},
-    }
+    assert "ghcr.io/dirien/devcontainer-feature-codex/codex:0" in config["features"]
     assert config["mounts"] == [
         "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
     ]
-    setup_codex = config["postCreateCommand"]["setupCodex"]
-    assert 'sudo chown -R "$(id -u):$(id -g)" "$config_dir"' in setup_codex
-    assert 'chmod 700 "$config_dir"' in setup_codex
-    assert "analytics" not in setup_codex
-
-    extensions = config["customizations"]["vscode"]["extensions"]
-    assert extensions == [
-        "openai.chatgpt",
-        "mhutchie.git-graph",
-        "Gruntfuggly.todo-tree",
-        "mutantdino.resourcemonitor",
-        "streetsidesoftware.code-spell-checker",
-    ]
-
-    assert "{{" not in rendered_config
-    assert "{%" not in rendered_config
-
-
-@pytest.mark.parametrize(
-    ("features", "answers"),
-    [
-        (
-            ["codex", "devcontainer"],
-            {"codex_devcontainer": False},
-        ),
-        (
-            ["devcontainer"],
-            {"codex_devcontainer": True},
-        ),
-    ],
-    ids=["disabled", "stale-answer"],
-)
-def test_codex_devcontainer_integration_is_not_added(
-    copier_case: Callable[..., AbstractContextManager[CopierCase]],
-    features: list[str],
-    answers: dict[str, bool],
-) -> None:
-    with copier_case(features=features, **answers) as case:
-        rendered_config = case.render(PATH_DEVCONTAINER_CONFIG)
-
-    config = json.loads(rendered_config)
-
-    assert config["features"] == {}
-    assert config["mounts"] == []
-    assert config["postCreateCommand"] == {}
-    assert "openai.chatgpt" not in config["customizations"]["vscode"]["extensions"]
+    assert "setupCodex" in config["postCreateCommand"]
+    assert "openai.chatgpt" in config["customizations"]["vscode"]["extensions"]

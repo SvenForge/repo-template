@@ -2,7 +2,7 @@
 : "${GITLAB_TOKEN:?GITLAB_TOKEN must be provided as a Codex Cloud Environment Secret.}"
 
 readonly GLAB_VERSION="1.113.0"
-readonly GITLAB_HOST="gitlab.com"
+readonly GITLAB_HOST="{{ core_repository_host }}"
 
 die() {
     printf 'setup: %s\n' "$*" >&2

@@ -10,6 +10,17 @@ core_repository_url:
   default: ""
   when: "{{ 'core' in modules }}"
 
+core_repository_host:
+  type: str
+  help: At which host is the repository hosted?
+  default: >-
+    {{ (
+      core_repository_url.split('://', 1)[1].rsplit('@', 1)[-1].split('/', 1)[0]
+      if '://' in core_repository_url
+      else core_repository_url.rsplit('@', 1)[-1].split(':', 1)[0].split('/', 1)[0]
+    ) if core_repository_url else 'gitlab.com' }}
+  when: false
+
 core_owner_name:
   type: str
   help: Who is the repository owner? (optional)
