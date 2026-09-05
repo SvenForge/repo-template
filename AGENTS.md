@@ -17,9 +17,9 @@
 
 ### Workflow stage transitions
 
-* A maintainer must perform or explicitly authorize transitions from **plan** to **create** and from **create** to **verify**.
+* The user must perform or explicitly authorize transitions from **plan** to **create** and from **create** to **verify**.
 * Only a maintainer may transition an issue from **verify** to **deploy**, normally by merging the approved merge request. If GitLab automatically closes the issue on merge, assigning `workflow::deploy` is optional.
-* An agent must respect the scope of the current workflow stage and may ask a maintainer to transition the issue when the current stage is complete.
+* An agent must respect the scope of the current workflow stage and may ask the user to transition the issue when the current stage is complete.
 * For open issues, the `workflow::*` label is the authoritative indicator of the current workflow stage. When an issue is automatically closed by merging its merge request, the closed state takes precedence over a stale workflow label. Do not apply `workflow::*` labels to merge requests.
 
 ### 1. Plan
@@ -46,9 +46,8 @@
 
 ### 3. Verify
 
-* Self-review the completed merge request for compliance with repository guidelines, correctness, and scope.
+* Review the completed merge request for compliance with repository guidelines, correctness, and scope.
 * Fetch the latest `main` and verify that the feature branch has no conflicts. Merge `main` into the feature branch when it has diverged.
-* Assign an appropriate independent reviewer, such as a code owner or maintainer, and tag them in a comment requesting review.
 * Keep review discussions in GitLab threads. Answer questions, or implement requested improvements and briefly explain the response. Resolve each thread after its concern is addressed.
 * When acting as a reviewer, inspect the changes and leave clear questions or actionable improvement requests in the merge request.
 * Run all relevant local checks when feasible and confirm that the latest merge request CI/CD pipeline and all required jobs pass.
