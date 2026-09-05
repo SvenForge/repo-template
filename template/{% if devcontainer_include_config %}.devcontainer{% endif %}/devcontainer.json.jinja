@@ -1,14 +1,14 @@
 {
     "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
     "features": {
-{% if codex_include_devcontainer %}
+{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
         "ghcr.io/devcontainers/features/node:2": {},
         "ghcr.io/dirien/devcontainer-feature-codex/codex:0": {}
 {% endif %}
     },
     "remoteUser": "vscode",
     "mounts": [
-{% if codex_include_devcontainer %}
+{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
         "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
 {% endif %}
     ],
@@ -19,14 +19,14 @@
         "setupGit": "set -eu; identity='${containerWorkspaceFolder}/.git/devcontainer-identity.gitconfig'; if [ -f \"$identity\" ]; then git config --global --add include.path \"$identity\" || true; fi; git config --global --add safe.directory '${containerWorkspaceFolder}'; git config --local core.autocrlf input"
     },
     "postCreateCommand": {
-{% if codex_include_devcontainer %}
+{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
         "setupCodex": "set -eu; config_dir=\"$HOME/.codex\"; mkdir -p \"$config_dir\"; sudo chown -R \"$(id -u):$(id -g)\" \"$config_dir\"; chmod 700 \"$config_dir\""
 {% endif %}
     },
     "customizations": {
         "vscode": {
             "extensions": [
-{% if codex_include_devcontainer %}
+{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
                 "openai.chatgpt",
 {% endif %}
                 "mhutchie.git-graph",

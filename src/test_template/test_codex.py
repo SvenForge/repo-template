@@ -10,31 +10,54 @@ import pytest
 from .conftest import CopierCase
 
 
-PATH_AGENTS = "template/{% if codex_include_config %}AGENTS.md{% endif %}.jinja"
-PATH_SETUP = "template/{% if codex_include_config %}.codex{% endif %}/setup.sh.jinja"
-PATH_MAINTENANCE = "template/{% if codex_include_config %}.codex{% endif %}/maintenance.sh.jinja"
+PATH_AGENTS = "template/{% if codex_include_agents %}AGENTS.md{% endif %}.jinja"
+PATH_SETUP = "template/{% if codex_include_setup %}.codex{% endif %}/setup.sh.jinja"
+PATH_MAINTENANCE = "template/{% if codex_include_maintenance %}.codex{% endif %}/maintenance.sh.jinja"
 PATH_DEVCONTAINER_CONFIG = "template/{% if devcontainer_include_config %}.devcontainer{% endif %}/devcontainer.json.jinja"
-PATH_DEVCONTAINER_LOCK = "template/{% if codex_include_devcontainer %}.devcontainer{% endif %}/devcontainer-lock.json"
 
 
 @pytest.mark.parametrize(
-    ("features", "expected"),
+    ("features", "answers", "expected"),
     [
-        ([], (False, False)),
-        (["codex"], (True, False)),
-        (["codex", "devcontainer"], (True, True)),
+        ([], {}, (False, False, False, False, False)),
+        (["codex"], {}, (True, False, True, True, True)),
+        (
+            ["codex"],
+            {"codex_cloud": False},
+            (False, False, True, False, False),
+        ),
+        (
+            ["codex", "devcontainer"],
+            {},
+            (True, True, True, True, True),
+        ),
+        (
+            ["codex", "devcontainer"],
+            {"codex_cloud": False, "codex_devcontainer": False},
+            (False, False, True, False, False),
+        ),
     ],
-    ids=["without-codex", "codex-only", "with-devcontainer"],
+    ids=[
+        "without-codex",
+        "codex-defaults",
+        "without-cloud",
+        "with-devcontainer",
+        "agents-only",
+    ],
 )
 def test_codex_file_selection(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
     features: list[str],
-    expected: tuple[bool, bool],
+    answers: dict[str, bool],
+    expected: tuple[bool, bool, bool, bool, bool],
 ) -> None:
-    with copier_case(features=features) as case:
+    with copier_case(features=features, **answers) as case:
         selected = (
-            case.context["codex_include_config"],
-            case.context["codex_include_devcontainer"],
+            case.context["codex_cloud"],
+            case.context["codex_devcontainer"],
+            case.context["codex_include_agents"],
+            case.context["codex_include_setup"],
+            case.context["codex_include_maintenance"],
         )
 
     assert selected == expected
@@ -173,10 +196,8 @@ def test_codex_devcontainer_integration(
 ) -> None:
     with copier_case(features=["codex", "devcontainer"]) as case:
         rendered_config = case.render(PATH_DEVCONTAINER_CONFIG)
-        rendered_lock = case.render(PATH_DEVCONTAINER_LOCK)
 
     config = json.loads(rendered_config)
-    lock = json.loads(rendered_lock)
 
     assert config["features"] == {
         "ghcr.io/devcontainers/features/node:2": {},
@@ -199,11 +220,35 @@ def test_codex_devcontainer_integration(
         "streetsidesoftware.code-spell-checker",
     ]
 
-    assert set(lock["features"]) == set(config["features"])
-    assert lock["features"]["ghcr.io/devcontainers/features/node:2"]["version"] == "2.1.0"
-    assert lock["features"]["ghcr.io/dirien/devcontainer-feature-codex/codex:0"]["version"] == "0.0.1"
-    for feature in lock["features"].values():
-        assert feature["resolved"].endswith(feature["integrity"])
-
     assert "{{" not in rendered_config
     assert "{%" not in rendered_config
+
+
+@pytest.mark.parametrize(
+    ("features", "answers"),
+    [
+        (
+            ["codex", "devcontainer"],
+            {"codex_devcontainer": False},
+        ),
+        (
+            ["devcontainer"],
+            {"codex_devcontainer": True},
+        ),
+    ],
+    ids=["disabled", "stale-answer"],
+)
+def test_codex_devcontainer_integration_is_not_added(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+    features: list[str],
+    answers: dict[str, bool],
+) -> None:
+    with copier_case(features=features, **answers) as case:
+        rendered_config = case.render(PATH_DEVCONTAINER_CONFIG)
+
+    config = json.loads(rendered_config)
+
+    assert config["features"] == {}
+    assert config["mounts"] == []
+    assert config["postCreateCommand"] == {}
+    assert "openai.chatgpt" not in config["customizations"]["vscode"]["extensions"]

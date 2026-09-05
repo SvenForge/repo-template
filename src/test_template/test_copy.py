@@ -75,13 +75,26 @@ COPY_CASES = {
         expected_files={
             Path(".codex/maintenance.sh"): ["set -euo pipefail"],
             Path(".codex/setup.sh"): ["set -euo pipefail"],
-            Path(".copier-answers.yml"): ["- codex"],
+            Path(".copier-answers.yml"): ["- codex", "codex_cloud: true"],
             Path("AGENTS.md"): ["## General guidelines", "## Safety and boundaries"],
         },
         executable_files=(
             Path(".codex/maintenance.sh"),
             Path(".codex/setup.sh"),
         ),
+    ),
+    "codex-without-cloud": CopyCase(
+        answers={
+            "features": "[codex]",
+            "codex_cloud": "false",
+            "core_include_readme": "false",
+            "core_license": "NOASSERTION",
+            "core_include_gitignore": "false",
+        },
+        expected_files={
+            Path(".copier-answers.yml"): ["- codex", "codex_cloud: false"],
+            Path("AGENTS.md"): ["## General guidelines", "## Safety and boundaries"],
+        },
     ),
     "codex-devcontainer": CopyCase(
         answers={
@@ -93,9 +106,11 @@ COPY_CASES = {
         expected_files={
             Path(".codex/maintenance.sh"): ["set -euo pipefail"],
             Path(".codex/setup.sh"): ["set -euo pipefail"],
-            Path(".copier-answers.yml"): ["- codex", "- devcontainer"],
-            Path(".devcontainer/devcontainer-lock.json"): [
-                "ghcr.io/dirien/devcontainer-feature-codex/codex:0"
+            Path(".copier-answers.yml"): [
+                "- codex",
+                "- devcontainer",
+                "codex_cloud: true",
+                "codex_devcontainer: true",
             ],
             Path(".devcontainer/devcontainer.json"): [
                 "ghcr.io/dirien/devcontainer-feature-codex/codex:0",
