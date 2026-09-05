@@ -1,13 +1,17 @@
 {
     "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
     "features": {
-{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}        "ghcr.io/devcontainers/features/node:2": {},
+{%- if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
+        "ghcr.io/devcontainers/features/node:2": {},
         "ghcr.io/dirien/devcontainer-feature-codex/codex:0": {}
-{% endif %}    },
+{%- endif %}
+    },
     "remoteUser": "vscode",
     "mounts": [
-{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}        "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
-{% endif %}    ],
+{%- if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
+        "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
+{%- endif %}
+    ],
     "initializeCommand": {
         "exportGitIdentity": ["git", "-C", "${localWorkspaceFolder}", "-c", "alias.export-identity=!f() { git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null) || exit 0; name=$(git config --get user.name 2>/dev/null) || exit 0; email=$(git config --get user.email 2>/dev/null) || exit 0; file=\"$git_dir/devcontainer-identity.gitconfig\"; git config --file \"$file\" user.name \"$name\"; git config --file \"$file\" user.email \"$email\"; }; f", "export-identity"]
     },
@@ -15,13 +19,17 @@
         "setupGit": "set -eu; identity='${containerWorkspaceFolder}/.git/devcontainer-identity.gitconfig'; if [ -f \"$identity\" ]; then git config --global --add include.path \"$identity\" || true; fi; git config --global --add safe.directory '${containerWorkspaceFolder}'; git config --local core.autocrlf input"
     },
     "postCreateCommand": {
-{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}        "setupCodex": "set -eu; config_dir=\"$HOME/.codex\"; mkdir -p \"$config_dir\"; sudo chown -R \"$(id -u):$(id -g)\" \"$config_dir\"; chmod 700 \"$config_dir\""
-{% endif %}    },
+{%- if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
+        "setupCodex": "set -eu; config_dir=\"$HOME/.codex\"; mkdir -p \"$config_dir\"; sudo chown -R \"$(id -u):$(id -g)\" \"$config_dir\"; chmod 700 \"$config_dir\""
+{%- endif %}
+    },
     "customizations": {
         "vscode": {
             "extensions": [
-{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}                "openai.chatgpt",
-{% endif %}                "mhutchie.git-graph",
+{%- if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
+                "openai.chatgpt",
+{%- endif %}
+                "mhutchie.git-graph",
                 "Gruntfuggly.todo-tree",
                 "mutantdino.resourcemonitor",
                 "streetsidesoftware.code-spell-checker"
