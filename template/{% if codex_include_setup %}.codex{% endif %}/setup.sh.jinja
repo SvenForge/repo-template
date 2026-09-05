@@ -7,9 +7,6 @@
 {% endif %}
 set -euo pipefail
 
-{% if 'copier' in modules %}
-{% include "template/_modules/copier/codex_setup.sh.jinja" %}
-{% endif %}
 {% if 'gitlab' in modules %}
 {% include "template/_modules/gitlab/codex_setup.sh.jinja" %}
 {% endif %}
