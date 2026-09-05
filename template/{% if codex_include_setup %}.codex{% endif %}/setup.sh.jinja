@@ -2,9 +2,6 @@
 # Set up a Codex Cloud environment.
 # Add the following setup command to the Codex Cloud Environment configuration:
 #   bash .codex/setup.sh
-{% if 'gitlab' in modules %}
-# Configure GITLAB_TOKEN as a Codex Cloud Environment Secret.
-{% endif %}
 set -euo pipefail
 
 {% if 'gitlab' in modules %}
