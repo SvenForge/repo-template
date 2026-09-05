@@ -1,0 +1,79 @@
+# Set up GitLab access for the Codex Cloud environment.
+: "${GITLAB_TOKEN:?GITLAB_TOKEN must be provided as a Codex Cloud Environment Secret.}"
+
+readonly GLAB_VERSION="1.113.0"
+readonly GITLAB_HOST="{{ core_repository_host }}"
+
+die() {
+    printf 'setup: %s\n' "$*" >&2
+    exit 1
+}
+
+glab_version() {
+    glab --version 2>/dev/null |
+        sed -nE '1s/^glab( version)? ([^[:space:]]+).*/\2/p'
+}
+
+# Install the pinned glab release when needed.
+if [[ "$(glab_version)" != "$GLAB_VERSION" ]]; then
+    architecture="$(dpkg --print-architecture)"
+    case "$architecture" in
+        amd64 | arm64) ;;
+        *) die "unsupported Debian architecture for glab: $architecture" ;;
+    esac
+
+    package="glab_${GLAB_VERSION}_linux_${architecture}.deb"
+    release_url="https://gitlab.com/gitlab-org/cli/-/releases/v${GLAB_VERSION}/downloads"
+    tmpdir="$(mktemp -d /tmp/codex-glab.XXXXXX)"
+    trap '[[ -z "${tmpdir:-}" ]] || rm -rf -- "$tmpdir"' EXIT
+
+    printf 'Installing glab %s...\n' "$GLAB_VERSION"
+    curl -fsSL -o "$tmpdir/$package" "$release_url/$package"
+    curl -fsSL -o "$tmpdir/checksums.txt" "$release_url/checksums.txt"
+    awk -v package="$package" \
+        '$2 == package || $2 == "*" package { print }' \
+        "$tmpdir/checksums.txt" |
+        (cd "$tmpdir" && sha256sum --check -)
+    sudo apt-get install --yes "$tmpdir/$package"
+
+    [[ "$(glab_version)" == "$GLAB_VERSION" ]] ||
+        die "glab ${GLAB_VERSION} was not installed successfully"
+    rm -rf -- "$tmpdir"
+    tmpdir=""
+fi
+
+# Persist the PAT, then use glab as this repository's HTTPS credential helper.
+without_token=(
+    env
+    -u GITLAB_TOKEN
+    -u GITLAB_ACCESS_TOKEN
+    -u OAUTH_TOKEN
+    GLAB_NO_PROMPT=1
+)
+umask 077
+printf '%s' "$GITLAB_TOKEN" | "${without_token[@]}" glab auth login \
+    --hostname "$GITLAB_HOST" \
+    --api-protocol https \
+    --git-protocol https \
+    --stdin
+
+"${without_token[@]}" glab config set remote_alias origin
+
+# Headless containers have no OS keyring, so restrict glab's fallback file.
+glab_config_dir="${GLAB_CONFIG_DIR:-${XDG_CONFIG_HOME:-"$HOME/.config"}/glab-cli}"
+glab_config_file="$glab_config_dir/config.yml"
+[[ -f "$glab_config_file" ]] || die "glab did not persist its credentials"
+chmod 700 "$glab_config_dir"
+chmod 600 "$glab_config_file"
+
+credential_key="credential.https://${GITLAB_HOST}.helper"
+git config --local --unset-all "$credential_key" >/dev/null 2>&1 || true
+git config --local --add "$credential_key" ""
+git config --local --add "$credential_key" \
+    "!$(command -v glab) auth git-credential"
+
+# Verify persisted authentication.
+"${without_token[@]}" glab auth status --hostname "$GITLAB_HOST" >/dev/null
+
+printf 'Verified glab %s and GitLab authentication.\n' \
+    "$GLAB_VERSION"

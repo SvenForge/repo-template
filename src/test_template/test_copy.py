@@ -63,6 +63,40 @@ COPY_CASES = {
             Path("template/_modules/core/copier.yml"): [],
         },
     ),
+    "codex": CopyCase(
+        answers={
+            "features": "[codex, devcontainer, gitlab]",
+        },
+        expected_files={
+            Path(".codex/maintenance.sh"): [
+                'readonly GITLAB_HOST="gitlab.com"',
+                "glab auth status",
+            ],
+            Path(".codex/setup.sh"): [
+                'readonly GITLAB_HOST="gitlab.com"',
+                "GITLAB_TOKEN",
+                "glab auth login",
+            ],
+            Path(".copier-answers.yml"): [],
+            Path(".devcontainer/devcontainer.json"): [
+                "ghcr.io/dirien/devcontainer-feature-codex/codex:0",
+                "openai.chatgpt",
+            ],
+            Path(".gitignore"): [],
+            Path(".gitlab-ci.yml"): [],
+            Path(".gitlab/ci/copier.yml"): [],
+            Path(".gitlab/ci/demo.yml"): [],
+            Path(".gitlab/issue_templates/default.md"): [],
+            Path(".gitlab/merge_request_templates/default.md"): [],
+            Path("AGENTS.md"): [
+                "## General guidelines",
+                "## GitLab development workflow",
+                "## Safety and boundaries",
+            ],
+            Path("LICENSE.md"): [],
+            Path("README.md"): [],
+        },
+    ),
 }
 
 

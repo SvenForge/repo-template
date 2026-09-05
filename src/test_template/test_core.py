@@ -6,6 +6,26 @@ import pytest
 from .conftest import CopierCase
 
 
+@pytest.mark.parametrize(
+    ("repository_url", "expected"),
+    [
+        ("", "gitlab.com"),
+        ("https://gitlab.example.com/group/repository.git", "gitlab.example.com"),
+        ("git@gitlab.example.com:group/repository.git", "gitlab.example.com"),
+    ],
+    ids=["default", "https", "ssh"],
+)
+def test_repository_host(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+    repository_url: str,
+    expected: str,
+) -> None:
+    with copier_case(core_repository_url=repository_url) as case:
+        repository_host = case.context["core_repository_host"]
+
+    assert repository_host == expected
+
+
 def test_readme_with_owner_contact(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
