@@ -3,7 +3,6 @@
 # Add the following maintenance command to the Codex Cloud Environment configuration:
 #   bash .codex/maintenance.sh
 set -euo pipefail
-
-{% if 'gitlab' in modules -%}
+{% if 'gitlab' in modules %}
 {% include "template/_modules/gitlab/maintenance.sh.jinja" -%}
 {% endif -%}

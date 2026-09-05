@@ -97,6 +97,33 @@ COPY_CASES = {
             Path("README.md"): [],
         },
     ),
+    "codex-without-gitlab": CopyCase(
+        answers={
+            "features": "[codex, devcontainer]",
+        },
+        expected_files={
+            Path(".codex/maintenance.sh"): [],
+            Path(".codex/setup.sh"): [],
+            Path(".copier-answers.yml"): [],
+            Path(".devcontainer/devcontainer.json"): [],
+            Path(".gitignore"): [],
+            Path("AGENTS.md"): [
+                "## General guidelines",
+                "## Safety and boundaries",
+            ],
+            Path("LICENSE.md"): [],
+            Path("README.md"): [],
+        },
+    ),
+}
+
+
+WHITESPACE_CHECKED_FILES = {
+    Path("AGENTS.md"),
+    Path(".codex/maintenance.sh"),
+    Path(".codex/setup.sh"),
+    Path(".devcontainer/devcontainer.json"),
+    Path("README.md"),
 }
 
 
@@ -128,3 +155,8 @@ def test_copy(tmp_path: Path, case: CopyCase) -> None:
         content = (destination / path).read_text()
         for expected in expected_content:
             assert expected in content
+
+        if path in WHITESPACE_CHECKED_FILES:
+            assert "\n\n\n" not in content
+            assert content.endswith("\n")
+            assert not content.endswith("\n\n")
