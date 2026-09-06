@@ -17,6 +17,7 @@ features:
   default:
     - devcontainer
     - gitlab
+    - python
 
 modules:
   type: yaml
