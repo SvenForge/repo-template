@@ -83,8 +83,8 @@ def test_python_codex_cloud_scripts(
         with_gitlab = (case.render(PATH_SETUP), case.render(PATH_MAINTENANCE))
 
     install_commands = [
-        "python -m pip install --constraint env/dev/constraints.txt --upgrade pip",
-        "python -m pip install --constraint env/dev/constraints.txt --editable . --group dev",
+        "python -m pip install --upgrade pip",
+        "python -m pip install --editable . --group dev",
     ]
     for script in (*without_gitlab, *with_gitlab):
         subprocess.run(["bash", "-n"], input=script, text=True, check=True)

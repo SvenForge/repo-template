@@ -3,7 +3,7 @@
 # Add the following setup command to the Codex Cloud Environment configuration:
 #   bash .codex/setup.sh
 set -euo pipefail
-{% if python_include_project %}
+{% if python_include_pyproject %}
 {% include "template/_modules/python/setup.sh.jinja" -%}
 {% endif -%}
 {% if 'gitlab' in modules %}

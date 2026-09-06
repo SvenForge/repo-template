@@ -10,19 +10,18 @@ name = {{ python_distribution_name | tojson }}
 dynamic = ["version"]
 requires-python = ">={{ python_version }}"
 dependencies = []
-{% if core_include_readme %}
+{% if core_include_readme -%}
 readme = "README.md"
-{% endif %}
-{% if core_include_license %}
+{% endif -%}
+{% if core_include_license -%}
 license = {% if core_license == 'NONE' %}"LicenseRef-Proprietary"{% else %}{{ core_license | tojson }}{% endif %}
 license-files = ["LICENSE.md"]
-{% endif %}
-{% if core_owner_name %}
+{% endif -%}
+{% if core_owner_name -%}
 authors = [
     { name = {{ core_owner_name | tojson }}{% if core_owner_email %}, email = {{ core_owner_email | tojson }}{% endif %} },
 ]
 {% endif %}
-
 [dependency-groups]
 test = [
     "pytest",

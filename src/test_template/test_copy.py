@@ -19,19 +19,31 @@ COPY_CASES = {
         expected_files={
             Path(".copier-answers.yml"): [],
             Path(".devcontainer/devcontainer.json"): [
-                '"image": "mcr.microsoft.com/devcontainers/base:2-bookworm"',
+                '"image": "mcr.microsoft.com/devcontainers/python:3-3.12-bookworm"',
                 '"remoteUser": "vscode"',
+                '"setupPython"',
             ],
-            Path(".gitignore"): [],
+            Path(".gitignore"): ["### Python ###", "__pypackages__/"],
             Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
             Path(".gitlab/ci/copier.yml"): ["copier:check:"],
             Path(".gitlab/ci/demo.yml"): ["demo:fortune:"],
+            Path(".gitlab/ci/python.yml"): [
+                "python:pytest:",
+                "python:ruff:",
+                "python:mypy:",
+            ],
             Path(".gitlab/issue_templates/default.md"): ["## Problem"],
             Path(".gitlab/merge_request_templates/default.md"): ["## What is changed?"],
             Path("LICENSE.md"): [],
             Path("README.md"): [
                 "# My Repository",
                 "_TODO: Add contact information._",
+            ],
+            Path("pyproject.toml"): ['name = "my-repository"'],
+            Path("src/my_repository/__init__.py"): [],
+            Path("src/test_my_repository/__init__.py"): [],
+            Path("src/test_my_repository/test_import.py"): [
+                "import my_repository",
             ],
         },
     ),
@@ -72,25 +84,32 @@ COPY_CASES = {
             "python_distribution_name": "acme-widget-library",
             "python_package_name": "acme_widget_library",
             "python_version": "3.13",
+            "python_include_testpackage": "false",
         },
         expected_files={
             Path(".copier-answers.yml"): [],
-            Path("env/dev/constraints.txt"): [
-                "pip==26.2.1",
-                "pytest==9.1.1",
-                "pytest-cov==7.1.0",
-                "mypy==2.3.1",
-                "ruff==0.16.6",
-            ],
             Path("pyproject.toml"): [
                 'name = "acme-widget-library"',
                 'requires-python = ">=3.13"',
                 'testpaths = ["src/test_acme_widget_library"]',
             ],
             Path("src/acme_widget_library/__init__.py"): [],
-            Path("src/test_acme_widget_library/__init__.py"): [],
-            Path("src/test_acme_widget_library/test_import.py"): [
-                "import acme_widget_library"
+        },
+    ),
+    "python-test-package-only": CopyCase(
+        answers={
+            "features": "[python]",
+            "core_include_readme": "false",
+            "core_license": "NOASSERTION",
+            "core_include_gitignore": "false",
+            "python_include_pyproject": "false",
+            "python_include_package": "false",
+        },
+        expected_files={
+            Path(".copier-answers.yml"): [],
+            Path("src/test_my_repository/__init__.py"): [],
+            Path("src/test_my_repository/test_import.py"): [
+                "import my_repository"
             ],
         },
     ),
@@ -104,17 +123,10 @@ COPY_CASES = {
         },
         expected_files={
             Path(".copier-answers.yml"): [],
-            Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
-            Path(".gitlab/ci/python.yml"): [
-                "python:pytest:",
-                "python:ruff:",
-                "python:mypy:",
-            ],
             Path(".gitlab/issue_templates/default.md"): ["## Problem"],
             Path(".gitlab/merge_request_templates/default.md"): [
                 "## What is changed?"
             ],
-            Path("env/dev/constraints.txt"): ["pip==26.2.1"],
             Path("pyproject.toml"): ['name = "my-repository"'],
             Path("src/my_repository/__init__.py"): [],
             Path("src/test_my_repository/__init__.py"): [],
@@ -161,12 +173,12 @@ COPY_CASES = {
         },
         expected_files={
             Path(".codex/maintenance.sh"): [
-                "python -m pip install --constraint env/dev/constraints.txt",
+                "python -m pip install --editable . --group dev",
                 'readonly GITLAB_HOST="gitlab.com"',
                 "glab auth status",
             ],
             Path(".codex/setup.sh"): [
-                "python -m pip install --constraint env/dev/constraints.txt",
+                "python -m pip install --editable . --group dev",
                 'readonly GITLAB_HOST="gitlab.com"',
                 "GITLAB_TOKEN",
                 "glab auth login",
@@ -178,7 +190,7 @@ COPY_CASES = {
                 "openai.chatgpt",
                 "setupPython",
             ],
-            Path(".gitignore"): ["### Python ###", "!env/dev/constraints.txt"],
+            Path(".gitignore"): ["### Python ###", "__pypackages__/"],
             Path(".gitlab-ci.yml"): [],
             Path(".gitlab/ci/copier.yml"): [],
             Path(".gitlab/ci/demo.yml"): [],
@@ -194,7 +206,6 @@ COPY_CASES = {
                 "## GitLab development workflow",
                 "## Safety and boundaries",
             ],
-            Path("env/dev/constraints.txt"): ["pip==26.2.1"],
             Path("LICENSE.md"): [],
             Path("pyproject.toml"): [
                 'name = "my-repository"',

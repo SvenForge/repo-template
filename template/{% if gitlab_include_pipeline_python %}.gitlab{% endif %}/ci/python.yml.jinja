@@ -3,8 +3,8 @@
 .python:base:
   image: python:{{ python_version }}-bookworm
   before_script:
-    - python -m pip install --constraint env/dev/constraints.txt --upgrade pip
-    - python -m pip install --constraint env/dev/constraints.txt --editable . --group "$PYTHON_DEPENDENCY_GROUP"
+    - python -m pip install --upgrade pip
+    - python -m pip install --editable . --group "$PYTHON_DEPENDENCY_GROUP"
 
 python:pytest:
   extends: .python:base

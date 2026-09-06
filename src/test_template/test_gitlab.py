@@ -35,7 +35,7 @@ def test_gitlab_python_pipeline(
 ) -> None:
     with copier_case(
         features=["gitlab", "python"],
-        gitlab_pipeline=[],
+        gitlab_pipeline=["python"],
         python_version="3.13",
     ) as case:
         rendered_root = case.render(PATH_ROOT_PIPELINE)
@@ -49,8 +49,8 @@ def test_gitlab_python_pipeline(
     base = python_pipeline[".python:base"]
     assert base["image"] == "python:3.13-bookworm"
     assert base["before_script"] == [
-        "python -m pip install --constraint env/dev/constraints.txt --upgrade pip",
-        'python -m pip install --constraint env/dev/constraints.txt --editable . --group "$PYTHON_DEPENDENCY_GROUP"',
+        "python -m pip install --upgrade pip",
+        'python -m pip install --editable . --group "$PYTHON_DEPENDENCY_GROUP"',
     ]
 
     pytest_job = python_pipeline["python:pytest"]
@@ -97,6 +97,14 @@ def test_gitlab_contribution_templates(
     assert "## GitLab development workflow" in agents_fragment
 
 
+def test_gitlab_python_pipeline_choice_requires_python_module(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+) -> None:
+    with pytest.raises(ValueError, match="gitlab_pipeline"):
+        with copier_case(features=["gitlab"], gitlab_pipeline=["python"]):
+            pass
+
+
 @pytest.mark.parametrize(
     ("answers", "expected"),
     [
@@ -115,7 +123,15 @@ def test_gitlab_contribution_templates(
         ),
         (
             {"features": ["gitlab", "python"], "gitlab_pipeline": []},
+            (True, True, False, False, False, False),
+        ),
+        (
+            {"features": ["gitlab", "python"], "gitlab_pipeline": ["python"]},
             (True, True, False, False, True, True),
+        ),
+        (
+            {"features": ["gitlab", "python"]},
+            (True, True, True, True, True, True),
         ),
     ],
     ids=[
@@ -124,6 +140,8 @@ def test_gitlab_contribution_templates(
         "copier-only",
         "python-only",
         "python-with-empty-pipeline",
+        "python-pipeline",
+        "python-default-pipelines",
     ],
 )
 def test_gitlab_file_selection(

@@ -14,12 +14,14 @@ gitlab_pipeline:
   type: str
   help: Which jobs shall be included in the GitLab pipeline?
   multiselect: true
-  choices:
+  choices: |
     Check for Copier template updates: copier
     Run the demonstration job: demo
-  default:
-    - copier
-    - demo
+    {% if 'python' in modules %}
+    Run the Python test and quality jobs: python
+    {% endif %}
+  default: >-
+    [copier, demo{% if 'python' in modules %}, python{% endif %}]
   when: "{{ 'gitlab' in modules }}"
 
 gitlab_include_pipeline_copier:
@@ -37,11 +39,11 @@ gitlab_include_pipeline_demo:
 gitlab_include_pipeline_python:
   type: bool
   help: Create the Python pipeline module?
-  default: "{{ 'gitlab' in modules and 'python' in modules }}"
+  default: "{{ 'gitlab' in modules and 'python' in modules and 'python' in gitlab_pipeline }}"
   when: false
 
 gitlab_include_pipeline:
   type: bool
   help: Create the GitLab CI/CD pipeline?
-  default: "{{ 'gitlab' in modules and (gitlab_pipeline | length > 0 or gitlab_include_pipeline_python) }}"
+  default: "{{ 'gitlab' in modules and gitlab_pipeline | length > 0 }}"
   when: false

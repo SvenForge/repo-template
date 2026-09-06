@@ -11,24 +11,31 @@ import pytest
 from .conftest import CopierCase, TEMPLATE_ROOT
 
 
-PATH_PROJECT = "template/{% if python_include_project %}pyproject.toml{% endif %}.jinja"
-PATH_CONSTRAINTS = "template/{% if python_include_project %}env{% endif %}/dev/constraints.txt"
-PATH_PACKAGE = "template/{% if python_include_project %}src{% endif %}/{{ python_package_name }}/__init__.py.jinja"
-PATH_TEST_PACKAGE = "template/{% if python_include_project %}src{% endif %}/test_{{ python_package_name }}/__init__.py"
-PATH_IMPORT_TEST = "template/{% if python_include_project %}src{% endif %}/test_{{ python_package_name }}/test_import.py.jinja"
+PATH_PROJECT = "template/{% if python_include_pyproject %}pyproject.toml{% endif %}.jinja"
+PATH_PACKAGE = "template/{% if python_include_package %}src{% endif %}/{{ python_package_name }}/__init__.py.jinja"
+PATH_TEST_PACKAGE = "template/{% if python_include_testpackage %}src{% endif %}/test_{{ python_package_name }}/__init__.py"
+PATH_IMPORT_TEST = "template/{% if python_include_testpackage %}src{% endif %}/test_{{ python_package_name }}/test_import.py.jinja"
 
 
 def test_python_file_selection_and_name_defaults(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(features=[]) as case:
-        assert case.context["python_include_project"] is False
+        assert (
+            case.context["python_include_pyproject"],
+            case.context["python_include_package"],
+            case.context["python_include_testpackage"],
+        ) == (False, False, False)
 
     with copier_case(
         features=["python"],
         core_repository_name="Example Repository",
     ) as case:
-        assert case.context["python_include_project"] is True
+        assert (
+            case.context["python_include_pyproject"],
+            case.context["python_include_package"],
+            case.context["python_include_testpackage"],
+        ) == (True, True, True)
         assert case.context["python_distribution_name"] == "example-repository"
         assert case.context["python_package_name"] == "example_repository"
         assert case.context["python_version"] == "3.12"
@@ -41,16 +48,22 @@ def test_python_file_selection_and_name_defaults(
         ({"python_distribution_name": "example_package"}, "python_distribution_name"),
         ({"python_package_name": "example-package"}, "python_package_name"),
         ({"python_package_name": "class"}, "python_package_name"),
+        ({"python_version": "3"}, "python_version"),
         ({"python_version": "3.11"}, "python_version"),
         ({"python_version": "3.13.1"}, "python_version"),
+        ({"python_version": "4.0"}, "python_version"),
+        ({"python_version": "3.15"}, "python_version"),
     ],
     ids=[
         "uppercase-distribution",
         "underscored-distribution",
         "hyphenated-package",
         "keyword-package",
-        "unsupported-version",
+        "missing-minor",
+        "below-supported-range",
         "patch-version",
+        "wrong-major",
+        "above-supported-range",
     ],
 )
 def test_python_answer_validation(
@@ -74,16 +87,15 @@ def test_python_project_configuration(
         core_license="MIT",
         python_distribution_name="acme-widget-library",
         python_package_name="acme_widget_library",
-        python_version="3.13",
+        python_version="3.14",
     ) as case:
         project = tomllib.loads(case.render(PATH_PROJECT))
-        constraints = case.render(PATH_CONSTRAINTS).splitlines()
         package = case.render(PATH_PACKAGE)
         test_package = case.render(PATH_TEST_PACKAGE)
         import_test = case.render(PATH_IMPORT_TEST)
 
     assert project["project"]["name"] == "acme-widget-library"
-    assert project["project"]["requires-python"] == ">=3.13"
+    assert project["project"]["requires-python"] == ">=3.14"
     assert project["project"]["dynamic"] == ["version"]
     assert project["project"]["dependencies"] == []
     assert project["project"]["readme"] == "README.md"
@@ -116,13 +128,13 @@ def test_python_project_configuration(
     assert project["tool"]["coverage"]["run"]["source"] == ["acme_widget_library"]
     assert project["tool"]["ruff"] == {
         "src": ["src"],
-        "target-version": "py313",
+        "target-version": "py314",
     }
     assert project["tool"]["mypy"]["files"] == [
         "src/acme_widget_library",
         "src/test_acme_widget_library",
     ]
-    assert project["tool"]["mypy"]["python_version"] == "3.13"
+    assert project["tool"]["mypy"]["python_version"] == "3.14"
     assert project["tool"]["pytest"]["ini_options"]["addopts"] == [
         "--cov=acme_widget_library",
         "--cov-report=term-missing",
@@ -130,13 +142,6 @@ def test_python_project_configuration(
         "--junitxml=pytest.xml",
     ]
 
-    assert set(constraints) == {
-        "pip==26.2.1",
-        "pytest==9.1.1",
-        "pytest-cov==7.1.0",
-        "mypy==2.3.1",
-        "ruff==0.16.6",
-    }
     assert "Acme Widget" in package
     assert test_package == ""
     assert "import acme_widget_library" in import_test
@@ -155,7 +160,10 @@ def test_python_project_omits_absent_core_metadata(
         core_owner_name="",
         core_license="NOASSERTION",
     ) as case:
-        project = tomllib.loads(case.render(PATH_PROJECT))["project"]
+        rendered = case.render(PATH_PROJECT)
+        project = tomllib.loads(rendered)["project"]
+    assert "dependencies = []\n\n[dependency-groups]" in rendered
+    assert "\n\n\n" not in rendered
 
     assert "readme" not in project
     assert "authors" not in project
@@ -230,8 +238,6 @@ def test_generated_python_project_editable_install(tmp_path: Path) -> None:
             "-m",
             "pip",
             "install",
-            "--constraint",
-            "env/dev/constraints.txt",
             "--upgrade",
             "pip",
         ],
@@ -244,8 +250,6 @@ def test_generated_python_project_editable_install(tmp_path: Path) -> None:
             "-m",
             "pip",
             "install",
-            "--constraint",
-            "env/dev/constraints.txt",
             "--editable",
             ".",
             "--group",

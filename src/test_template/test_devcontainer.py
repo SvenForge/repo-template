@@ -75,11 +75,8 @@ def test_python_devcontainer_integration(
     assert config["features"] == {}
     assert config["mounts"] == []
     assert config["postCreateCommand"] == {
-        "setupPython": (
-            "python -m pip install --constraint env/dev/constraints.txt --upgrade pip"
-            " && python -m pip install --constraint env/dev/constraints.txt"
-            " --editable . --group dev"
-        )
+        "setupPython": "python -m pip install --upgrade pip"
+        " && python -m pip install --editable . --group dev"
     }
     assert "setupCodex" not in rendered
     assert "openai.chatgpt" not in rendered
