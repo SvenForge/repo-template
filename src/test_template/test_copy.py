@@ -40,10 +40,18 @@ COPY_CASES = {
                 "_TODO: Add contact information._",
             ],
             Path("pyproject.toml"): ['name = "my-repository"'],
-            Path("src/my_repository/__init__.py"): [],
-            Path("src/test_my_repository/__init__.py"): [],
+            Path("src/my_repository/__init__.py"): [
+                '"""my_repository package."""',
+            ],
+            Path("src/test_my_repository/__init__.py"): [
+                '"""Test package."""',
+            ],
             Path("src/test_my_repository/test_import.py"): [
+                '"""Test package imports."""',
                 "import my_repository",
+            ],
+            Path("src/test_my_repository/test_self.py"): [
+                '"""Self-tests of the test suite."""',
             ],
         },
     ),

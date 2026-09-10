@@ -79,5 +79,5 @@ def test_python_project_configuration(
     assert project["tool"]["coverage"]["run"]["omit"] == ["test_*"]
     assert project["tool"]["ruff"]["src"] == ["src"]
     assert project["tool"]["mypy"]["files"] == ["src"]
-    assert "Acme Widget package." in package
+    assert '"""acme_widget_library package."""' in package
     assert "import acme_widget_library" in import_test
