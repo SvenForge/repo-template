@@ -16,6 +16,7 @@
         - .gitlab-ci.yml
         - .gitlab/ci/**/*
     - when: manual
+      allow_failure: true
 
 python:pytest:
   extends: .python:base
