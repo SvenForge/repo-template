@@ -65,12 +65,37 @@ omit = ["test_*"]
 show_missing = true
 
 [tool.ruff]
+src = ["src"]
 exclude = [
     ".git",
     "__pycache__",
     "*/.ipynb_checkpoints/*.py",
 ]
-src = ["src"]
+line-length = 200
+indent-width = 4
+
+[tool.ruff.lint]
+extend-select = [
+    "D",    # pydocstyle
+    "N",    # pep8-naming
+    "Q",    # flake8-quotes
+    "COM",  # flake8-commas
+    "C4",   # flake8-comprehensions
+    "FIX",  # flake8-fixme
+    "PTH",  # flake8-use-pathlib
+]
+ignore = [
+    "D212",  # multi-line docstring summary should start at the first line
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "single"
 
 [tool.mypy]
 files = ["src"]
