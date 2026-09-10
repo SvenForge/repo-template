@@ -7,17 +7,9 @@ import pytest
 from .conftest import CopierCase
 
 
-PATH_PROJECT = (
-    "template/{% if python_include_pyproject %}pyproject.toml{% endif %}.jinja"
-)
-PATH_PACKAGE = (
-    "template/{% if python_include_package %}src{% endif %}/"
-    "{{ python_package_name }}/__init__.py.jinja"
-)
-PATH_IMPORT_TEST = (
-    "template/{% if python_include_testpackage %}src{% endif %}/"
-    "test_{{ python_package_name }}/test_import.py.jinja"
-)
+PATH_PROJECT = "template/{% if python_include_pyproject %}pyproject.toml{% endif %}.jinja"
+PATH_PACKAGE = "template/{% if python_include_package %}src{% endif %}/{{ python_package_name }}/__init__.py.jinja"
+PATH_IMPORT_TEST = "template/{% if python_include_testpackage %}src{% endif %}/test_{{ python_package_name }}/test_import.py.jinja"
 
 
 def test_python_file_selection_and_defaults(
@@ -25,11 +17,10 @@ def test_python_file_selection_and_defaults(
 ) -> None:
     with copier_case(features=[]) as case:
         context = case.context
-        assert (
-            context["python_include_pyproject"],
-            context["python_include_package"],
-            context["python_include_testpackage"],
-        ) == (False, False, False)
+
+    assert context["python_include_pyproject"] == False
+    assert context["python_include_package"] == False
+    assert context["python_include_testpackage"] == False
 
     with copier_case(
         features=["python"],
@@ -37,11 +28,9 @@ def test_python_file_selection_and_defaults(
     ) as case:
         context = case.context
 
-    assert (
-        context["python_include_pyproject"],
-        context["python_include_package"],
-        context["python_include_testpackage"],
-    ) == (True, True, True)
+    assert context["python_include_pyproject"] == True
+    assert context["python_include_package"] == True
+    assert context["python_include_testpackage"] == True
     assert context["python_distribution_name"] == "example-repository"
     assert context["python_package_name"] == "example_repository"
     assert context["python_version"] == "3.12"

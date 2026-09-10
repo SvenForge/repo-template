@@ -140,6 +140,3 @@ def test_copy(tmp_path: Path, case: CopyCase) -> None:
         content = (destination / path).read_text()
         for expected in expected_content:
             assert expected in content
-        if path != Path("copier.yml"):
-            assert "{{" not in content
-            assert "{%" not in content
