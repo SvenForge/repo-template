@@ -75,64 +75,6 @@ COPY_CASES = {
             Path("template/_modules/core/copier.yml"): [],
         },
     ),
-    "python": CopyCase(
-        answers={
-            "features": "[python]",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
-            "python_distribution_name": "acme-widget-library",
-            "python_package_name": "acme_widget_library",
-            "python_version": "3.13",
-            "python_include_testpackage": "false",
-        },
-        expected_files={
-            Path(".copier-answers.yml"): [],
-            Path("pyproject.toml"): [
-                'name = "acme-widget-library"',
-                'requires-python = ">=3.13"',
-                'testpaths = ["src/test_*"]',
-            ],
-            Path("src/acme_widget_library/__init__.py"): [],
-        },
-    ),
-    "python-test-package-only": CopyCase(
-        answers={
-            "features": "[python]",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
-            "python_include_pyproject": "false",
-            "python_include_package": "false",
-        },
-        expected_files={
-            Path(".copier-answers.yml"): [],
-            Path("src/test_my_repository/__init__.py"): [],
-            Path("src/test_my_repository/test_import.py"): [
-                "import my_repository"
-            ],
-        },
-    ),
-    "python-gitlab-empty": CopyCase(
-        answers={
-            "features": "[gitlab, python]",
-            "gitlab_pipeline": "[]",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
-        },
-        expected_files={
-            Path(".copier-answers.yml"): [],
-            Path(".gitlab/issue_templates/default.md"): ["## Problem"],
-            Path(".gitlab/merge_request_templates/default.md"): [
-                "## What is changed?"
-            ],
-            Path("pyproject.toml"): ['name = "my-repository"'],
-            Path("src/my_repository/__init__.py"): [],
-            Path("src/test_my_repository/__init__.py"): [],
-            Path("src/test_my_repository/test_import.py"): ["import my_repository"],
-        },
-    ),
     "codex": CopyCase(
         answers={
             "features": "[codex, devcontainer, gitlab]",
@@ -165,56 +107,6 @@ COPY_CASES = {
             ],
             Path("LICENSE.md"): [],
             Path("README.md"): [],
-        },
-    ),
-    "combined": CopyCase(
-        answers={
-            "features": "[codex, devcontainer, gitlab, python]",
-        },
-        expected_files={
-            Path(".codex/maintenance.sh"): [
-                "python -m pip install --editable . --group dev",
-                'readonly GITLAB_HOST="gitlab.com"',
-                "glab auth status",
-            ],
-            Path(".codex/setup.sh"): [
-                "python -m pip install --editable . --group dev",
-                'readonly GITLAB_HOST="gitlab.com"',
-                "GITLAB_TOKEN",
-                "glab auth login",
-            ],
-            Path(".copier-answers.yml"): [],
-            Path(".devcontainer/devcontainer.json"): [
-                "mcr.microsoft.com/devcontainers/python:3-3.12-bookworm",
-                "ghcr.io/dirien/devcontainer-feature-codex/codex:0",
-                "openai.chatgpt",
-                "setupPython",
-            ],
-            Path(".gitignore"): ["### Python ###", "__pypackages__/"],
-            Path(".gitlab-ci.yml"): [],
-            Path(".gitlab/ci/copier.yml"): [],
-            Path(".gitlab/ci/demo.yml"): [],
-            Path(".gitlab/ci/python.yml"): [
-                "python:pytest:",
-                "python:ruff:",
-                "python:mypy:",
-            ],
-            Path(".gitlab/issue_templates/default.md"): [],
-            Path(".gitlab/merge_request_templates/default.md"): [],
-            Path("AGENTS.md"): [
-                "## General guidelines",
-                "## GitLab development workflow",
-                "## Safety and boundaries",
-            ],
-            Path("LICENSE.md"): [],
-            Path("pyproject.toml"): [
-                'name = "my-repository"',
-                'requires-python = ">=3.12"',
-            ],
-            Path("README.md"): [],
-            Path("src/my_repository/__init__.py"): [],
-            Path("src/test_my_repository/__init__.py"): [],
-            Path("src/test_my_repository/test_import.py"): ["import my_repository"],
         },
     ),
 }

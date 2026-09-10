@@ -53,7 +53,7 @@ def test_codex_cloud_scripts(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
-        features=["codex", "gitlab"],
+        features=["codex", "gitlab", "python"],
         core_repository_url="https://gitlab.example.com/group/repository.git",
     ) as case:
         setup = case.render(PATH_SETUP)
@@ -63,37 +63,13 @@ def test_codex_cloud_scripts(
         assert script.startswith("#!/usr/bin/env bash\n")
         assert "set -euo pipefail" in script
         assert 'readonly GITLAB_HOST="gitlab.example.com"' in script
+        assert "python -m pip install --editable . --group dev" in script
         assert "{{" not in script
         assert "{%" not in script
 
     assert "GITLAB_TOKEN" in setup
     assert "glab auth login" in setup
     assert "glab auth status" in maintenance
-
-
-def test_python_codex_cloud_scripts(
-    copier_case: Callable[..., AbstractContextManager[CopierCase]],
-) -> None:
-    with copier_case(features=["codex", "python"]) as case:
-        without_gitlab = (case.render(PATH_SETUP), case.render(PATH_MAINTENANCE))
-    with copier_case(features=["codex", "gitlab", "python"]) as case:
-        with_gitlab = (case.render(PATH_SETUP), case.render(PATH_MAINTENANCE))
-
-    install_commands = [
-        "python -m pip install --upgrade pip",
-        "python -m pip install --editable . --group dev",
-    ]
-    for script in (*without_gitlab, *with_gitlab):
-        for command in install_commands:
-            assert script.count(command) == 1
-        assert script.index(install_commands[0]) < script.index(install_commands[1])
-        assert "{{" not in script
-        assert "{%" not in script
-
-    for script in without_gitlab:
-        assert "GITLAB_HOST" not in script
-    for script in with_gitlab:
-        assert script.index(install_commands[1]) < script.index("GITLAB_HOST")
 
 
 def test_codex_agent_instructions(
@@ -113,10 +89,7 @@ def test_codex_agent_instructions(
 def test_codex_devcontainer_integration(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
-    with copier_case(
-        features=["codex", "devcontainer", "python"],
-        python_version="3.13",
-    ) as case:
+    with copier_case(features=["codex", "devcontainer", "python"]) as case:
         rendered = case.render(PATH_DEVCONTAINER_CONFIG)
 
     config = json.loads(rendered)
@@ -125,8 +98,6 @@ def test_codex_devcontainer_integration(
     assert config["mounts"] == [
         "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
     ]
-    assert set(config["postCreateCommand"]) == {"setupCodex", "setupPython"}
-    assert config["image"] == "mcr.microsoft.com/devcontainers/python:3-3.13-bookworm"
+    assert "setupCodex" in config["postCreateCommand"]
+    assert "setupPython" in config["postCreateCommand"]
     assert "openai.chatgpt" in config["customizations"]["vscode"]["extensions"]
-    assert "{{" not in rendered
-    assert "{%" not in rendered

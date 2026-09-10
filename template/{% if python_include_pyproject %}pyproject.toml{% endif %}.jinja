@@ -71,9 +71,7 @@ exclude = [
     "*/.ipynb_checkpoints/*.py",
 ]
 src = ["src"]
-target-version = "py{{ python_version | replace('.', '') }}"
 
 [tool.mypy]
 files = ["src"]
-python_version = "{{ python_version }}"
 strict = true
