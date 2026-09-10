@@ -86,9 +86,11 @@ def test_gitignore(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case() as case:
-        rendered = case.render("template/{% if core_include_gitignore %}.gitignore{% endif %}")
+        rendered = case.render("template/{% if core_include_gitignore %}.gitignore{% endif %}.jinja")
 
     assert "### Linux ###" in rendered
     assert "### macOS ###" in rendered
     assert "### VisualStudioCode ###" in rendered
     assert "### Windows ###" in rendered
+    assert "### Python ###" in rendered
+    assert "### Project Customization ###" in rendered

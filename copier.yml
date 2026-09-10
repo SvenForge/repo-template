@@ -13,9 +13,11 @@ features:
     Copier: copier
     DevContainer: devcontainer
     GitLab: gitlab
+    Python: python
   default:
     - devcontainer
     - gitlab
+    - python
 
 modules:
   type: yaml
@@ -38,3 +40,5 @@ copier_version:
 !include template/_modules/devcontainer/copier.yml
 ---
 !include template/_modules/gitlab/copier.yml
+---
+!include template/_modules/python/copier.yml

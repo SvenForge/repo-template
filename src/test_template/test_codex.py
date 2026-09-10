@@ -53,7 +53,7 @@ def test_codex_cloud_scripts(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
-        features=["codex", "gitlab"],
+        features=["codex", "gitlab", "python"],
         core_repository_url="https://gitlab.example.com/group/repository.git",
     ) as case:
         setup = case.render(PATH_SETUP)
@@ -63,6 +63,7 @@ def test_codex_cloud_scripts(
         assert script.startswith("#!/usr/bin/env bash\n")
         assert "set -euo pipefail" in script
         assert 'readonly GITLAB_HOST="gitlab.example.com"' in script
+        assert "python -m pip install --editable . --group dev" in script
         assert "{{" not in script
         assert "{%" not in script
 
@@ -88,7 +89,7 @@ def test_codex_agent_instructions(
 def test_codex_devcontainer_integration(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
-    with copier_case(features=["codex", "devcontainer"]) as case:
+    with copier_case(features=["codex", "devcontainer", "python"]) as case:
         rendered = case.render(PATH_DEVCONTAINER_CONFIG)
 
     config = json.loads(rendered)
@@ -98,4 +99,5 @@ def test_codex_devcontainer_integration(
         "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
     ]
     assert "setupCodex" in config["postCreateCommand"]
+    assert "setupPython" in config["postCreateCommand"]
     assert "openai.chatgpt" in config["customizations"]["vscode"]["extensions"]

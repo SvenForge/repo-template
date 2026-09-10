@@ -19,13 +19,19 @@ COPY_CASES = {
         expected_files={
             Path(".copier-answers.yml"): [],
             Path(".devcontainer/devcontainer.json"): [
-                '"image": "mcr.microsoft.com/devcontainers/base:2-bookworm"',
+                '"image": "mcr.microsoft.com/devcontainers/python:3-3.12-bookworm"',
                 '"remoteUser": "vscode"',
+                '"setupPython"',
             ],
-            Path(".gitignore"): [],
+            Path(".gitignore"): ["### Python ###", "__pypackages__/"],
             Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
             Path(".gitlab/ci/copier.yml"): ["copier:check:"],
             Path(".gitlab/ci/demo.yml"): ["demo:fortune:"],
+            Path(".gitlab/ci/python.yml"): [
+                "python:pytest:",
+                "python:ruff:",
+                "python:mypy:",
+            ],
             Path(".gitlab/issue_templates/default.md"): ["## Problem"],
             Path(".gitlab/merge_request_templates/default.md"): ["## What is changed?"],
             Path("LICENSE.md"): [],
@@ -33,6 +39,13 @@ COPY_CASES = {
                 "# My Repository",
                 "_TODO: Add contact information._",
             ],
+            Path("pyproject.toml"): ['name = "my-repository"'],
+            Path("src/my_repository/__init__.py"): [],
+            Path("src/test_my_repository/__init__.py"): [],
+            Path("src/test_my_repository/test_import.py"): [
+                "import my_repository",
+            ],
+            Path("src/test_my_repository/test_self.py"): [],
         },
     ),
     "empty-repository": CopyCase(

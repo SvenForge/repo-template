@@ -1,0 +1,62 @@
+# Python Pipeline Definition
+
+.python:base:
+  image: python:{{ python_version }}-bookworm
+  before_script:
+    - python -m pip install --upgrade pip
+    - python -m pip install --editable . --group "$PYTHON_DEPENDENCY_GROUP"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "**/*.py"
+        - src/**/*
+        - pyproject.toml
+        - uv.lock
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+    - when: manual
+      allow_failure: true
+
+python:pytest:
+  extends: .python:base
+  needs: []
+  variables:
+    PYTHON_DEPENDENCY_GROUP: test
+  script:
+    - pytest
+  artifacts:
+    when: always
+    reports:
+      junit: pytest.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+python:ruff:
+  extends: .python:base
+  needs: []
+  variables:
+    PYTHON_DEPENDENCY_GROUP: lint
+  script:
+    - ruff check --output-format=gitlab --output-file=ruff-code-quality.json
+  allow_failure: true
+  artifacts:
+    when: always
+    reports:
+      codequality: ruff-code-quality.json
+
+python:mypy:
+  extends: .python:base
+  needs: []
+  variables:
+    PYTHON_DEPENDENCY_GROUP: lint
+  script:
+    - mypy --output=json > mypy.json || mypy_status=$?
+    - mypy-gitlab-code-quality < mypy.json > mypy-code-quality.json || exit $?
+    - exit "${mypy_status:-0}"
+  allow_failure: true
+  artifacts:
+    when: always
+    reports:
+      codequality: mypy-code-quality.json

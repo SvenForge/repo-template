@@ -1,0 +1,49 @@
+python_distribution_name:
+  type: str
+  help: What is the Python distribution name?
+  default: >-
+    {{ core_repository_name | lower | regex_replace('[^a-z0-9]+', '-') | regex_replace('(^-+|-+$)', '') }}
+  validator: >-
+    {% if not (python_distribution_name | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
+    Use lowercase letters and numbers separated by single hyphens.
+    {% endif %}
+  when: "{{ 'python' in modules }}"
+
+python_package_name:
+  type: str
+  help: What is the Python import package name?
+  default: >-
+    {{ '_' if python_distribution_name[0] in '0123456789' else '' }}{{ python_distribution_name | replace('-', '_') }}
+  validator: >-
+    {% if not (python_package_name | regex_search('^[a-z_][a-z0-9_]*$')) %}
+    Use a valid lowercase Python identifier with underscores as separators.
+    {% endif %}
+  when: "{{ 'python' in modules }}"
+
+python_version:
+  type: str
+  help: What is the minimum supported Python version?
+  default: "3.12"
+  validator: >-
+    {% if not (python_version | regex_search('^[0-9]+[.][0-9]+$')) %}
+    Use a numeric Python major and minor version, such as 3.12.
+    {% endif %}
+  when: "{{ 'python' in modules }}"
+
+python_include_pyproject:
+  type: bool
+  help: Create pyproject.toml?
+  default: "{{ 'python' in modules }}"
+  when: false
+
+python_include_package:
+  type: bool
+  help: Create the Python package?
+  default: "{{ 'python' in modules }}"
+  when: false
+
+python_include_testpackage:
+  type: bool
+  help: Create the Python test package?
+  default: "{{ 'python' in modules }}"
+  when: false
