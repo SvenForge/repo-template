@@ -2,13 +2,9 @@ python_distribution_name:
   type: str
   help: What is the Python distribution name?
   default: >-
-    {{ core_repository_name
-      | lower
-      | regex_replace('[^a-z0-9]+', '-')
-      | regex_replace('(^-+|-+$)', '') }}
+    {{ core_repository_name | lower | regex_replace('[^a-z0-9]+', '-') | regex_replace('(^-+|-+$)', '') }}
   validator: >-
-    {% if not (python_distribution_name
-      | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
+    {% if not (python_distribution_name | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
     Use lowercase letters and numbers separated by single hyphens.
     {% endif %}
   when: "{{ 'python' in modules }}"
@@ -17,20 +13,10 @@ python_package_name:
   type: str
   help: What is the Python import package name?
   default: >-
-    {{ '_' if python_distribution_name[0] in '0123456789' else ''
-    }}{{ python_distribution_name | replace('-', '_') }}
+    {{ '_' if python_distribution_name[0] in '0123456789' else '' }}{{ python_distribution_name | replace('-', '_') }}
   validator: >-
-    {% set keywords = [
-      'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue',
-      'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from',
-      'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or',
-      'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'
-    ] %}
-    {% if not (python_package_name
-      | regex_search('^[a-z_][a-z0-9_]*$')) %}
+    {% if not (python_package_name | regex_search('^[a-z_][a-z0-9_]*$')) %}
     Use a valid lowercase Python identifier with underscores as separators.
-    {% elif python_package_name in keywords %}
-    The package name must not be a Python keyword.
     {% endif %}
   when: "{{ 'python' in modules }}"
 
