@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from contextlib import AbstractContextManager
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -49,10 +50,9 @@ def test_python_file_selection_and_name_defaults(
         ({"python_package_name": "example-package"}, "python_package_name"),
         ({"python_package_name": "class"}, "python_package_name"),
         ({"python_version": "3"}, "python_version"),
-        ({"python_version": "3.11"}, "python_version"),
         ({"python_version": "3.13.1"}, "python_version"),
-        ({"python_version": "4.0"}, "python_version"),
-        ({"python_version": "3.15"}, "python_version"),
+        ({"python_version": "v3.13"}, "python_version"),
+        ({"python_version": "3.x"}, "python_version"),
     ],
     ids=[
         "uppercase-distribution",
@@ -60,10 +60,9 @@ def test_python_file_selection_and_name_defaults(
         "hyphenated-package",
         "keyword-package",
         "missing-minor",
-        "below-supported-range",
         "patch-version",
-        "wrong-major",
-        "above-supported-range",
+        "version-prefix",
+        "non-numeric-minor",
     ],
 )
 def test_python_answer_validation(
@@ -74,6 +73,15 @@ def test_python_answer_validation(
     with pytest.raises(ValueError, match=question):
         with copier_case(features=["python"], **answers):
             pass
+
+
+@pytest.mark.parametrize("python_version", ["3.11", "3.15", "4.0"])
+def test_python_version_accepts_well_formed_identifiers(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+    python_version: str,
+) -> None:
+    with copier_case(features=["python"], python_version=python_version) as case:
+        assert case.context["python_version"] == python_version
 
 
 def test_python_project_configuration(
@@ -116,27 +124,23 @@ def test_python_project_configuration(
 
     groups = project["dependency-groups"]
     assert groups["test"] == ["pytest", "pytest-cov"]
-    assert groups["lint"] == ["mypy", "ruff"]
+    assert groups["lint"] == ["mypy", "mypy-gitlab-code-quality", "ruff"]
     assert groups["dev"] == [
         {"include-group": "test"},
         {"include-group": "lint"},
     ]
 
-    assert project["tool"]["pytest"]["ini_options"]["testpaths"] == [
-        "src/test_acme_widget_library"
-    ]
-    assert project["tool"]["coverage"]["run"]["source"] == ["acme_widget_library"]
+    assert project["tool"]["pytest"]["ini_options"]["testpaths"] == ["src/test_*"]
+    assert project["tool"]["coverage"]["run"]["omit"] == ["test_*"]
     assert project["tool"]["ruff"] == {
+        "exclude": [".git", "__pycache__", "*/.ipynb_checkpoints/*.py"],
         "src": ["src"],
         "target-version": "py314",
     }
-    assert project["tool"]["mypy"]["files"] == [
-        "src/acme_widget_library",
-        "src/test_acme_widget_library",
-    ]
+    assert project["tool"]["mypy"]["files"] == ["src"]
     assert project["tool"]["mypy"]["python_version"] == "3.14"
     assert project["tool"]["pytest"]["ini_options"]["addopts"] == [
-        "--cov=acme_widget_library",
+        "--cov",
         "--cov-report=term-missing",
         "--cov-report=xml:coverage.xml",
         "--junitxml=pytest.xml",
@@ -263,17 +267,42 @@ def test_generated_python_project_editable_install(tmp_path: Path) -> None:
         cwd=destination,
         check=True,
     )
+    ruff_report = destination / "ruff-code-quality.json"
     subprocess.run(
-        [python, "-m", "ruff", "check", "src"],
+        [
+            python,
+            "-m",
+            "ruff",
+            "check",
+            "src",
+            "--output-format=gitlab",
+            "--output-file",
+            str(ruff_report),
+        ],
         cwd=destination,
         check=True,
     )
+    assert json.loads(ruff_report.read_text()) == []
     subprocess.run(
         [python, "-m", "ruff", "format", "--check", "src"],
         cwd=destination,
         check=True,
     )
-    subprocess.run([python, "-m", "mypy"], cwd=destination, check=True)
+    mypy_result = subprocess.run(
+        [python, "-m", "mypy", "--no-error-summary"],
+        cwd=destination,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    mypy_report = subprocess.run(
+        [environment / "bin/mypy-gitlab-code-quality"],
+        input=mypy_result.stdout,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(mypy_report.stdout) == []
     subprocess.run(
         [
             python,

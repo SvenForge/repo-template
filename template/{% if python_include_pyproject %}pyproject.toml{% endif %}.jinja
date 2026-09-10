@@ -29,6 +29,7 @@ test = [
 ]
 lint = [
     "mypy",
+    "mypy-gitlab-code-quality",
     "ruff",
 ]
 dev = [
@@ -49,28 +50,30 @@ fallback_version = "0.0.0"
 
 [tool.pytest.ini_options]
 addopts = [
-    "--cov={{ python_package_name }}",
+    "--cov",
     "--cov-report=term-missing",
     "--cov-report=xml:coverage.xml",
     "--junitxml=pytest.xml",
 ]
-testpaths = ["src/test_{{ python_package_name }}"]
+testpaths = ["src/test_*"]
 
 [tool.coverage.run]
 branch = true
-source = ["{{ python_package_name }}"]
+omit = ["test_*"]
 
 [tool.coverage.report]
 show_missing = true
 
 [tool.ruff]
+exclude = [
+    ".git",
+    "__pycache__",
+    "*/.ipynb_checkpoints/*.py",
+]
 src = ["src"]
 target-version = "py{{ python_version | replace('.', '') }}"
 
 [tool.mypy]
-files = [
-    "src/{{ python_package_name }}",
-    "src/test_{{ python_package_name }}",
-]
+files = ["src"]
 python_version = "{{ python_version }}"
 strict = true

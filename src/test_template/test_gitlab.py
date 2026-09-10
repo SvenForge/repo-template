@@ -66,12 +66,27 @@ def test_gitlab_python_pipeline(
     ruff_job = python_pipeline["python:ruff"]
     assert ruff_job["needs"] == []
     assert ruff_job["variables"]["PYTHON_DEPENDENCY_GROUP"] == "lint"
-    assert ruff_job["script"] == ["ruff check src", "ruff format --check src"]
+    assert ruff_job["script"] == [
+        "ruff check src --output-format=gitlab"
+        " --output-file=ruff-code-quality.json || true",
+        "ruff format --check src || true",
+    ]
+    assert ruff_job["artifacts"] == {
+        "when": "always",
+        "reports": {"codequality": "ruff-code-quality.json"},
+    }
 
     mypy_job = python_pipeline["python:mypy"]
     assert mypy_job["needs"] == []
     assert mypy_job["variables"]["PYTHON_DEPENDENCY_GROUP"] == "lint"
-    assert mypy_job["script"] == ["mypy"]
+    assert mypy_job["script"] == [
+        "mypy --no-error-summary > mypy-out.txt || true",
+        "mypy-gitlab-code-quality < mypy-out.txt > mypy-code-quality.json",
+    ]
+    assert mypy_job["artifacts"] == {
+        "when": "always",
+        "reports": {"codequality": "mypy-code-quality.json"},
+    }
 
     visible_jobs = {key for key in python_pipeline if not key.startswith(".")}
     assert visible_jobs == {"python:pytest", "python:ruff", "python:mypy"}

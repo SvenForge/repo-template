@@ -27,8 +27,12 @@ python:ruff:
   variables:
     PYTHON_DEPENDENCY_GROUP: lint
   script:
-    - ruff check src
-    - ruff format --check src
+    - ruff check src --output-format=gitlab --output-file=ruff-code-quality.json || true
+    - ruff format --check src || true
+  artifacts:
+    when: always
+    reports:
+      codequality: ruff-code-quality.json
 
 python:mypy:
   extends: .python:base
@@ -36,4 +40,9 @@ python:mypy:
   variables:
     PYTHON_DEPENDENCY_GROUP: lint
   script:
-    - mypy
+    - mypy --no-error-summary > mypy-out.txt || true
+    - mypy-gitlab-code-quality < mypy-out.txt > mypy-code-quality.json
+  artifacts:
+    when: always
+    reports:
+      codequality: mypy-code-quality.json

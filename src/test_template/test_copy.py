@@ -91,7 +91,7 @@ COPY_CASES = {
             Path("pyproject.toml"): [
                 'name = "acme-widget-library"',
                 'requires-python = ">=3.13"',
-                'testpaths = ["src/test_acme_widget_library"]',
+                'testpaths = ["src/test_*"]',
             ],
             Path("src/acme_widget_library/__init__.py"): [],
         },

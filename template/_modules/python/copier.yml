@@ -39,8 +39,8 @@ python_version:
   help: What is the minimum supported Python version?
   default: "3.12"
   validator: >-
-    {% if not (python_version | regex_search('^3[.](?:12|13|14)$')) %}
-    Use a supported Python version: 3.12, 3.13, or 3.14.
+    {% if not (python_version | regex_search('^[0-9]+[.][0-9]+$')) %}
+    Use a numeric Python major and minor version, such as 3.12.
     {% endif %}
   when: "{{ 'python' in modules }}"
 
