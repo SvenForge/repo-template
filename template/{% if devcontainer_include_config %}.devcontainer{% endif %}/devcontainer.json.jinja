@@ -5,14 +5,14 @@
     "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
 {%- endif %}
     "features": {
-{%- if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
+{%- if codex_devcontainer %}
         "ghcr.io/devcontainers/features/node:2": {},
         "ghcr.io/dirien/devcontainer-feature-codex/codex:0": {}
 {%- endif %}
     },
     "remoteUser": "vscode",
     "mounts": [
-{%- if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
+{%- if codex_devcontainer %}
         "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
 {%- endif %}
     ],
@@ -22,24 +22,19 @@
     "onCreateCommand": {
         "setupGit": "set -eu; identity='${containerWorkspaceFolder}/.git/devcontainer-identity.gitconfig'; if [ -f \"$identity\" ]; then git config --global --add include.path \"$identity\" || true; fi; git config --global --add safe.directory '${containerWorkspaceFolder}'; git config --local core.autocrlf input"
     },
-{% set postcreate_commands = [] -%}
-{% if python_include_pyproject -%}
-{% set setup_python = 'python -m pip install --upgrade pip && python -m pip install --editable . --group dev' -%}
-{% set postcreate_commands = postcreate_commands + ['        "setupPython": ' ~ (setup_python | tojson)] -%}
-{% endif -%}
-{% if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer -%}
-{% set setup_codex = 'set -eu; config_dir="$HOME/.codex"; mkdir -p "$config_dir"; sudo chown -R "$(id -u):$(id -g)" "$config_dir"; chmod 700 "$config_dir"' -%}
-{% set postcreate_commands = postcreate_commands + ['        "setupCodex": ' ~ (setup_codex | tojson)] -%}
-{% endif -%}
     "postCreateCommand": {
-{% if postcreate_commands -%}
-{{ postcreate_commands | join(',\n') }}
-{% endif -%}
+{%- set postcreate_commands = [
+    '"setupPython": ' ~ ('python -m pip install --upgrade pip && python -m pip install --editable . --group dev' | tojson) if python_include_pyproject else none,
+    '"setupCodex": ' ~ ('set -eu; config_dir="$HOME/.codex"; mkdir -p "$config_dir"; sudo chown -R "$(id -u):$(id -g)" "$config_dir"; chmod 700 "$config_dir"' | tojson) if codex_devcontainer else none,
+] | reject('none') | list %}
+{%- if postcreate_commands %}
+        {{ postcreate_commands | join(',\n        ') }}
+{%- endif %}
     },
     "customizations": {
         "vscode": {
             "extensions": [
-{%- if 'codex' in modules and 'devcontainer' in modules and codex_devcontainer %}
+{%- if codex_devcontainer %}
                 "openai.chatgpt",
 {%- endif %}
                 "mhutchie.git-graph",
