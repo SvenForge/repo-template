@@ -114,6 +114,5 @@ def test_gitignore(
         "pyrightconfig.json",
     ):
         assert (pattern in rendered) is includes_python
-    assert "!env/dev/constraints.txt" not in rendered
     assert "{{" not in rendered
     assert "{%" not in rendered

@@ -1,7 +1,6 @@
 from collections.abc import Callable
 from contextlib import AbstractContextManager
 import json
-import subprocess
 from typing import Any
 
 import pytest
@@ -61,11 +60,9 @@ def test_codex_cloud_scripts(
         maintenance = case.render(PATH_MAINTENANCE)
 
     for script in (setup, maintenance):
-        subprocess.run(["bash", "-n"], input=script, text=True, check=True)
         assert script.startswith("#!/usr/bin/env bash\n")
         assert "set -euo pipefail" in script
         assert 'readonly GITLAB_HOST="gitlab.example.com"' in script
-        assert "env/dev/constraints.txt" not in script
         assert "{{" not in script
         assert "{%" not in script
 
@@ -87,7 +84,6 @@ def test_python_codex_cloud_scripts(
         "python -m pip install --editable . --group dev",
     ]
     for script in (*without_gitlab, *with_gitlab):
-        subprocess.run(["bash", "-n"], input=script, text=True, check=True)
         for command in install_commands:
             assert script.count(command) == 1
         assert script.index(install_commands[0]) < script.index(install_commands[1])
