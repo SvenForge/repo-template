@@ -12,6 +12,9 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "web"
     - when: never
 
+stages:
+  - test
+
 default:
   image: ubuntu:26.04
   interruptible: true
