@@ -10,6 +10,7 @@ from .conftest import CopierCase
 
 PATH_CONFIG = "template/{% if sphinx_include_config %}conf.py{% endif %}.jinja"
 PATH_INDEX = "template/{% if sphinx_include_index %}index.md{% endif %}.jinja"
+PATH_LICENSE = "template/{% if core_include_license %}LICENSE.md{% endif %}.jinja"
 PATH_MAKEFILE = "template/{% if sphinx_include_makefile %}doc{% endif %}/sphinx/Makefile"
 PATH_MAKEBAT = "template/{% if sphinx_include_makebat %}doc{% endif %}/sphinx/make.bat"
 PATH_API = "template/{% if sphinx_include_api %}doc{% endif %}/api.md.jinja"
@@ -101,6 +102,7 @@ def test_sphinx_integrations(
         config = case.render(PATH_CONFIG)
         index = case.render(PATH_INDEX)
         api = case.render(PATH_API)
+        license_text = case.render(PATH_LICENSE)
         needs_pages = {
             name: case.render(path)
             for name, path in PATH_NEEDS.items()
@@ -159,9 +161,10 @@ def test_sphinx_integrations(
     for entry in (
         "doc/api",
         *(f"doc/{page}" for page in PATH_NEEDS),
-        "LICENSE",
+        "License <LICENSE>",
     ):
         assert entry in index
+    assert license_text.startswith("# License\n")
     assert "{eval-rst}" in api
     assert ".. autosummary::" in api
     assert ":toctree: sphinx/_autosummary" in api
