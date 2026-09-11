@@ -14,11 +14,13 @@ copyright = {{ core_year | string | tojson }}
 extensions = [
     'myst_parser',
     'sphinx.ext.intersphinx',
-{% if sphinx_include_api %}    'sphinx.ext.apidoc',
+{% if sphinx_include_api -%}
+    'sphinx.ext.apidoc',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
 {% endif -%}
-{% if sphinx_needs %}    'sphinx_needs',
+{% if sphinx_needs -%}
+    'sphinx_needs',
 {% endif -%}
 ]
 
