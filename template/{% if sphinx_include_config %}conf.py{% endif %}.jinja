@@ -14,8 +14,8 @@ copyright = {{ core_year | string | tojson }}
 extensions = [
     'myst_parser',
     'sphinx.ext.intersphinx',
-{% if sphinx_include_api %}    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
+{% if sphinx_include_api %}    'sphinx.ext.apidoc',
+    'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
 {% endif -%}
 {% if sphinx_needs %}    'sphinx_needs',
@@ -23,6 +23,7 @@ extensions = [
 ]
 
 root_doc = 'index'
+needs_sphinx = '8.2'
 exclude_patterns = [
     '.*',
     '**/.*',
@@ -44,12 +45,17 @@ intersphinx_mapping = {
 }
 
 {% if sphinx_include_api -%}
+apidoc_modules = [
+    {
+        'path': 'src',
+        'destination': 'doc/sphinx/_apidoc',
+    },
+]
 autodoc_default_options = {
     'members': True,
     'show-inheritance': True,
 }
 autodoc_typehints = 'description'
-autosummary_generate = True
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 

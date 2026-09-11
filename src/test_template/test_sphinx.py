@@ -11,6 +11,7 @@ from .conftest import CopierCase
 PATH_CONFIG = "template/{% if sphinx_include_config %}conf.py{% endif %}.jinja"
 PATH_INDEX = "template/{% if sphinx_include_index %}index.md{% endif %}.jinja"
 PATH_LICENSE = "template/{% if core_include_license %}LICENSE.md{% endif %}.jinja"
+PATH_README = "template/{% if core_include_readme %}README.md{% endif %}.jinja"
 PATH_MAKEFILE = "template/{% if sphinx_include_makefile %}doc{% endif %}/sphinx/Makefile"
 PATH_MAKEBAT = "template/{% if sphinx_include_makebat %}doc{% endif %}/sphinx/make.bat"
 PATH_API = "template/{% if sphinx_include_api %}doc{% endif %}/api.md.jinja"
@@ -78,18 +79,20 @@ def test_sphinx_standalone_without_readme(
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
     assert "{include} README.md" not in index
-    assert "doc/api" in index
+    assert ":glob:" in index
+    assert "doc/*" in index
     assert "sphinx-build" in makefile
-    assert "SOURCEDIR = ../.." in makefile
-    assert "BUILDDIR = _build" in makefile
+    assert "SOURCEDIR     = ../.." in makefile
+    assert "BUILDDIR      = _build" in makefile
     assert "sphinx-build" in makebat
-    assert r"SOURCEDIR=..\.." in makebat
+    assert r'SOURCEDIR="..\.."' in makebat
     assert "BUILDDIR=_build" in makebat
 
 
 def test_sphinx_integrations(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
+    pages_url = "https://example-library.gitlab.io/"
     with copier_case(
         features=["sphinx", "gitlab"],
         core_repository_name="Example Library",
@@ -97,10 +100,12 @@ def test_sphinx_integrations(
         sphinx_needs=True,
         sphinx_needs_pages=list(PATH_NEEDS),
         gitlab_pipeline=["sphinx"],
+        gitlab_pages_url=pages_url,
     ) as case:
         context = case.context
         config = case.render(PATH_CONFIG)
         index = case.render(PATH_INDEX)
+        readme = case.render(PATH_README)
         api = case.render(PATH_API)
         license_text = case.render(PATH_LICENSE)
         needs_pages = {
@@ -123,9 +128,11 @@ def test_sphinx_integrations(
             "project",
             "author",
             "extensions",
+            "needs_sphinx",
             "html_theme",
             "intersphinx_mapping",
             "exclude_patterns",
+            "apidoc_modules",
             "needs_types",
         },
     )
@@ -134,11 +141,18 @@ def test_sphinx_integrations(
     assert {
         "myst_parser",
         "sphinx.ext.intersphinx",
+        "sphinx.ext.apidoc",
         "sphinx.ext.autodoc",
-        "sphinx.ext.autosummary",
         "sphinx.ext.napoleon",
         "sphinx_needs",
     }.issubset(assignments["extensions"])
+    assert assignments["needs_sphinx"] == "8.2"
+    assert assignments["apidoc_modules"] == [
+        {
+            "path": "src",
+            "destination": "doc/sphinx/_apidoc",
+        },
+    ]
     assert assignments["html_theme"] == "furo"
     assert {
         "python",
@@ -158,17 +172,15 @@ def test_sphinx_integrations(
     }
 
     assert "{include} README.md" in index
-    for entry in (
-        "doc/api",
-        *(f"doc/{page}" for page in PATH_NEEDS),
-        "License <LICENSE>",
-    ):
-        assert entry in index
-    assert license_text.startswith("# License\n")
-    assert "{eval-rst}" in api
-    assert ".. autosummary::" in api
-    assert ":toctree: sphinx/_autosummary" in api
-    assert "example_library" in api
+    assert "{toctree}" in readme
+    assert ":maxdepth: 1" in readme
+    assert ":glob:" in readme
+    assert "doc/*" in readme
+    assert f"[GitLab Pages]({pages_url})" in readme
+    assert "License <LICENSE>" in readme
+    assert license_text.startswith("# License & Copyright Information\n")
+    assert "{toctree}" in api
+    assert "sphinx/_apidoc/modules" in api
 
     needs_contracts = {
         "requirements": ("req", "REQ_001"),
@@ -190,12 +202,22 @@ def test_sphinx_integrations(
     assert build["script"] == [
         "make -C doc/sphinx html SPHINXOPTS='-W --keep-going'"
     ]
+    assert build["rules"][-1] == {"when": "manual"}
+    merge_request_rule = next(
+        rule
+        for rule in build["rules"]
+        if rule.get("if") == '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    )
+    assert {"conf.py", "doc/**/*", "src/**/*"}.issubset(
+        merge_request_rule["changes"]
+    )
     assert {
         path.rstrip("/")
         for path in build["artifacts"]["paths"]
     } == {"doc/sphinx/_build/html"}
 
     pages = pipeline["sphinx:pages"]
+    assert "stage" not in pages
     assert any(
         isinstance(need, dict)
         and need.get("job") == "sphinx:build"
@@ -203,4 +225,4 @@ def test_sphinx_integrations(
         for need in pages["needs"]
     )
     assert pages["pages"]["publish"].rstrip("/") == "doc/sphinx/_build/html"
-    assert root_pipeline["stages"] == ["test", "deploy"]
+    assert "stages" not in root_pipeline

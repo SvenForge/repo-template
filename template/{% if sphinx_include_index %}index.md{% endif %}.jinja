@@ -5,20 +5,14 @@
 # {{ core_repository_name }}
 
 Documentation for {{ core_repository_name }}.
-{% endif %}
-{% set sphinx_documents = [
-    'doc/api' if sphinx_include_api else none,
-    'doc/requirements' if sphinx_include_requirements else none,
-    'doc/architecture' if sphinx_include_architecture else none,
-    'doc/implementation' if sphinx_include_implementation else none,
-    'doc/verification' if sphinx_include_verification else none,
-    'License <LICENSE>' if core_include_license else none,
-] | reject('none') | list -%}
-{% if sphinx_documents %}
-```{toctree}
-:hidden:
-:maxdepth: 2
 
-{{ sphinx_documents | join('\n') }}
+```{toctree}
+:maxdepth: 1
+:glob:
+
+doc/*
+{% if core_include_license -%}
+License <LICENSE>
+{% endif -%}
 ```
 {% endif -%}

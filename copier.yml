@@ -24,7 +24,7 @@ features:
 modules:
   type: yaml
   help: Which template modules shall be used?
-  default: "{{ ['core'] + features }}"
+  default: "{{ ['core'] + features + (['python'] if 'sphinx' in features and 'python' not in features else []) }}"
   when: false
 
 copier_version:
