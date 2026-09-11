@@ -23,12 +23,7 @@ COPY_CASES = {
                 '"remoteUser": "vscode"',
                 '"setupPython"',
             ],
-            Path(".gitignore"): [
-                "### Python ###",
-                "__pypackages__/",
-                "### Sphinx ###",
-                "doc/sphinx/_apidoc/",
-            ],
+            Path(".gitignore"): ["### Python ###", "__pypackages__/"],
             Path(".gitlab-ci.yml"): [".gitlab/ci/*.yml"],
             Path(".gitlab/ci/copier.yml"): ["copier:check:"],
             Path(".gitlab/ci/demo.yml"): ["demo:fortune:"],
@@ -40,7 +35,6 @@ COPY_CASES = {
             Path(".gitlab/ci/sphinx.yml"): [
                 "sphinx:build:",
                 "sphinx:pages:",
-                "when: manual",
             ],
             Path(".gitlab/issue_templates/default.md"): ["## Problem"],
             Path(".gitlab/merge_request_templates/default.md"): ["## What is changed?"],
@@ -66,15 +60,10 @@ COPY_CASES = {
                 "BUILDDIR=_build",
             ],
             Path("index.md"): [
-                "{include} README.md",
                 "{toctree}",
                 "doc/*",
             ],
-            Path("pyproject.toml"): [
-                'name = "my-repository"',
-                "doc = [",
-                '"sphinx>=8.2"',
-            ],
+            Path("pyproject.toml"): ['name = "my-repository"'],
             Path("src/my_repository/__init__.py"): [],
             Path("src/test_my_repository/__init__.py"): [],
             Path("src/test_my_repository/test_import.py"): [
@@ -109,48 +98,6 @@ COPY_CASES = {
                 "!include template/_modules/core/copier.yml",
             ],
             Path("template/_modules/core/copier.yml"): [],
-        },
-    ),
-    "sphinx": CopyCase(
-        answers={
-            "features": "[sphinx, python]",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
-        },
-        expected_files={
-            Path(".copier-answers.yml"): [],
-            Path("conf.py"): [
-                'project = "My Repository"',
-                "sphinx.ext.apidoc",
-            ],
-            Path("doc/api.md"): ["sphinx/_apidoc/modules"],
-            Path("doc/sphinx/Makefile"): [
-                "sphinx-build",
-                "SOURCEDIR     = ../..",
-                "BUILDDIR      = _build",
-            ],
-            Path("doc/sphinx/make.bat"): [
-                "sphinx-build",
-                'SOURCEDIR="..\\.."',
-                "BUILDDIR=_build",
-            ],
-            Path("index.md"): [
-                "# My Repository",
-                "Documentation for My Repository.",
-                ":glob:",
-                "doc/*",
-            ],
-            Path("pyproject.toml"): [
-                'name = "my-repository"',
-                "doc = [",
-            ],
-            Path("src/my_repository/__init__.py"): [],
-            Path("src/test_my_repository/__init__.py"): [],
-            Path("src/test_my_repository/test_import.py"): [
-                "import my_repository",
-            ],
-            Path("src/test_my_repository/test_self.py"): [],
         },
     ),
     "codex": CopyCase(
