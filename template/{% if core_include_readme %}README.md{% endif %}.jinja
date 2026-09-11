@@ -23,17 +23,7 @@ The documentation is available on [GitLab Pages]({{ gitlab_pages_url }}).
 {% else -%}
 _TODO: Link or add documentation._
 {% endif %}
-{% if 'sphinx' in modules %}
-```{toctree}
-:maxdepth: 1
-:glob:
 
-doc/*
-{% if core_include_license -%}
-License <LICENSE>
-{% endif -%}
-```
-{% endif %}
 ## Contributing
 
 ### Maintainer
