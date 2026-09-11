@@ -14,10 +14,16 @@ features:
     DevContainer: devcontainer
     GitLab: gitlab
     Python: python
+    Sphinx: sphinx
   default:
     - devcontainer
     - gitlab
     - python
+    - sphinx
+  validator: >-
+    {% if 'sphinx' in features and 'python' not in features %}
+    Select Python when selecting Sphinx.
+    {% endif %}
 
 modules:
   type: yaml
@@ -42,3 +48,5 @@ copier_version:
 !include template/_modules/gitlab/copier.yml
 ---
 !include template/_modules/python/copier.yml
+---
+!include template/_modules/sphinx/copier.yml

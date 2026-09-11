@@ -1,0 +1,45 @@
+# Sphinx Pipeline Definition
+
+.sphinx:base:
+  image: python:{{ python_version }}-bookworm
+  before_script:
+    - python -m pip install --upgrade pip
+    - python -m pip install --editable . --group doc
+
+sphinx:build:
+  extends: .sphinx:base
+  needs: []
+  script:
+    - "make -C doc/sphinx html SPHINXOPTS='-W --keep-going'"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "**/*.py"
+        - "**/*.md"
+        - "**/*.rst"
+        - src/**/*
+        - doc/**/*
+        - pyproject.toml
+        - uv.lock
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
+    - when: manual
+      allow_failure: true
+  artifacts:
+    expose_as: Sphinx documentation
+    expire_in: 1 week
+    paths:
+      - doc/sphinx/_build/html/
+
+sphinx:pages:
+  image: alpine:3.22
+  needs:
+    - job: sphinx:build
+      artifacts: true
+  script:
+    - test -f doc/sphinx/_build/html/index.html
+  pages:
+    publish: doc/sphinx/_build/html
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

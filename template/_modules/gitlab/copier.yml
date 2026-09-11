@@ -20,8 +20,11 @@ gitlab_pipeline:
     {% if 'python' in modules %}
     Run the Python test and quality jobs: python
     {% endif %}
+    {% if 'sphinx' in modules %}
+    Build and deploy the Sphinx documentation: sphinx
+    {% endif %}
   default: >-
-    [copier, demo{% if 'python' in modules %}, python{% endif %}]
+    [copier, demo{% if 'python' in modules %}, python{% endif %}{% if 'sphinx' in modules %}, sphinx{% endif %}]
   when: "{{ 'gitlab' in modules }}"
 
 gitlab_include_pipeline_copier:
@@ -41,6 +44,18 @@ gitlab_include_pipeline_python:
   help: Create the Python pipeline module?
   default: "{{ 'gitlab' in modules and 'python' in modules and 'python' in gitlab_pipeline }}"
   when: false
+
+gitlab_include_pipeline_sphinx:
+  type: bool
+  help: Create the Sphinx pipeline module?
+  default: "{{ 'gitlab' in modules and 'sphinx' in modules and 'sphinx' in gitlab_pipeline }}"
+  when: false
+
+gitlab_pages_url:
+  type: str
+  help: At which URL is the Sphinx documentation published by GitLab Pages? (optional)
+  default: ""
+  when: "{{ gitlab_include_pipeline_sphinx and core_include_readme }}"
 
 gitlab_include_pipeline:
   type: bool

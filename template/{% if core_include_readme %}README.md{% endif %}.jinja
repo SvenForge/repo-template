@@ -18,7 +18,11 @@ _TODO: Add development instructions._
 
 ## Documentation
 
+{% if gitlab_include_pipeline_sphinx and gitlab_pages_url -%}
+The documentation is available on [GitLab Pages]({{ gitlab_pages_url }}).
+{% else -%}
 _TODO: Link or add documentation._
+{% endif %}
 
 ## Contributing
 
