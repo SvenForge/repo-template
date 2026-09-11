@@ -147,6 +147,7 @@ def test_sphinx_integrations(
         "matplotlib",
     }.issubset(assignments["intersphinx_mapping"])
     assert "doc/sphinx/_build" in assignments["exclude_patterns"]
+    assert "LICENSE.md" not in assignments["exclude_patterns"]
     assert {need_type["directive"] for need_type in assignments["needs_types"]} >= {
         "req",
         "spec",
@@ -155,9 +156,14 @@ def test_sphinx_integrations(
     }
 
     assert "{include} README.md" in index
-    for entry in ("doc/api", *(f"doc/{page}" for page in PATH_NEEDS)):
+    for entry in (
+        "doc/api",
+        *(f"doc/{page}" for page in PATH_NEEDS),
+        "LICENSE",
+    ):
         assert entry in index
-    assert "{autosummary}" in api
+    assert "{eval-rst}" in api
+    assert ".. autosummary::" in api
     assert ":toctree: sphinx/_autosummary" in api
     assert "example_library" in api
 

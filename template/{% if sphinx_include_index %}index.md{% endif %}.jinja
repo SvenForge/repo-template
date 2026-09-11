@@ -12,6 +12,7 @@ Documentation for {{ core_repository_name }}.
     'doc/architecture' if sphinx_include_architecture else none,
     'doc/implementation' if sphinx_include_implementation else none,
     'doc/verification' if sphinx_include_verification else none,
+    'LICENSE' if core_include_license else none,
 ] | reject('none') | list -%}
 {% if sphinx_documents %}
 ```{toctree}
