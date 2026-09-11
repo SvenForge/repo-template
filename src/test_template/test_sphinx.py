@@ -46,11 +46,11 @@ def _literal_assignments(source: str, names: set[str]) -> dict[str, Any]:
     return assignments
 
 
-def test_sphinx_standalone_without_readme(
+def test_sphinx_without_readme(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
-        features=["sphinx"],
+        features=["sphinx", "python"],
         core_repository_name="Example Repository",
         core_include_readme=False,
         sphinx_needs=False,
@@ -94,7 +94,7 @@ def test_sphinx_integrations(
 ) -> None:
     pages_url = "https://example-library.gitlab.io/"
     with copier_case(
-        features=["sphinx", "gitlab"],
+        features=["sphinx", "gitlab", "python"],
         core_repository_name="Example Library",
         core_owner_name="Example Owner",
         sphinx_needs=True,
@@ -172,12 +172,13 @@ def test_sphinx_integrations(
     }
 
     assert "{include} README.md" in index
-    assert "{toctree}" in readme
-    assert ":maxdepth: 1" in readme
-    assert ":glob:" in readme
-    assert "doc/*" in readme
+    assert "{toctree}" in index
+    assert ":maxdepth: 1" in index
+    assert ":glob:" in index
+    assert "doc/*" in index
     assert f"[GitLab Pages]({pages_url})" in readme
-    assert "License <LICENSE>" in readme
+    assert "{toctree}" not in readme
+    assert "License <LICENSE>" in index
     assert license_text.startswith("# License & Copyright Information\n")
     assert "{toctree}" in api
     assert "sphinx/_apidoc/modules" in api
@@ -202,13 +203,16 @@ def test_sphinx_integrations(
     assert build["script"] == [
         "make -C doc/sphinx html SPHINXOPTS='-W --keep-going'"
     ]
-    assert build["rules"][-1] == {"when": "manual"}
+    assert build["rules"][-1] == {
+        "when": "manual",
+        "allow_failure": True,
+    }
     merge_request_rule = next(
         rule
         for rule in build["rules"]
         if rule.get("if") == '$CI_PIPELINE_SOURCE == "merge_request_event"'
     )
-    assert {"conf.py", "doc/**/*", "src/**/*"}.issubset(
+    assert {"**/*.py", "**/*.md", "doc/**/*", "src/**/*"}.issubset(
         merge_request_rule["changes"]
     )
     assert {
@@ -225,4 +229,4 @@ def test_sphinx_integrations(
         for need in pages["needs"]
     )
     assert pages["pages"]["publish"].rstrip("/") == "doc/sphinx/_build/html"
-    assert "stages" not in root_pipeline
+    assert root_pipeline["stages"] == ["test"]

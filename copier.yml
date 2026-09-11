@@ -20,6 +20,10 @@ features:
     - gitlab
     - python
     - sphinx
+  validator: >-
+    {% if 'sphinx' in features and 'python' not in features %}
+    Select Python when selecting Sphinx.
+    {% endif %}
 
 modules:
   type: yaml

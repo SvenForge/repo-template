@@ -4,12 +4,14 @@
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent / 'src'))
-
 {% endif -%}
+# -- Project information -----------------------------------------------------
+
 project = {{ core_repository_name | tojson }}
 author = {{ core_owner_name | tojson }}
 copyright = {{ core_year | string | tojson }}
+
+# -- General configuration ---------------------------------------------------
 
 extensions = [
     'myst_parser',
@@ -35,7 +37,11 @@ exclude_patterns = [
     'template',
 ]
 
+# -- Options for HTML output -------------------------------------------------
+
 html_theme = 'furo'
+
+# -- Options for intersphinx extension ---------------------------------------
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
@@ -47,22 +53,32 @@ intersphinx_mapping = {
 }
 
 {% if sphinx_include_api -%}
+# -- Options for apidoc extension --------------------------------------------
+
 apidoc_modules = [
     {
         'path': 'src',
         'destination': 'doc/sphinx/_apidoc',
     },
 ]
+# -- Options for autodoc extension -------------------------------------------
+
+sys.path.insert(0, str(Path(__file__).parent / 'src'))
+
 autodoc_default_options = {
     'members': True,
     'show-inheritance': True,
 }
 autodoc_typehints = 'description'
+# -- Options for napoleon extension ------------------------------------------
+
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 
 {% endif -%}
 {% if sphinx_needs -%}
+# -- Options for sphinx-needs extension --------------------------------------
+
 needs_types = [
     {
         'directive': 'req',

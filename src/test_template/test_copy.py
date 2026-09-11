@@ -48,8 +48,6 @@ COPY_CASES = {
             Path("README.md"): [
                 "# My Repository",
                 "_TODO: Link or add documentation._",
-                "{toctree}",
-                "doc/*",
                 "_TODO: Add contact information._",
             ],
             Path("conf.py"): [
@@ -67,7 +65,11 @@ COPY_CASES = {
                 'SOURCEDIR="..\\.."',
                 "BUILDDIR=_build",
             ],
-            Path("index.md"): ["{include} README.md"],
+            Path("index.md"): [
+                "{include} README.md",
+                "{toctree}",
+                "doc/*",
+            ],
             Path("pyproject.toml"): [
                 'name = "my-repository"',
                 "doc = [",
@@ -111,7 +113,7 @@ COPY_CASES = {
     ),
     "sphinx": CopyCase(
         answers={
-            "features": "[sphinx]",
+            "features": "[sphinx, python]",
             "core_include_readme": "false",
             "core_license": "NOASSERTION",
             "core_include_gitignore": "false",
