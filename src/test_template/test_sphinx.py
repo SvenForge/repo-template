@@ -78,10 +78,12 @@ def test_sphinx_standalone_without_readme(
     assert "Documentation for Example Repository." in index
     assert "{include} README.md" not in index
     assert "doc/api" in index
-    for build_file in (makefile, makebat):
-        assert "sphinx-build" in build_file
-        assert "../.." in build_file
-        assert "_build" in build_file
+    assert "sphinx-build" in makefile
+    assert "SOURCEDIR = ../.." in makefile
+    assert "BUILDDIR = _build" in makefile
+    assert "sphinx-build" in makebat
+    assert r"SOURCEDIR=..\.." in makebat
+    assert "BUILDDIR=_build" in makebat
 
 
 def test_sphinx_integrations(
