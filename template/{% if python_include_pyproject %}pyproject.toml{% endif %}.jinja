@@ -32,9 +32,22 @@ lint = [
     "mypy-gitlab-code-quality",
     "ruff",
 ]
+{% if 'sphinx' in modules -%}
+doc = [
+    "furo",
+    "myst-parser",
+    "sphinx",
+{% if sphinx_needs -%}
+    "sphinx-needs",
+{% endif -%}
+]
+{% endif -%}
 dev = [
     { include-group = "test" },
     { include-group = "lint" },
+{% if 'sphinx' in modules -%}
+    { include-group = "doc" },
+{% endif -%}
 ]
 
 [tool.setuptools]

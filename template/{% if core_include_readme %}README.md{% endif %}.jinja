@@ -18,8 +18,18 @@ _TODO: Add development instructions._
 
 ## Documentation
 
-_TODO: Link or add documentation._
+{% if 'sphinx' in modules -%}
+Install the documentation dependencies and build the HTML documentation:
 
+```shell
+python -m pip install --editable . --group doc
+make -C doc/sphinx html
+```
+
+The generated documentation is written to `doc/sphinx/_build/html`.
+{% else -%}
+_TODO: Link or add documentation._
+{% endif %}
 ## Contributing
 
 ### Maintainer

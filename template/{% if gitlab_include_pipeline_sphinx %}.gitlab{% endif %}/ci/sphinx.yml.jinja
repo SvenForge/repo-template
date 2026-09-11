@@ -10,7 +10,7 @@ sphinx:build:
   extends: .sphinx:base
   needs: []
   script:
-    - "make html SPHINXOPTS='-W --keep-going'"
+    - "make -C doc/sphinx html SPHINXOPTS='-W --keep-going'"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"

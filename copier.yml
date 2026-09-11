@@ -14,6 +14,7 @@ features:
     DevContainer: devcontainer
     GitLab: gitlab
     Python: python
+    Sphinx: sphinx
   default:
     - devcontainer
     - gitlab
@@ -22,7 +23,7 @@ features:
 modules:
   type: yaml
   help: Which template modules shall be used?
-  default: "{{ ['core'] + features }}"
+  default: "{{ ['core'] + features + (['python'] if 'sphinx' in features and 'python' not in features else []) }}"
   when: false
 
 copier_version:
@@ -42,3 +43,5 @@ copier_version:
 !include template/_modules/gitlab/copier.yml
 ---
 !include template/_modules/python/copier.yml
+---
+!include template/_modules/sphinx/copier.yml

@@ -1,0 +1,75 @@
+sphinx_needs:
+  type: bool
+  help: Include Sphinx-Needs support?
+  default: false
+  when: "{{ 'sphinx' in modules }}"
+
+sphinx_needs_pages:
+  type: str
+  help: Which Sphinx-Needs starter pages shall be created?
+  multiselect: true
+  choices:
+    Requirements: requirements
+    Architecture: architecture
+    Implementation: implementation
+    Verification: verification
+  default:
+    - requirements
+    - architecture
+    - implementation
+    - verification
+  when: "{{ 'sphinx' in modules and sphinx_needs }}"
+
+sphinx_include_config:
+  type: bool
+  help: Create conf.py?
+  default: "{{ 'sphinx' in modules }}"
+  when: false
+
+sphinx_include_index:
+  type: bool
+  help: Create index.md?
+  default: "{{ 'sphinx' in modules }}"
+  when: false
+
+sphinx_include_makefile:
+  type: bool
+  help: Create the Sphinx Makefile?
+  default: "{{ 'sphinx' in modules }}"
+  when: false
+
+sphinx_include_makebat:
+  type: bool
+  help: Create the Sphinx Windows build script?
+  default: "{{ 'sphinx' in modules }}"
+  when: false
+
+sphinx_include_api:
+  type: bool
+  help: Create the Python API page?
+  default: "{{ 'sphinx' in modules and python_include_package }}"
+  when: false
+
+sphinx_include_requirements:
+  type: bool
+  help: Create the requirements page?
+  default: "{{ 'sphinx' in modules and sphinx_needs and 'requirements' in sphinx_needs_pages }}"
+  when: false
+
+sphinx_include_architecture:
+  type: bool
+  help: Create the architecture page?
+  default: "{{ 'sphinx' in modules and sphinx_needs and 'architecture' in sphinx_needs_pages }}"
+  when: false
+
+sphinx_include_implementation:
+  type: bool
+  help: Create the implementation page?
+  default: "{{ 'sphinx' in modules and sphinx_needs and 'implementation' in sphinx_needs_pages }}"
+  when: false
+
+sphinx_include_verification:
+  type: bool
+  help: Create the verification page?
+  default: "{{ 'sphinx' in modules and sphinx_needs and 'verification' in sphinx_needs_pages }}"
+  when: false
