@@ -4,6 +4,8 @@
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent / 'src'))
+
 {% endif -%}
 # -- Project information -----------------------------------------------------
 
@@ -53,7 +55,7 @@ intersphinx_mapping = {
 }
 
 {% if sphinx_include_api -%}
-# -- Options for apidoc extension --------------------------------------------
+# -- Options for apidoc / autodoc extensions ---------------------------------
 
 apidoc_modules = [
     {
@@ -61,15 +63,12 @@ apidoc_modules = [
         'destination': 'doc/sphinx/_apidoc',
     },
 ]
-# -- Options for autodoc extension -------------------------------------------
-
-sys.path.insert(0, str(Path(__file__).parent / 'src'))
-
 autodoc_default_options = {
     'members': True,
     'show-inheritance': True,
 }
 autodoc_typehints = 'description'
+
 # -- Options for napoleon extension ------------------------------------------
 
 napoleon_google_docstring = True
