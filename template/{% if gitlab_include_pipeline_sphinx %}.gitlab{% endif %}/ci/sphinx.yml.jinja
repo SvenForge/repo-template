@@ -15,16 +15,17 @@ sphinx:build:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - ".gitlab-ci.yml"
-        - ".gitlab/ci/sphinx.yml"
-        - "conf.py"
-        - "doc/**/*"
-        - "index.md"
-        - "LICENSE.md"
-        - "pyproject.toml"
-        - "README.md"
-        - "src/**/*"
+        - "**/*.py"
+        - "**/*.md"
+        - "**/*.rst"
+        - src/**/*
+        - doc/**/*
+        - pyproject.toml
+        - uv.lock
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*
     - when: manual
+      allow_failure: true
   artifacts:
     expose_as: Sphinx documentation
     expire_in: 1 week
