@@ -37,16 +37,14 @@ doc = [
     "furo",
     "myst-parser",
     "sphinx",
-{% if sphinx_needs -%}
-    "sphinx-needs",
+{% if sphinx_needs %}    "sphinx-needs",
 {% endif -%}
 ]
 {% endif -%}
 dev = [
     { include-group = "test" },
     { include-group = "lint" },
-{% if 'sphinx' in modules -%}
-    { include-group = "doc" },
+{% if 'sphinx' in modules %}    { include-group = "doc" },
 {% endif -%}
 ]
 
