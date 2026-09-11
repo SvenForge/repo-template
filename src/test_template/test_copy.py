@@ -76,6 +76,46 @@ COPY_CASES = {
             Path("template/_modules/core/copier.yml"): [],
         },
     ),
+    "sphinx": CopyCase(
+        answers={
+            "features": "[sphinx]",
+            "core_include_readme": "false",
+            "core_license": "NOASSERTION",
+            "core_include_gitignore": "false",
+        },
+        expected_files={
+            Path(".copier-answers.yml"): [],
+            Path("conf.py"): [
+                'project = "My Repository"',
+                "myst_parser",
+            ],
+            Path("doc/api.md"): [
+                "my_repository",
+                ":toctree: sphinx/_autosummary",
+            ],
+            Path("doc/sphinx/Makefile"): [
+                "sphinx-build",
+                "SOURCEDIR = ../..",
+                "BUILDDIR = _build",
+            ],
+            Path("doc/sphinx/make.bat"): ["sphinx-build", "_build"],
+            Path("index.md"): [
+                "# My Repository",
+                "Documentation for My Repository.",
+                "doc/api",
+            ],
+            Path("pyproject.toml"): [
+                'name = "my-repository"',
+                "doc = [",
+            ],
+            Path("src/my_repository/__init__.py"): [],
+            Path("src/test_my_repository/__init__.py"): [],
+            Path("src/test_my_repository/test_import.py"): [
+                "import my_repository",
+            ],
+            Path("src/test_my_repository/test_self.py"): [],
+        },
+    ),
     "codex": CopyCase(
         answers={
             "features": "[codex, devcontainer, gitlab]",
