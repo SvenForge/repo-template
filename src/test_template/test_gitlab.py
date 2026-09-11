@@ -27,6 +27,7 @@ def test_gitlab_pipeline(
     assert root_pipeline["include"] == [{"local": ".gitlab/ci/*.yml"}]
     assert "copier:check" in copier_pipeline
     assert copier_pipeline[".copier:base"]["variables"]["COPIER_VERSION"] == "9.17.2"
+    assert "CI_JOB_TOKEN" in copier_pipeline[".copier:base"]["before_script"][0]
     assert "demo:fortune" in demo_pipeline
 
 

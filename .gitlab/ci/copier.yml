@@ -5,6 +5,7 @@
   variables:
     COPIER_VERSION: "9.17.2"
   before_script:
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/".insteadOf "https://${CI_SERVER_HOST}/"
     - python -m pip install "copier==$COPIER_VERSION"
 
 copier:check:
