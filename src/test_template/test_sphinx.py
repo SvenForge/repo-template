@@ -10,8 +10,8 @@ from .conftest import CopierCase
 
 PATH_CONFIG = "template/{% if sphinx_include_config %}conf.py{% endif %}.jinja"
 PATH_INDEX = "template/{% if sphinx_include_index %}index.md{% endif %}.jinja"
-PATH_LICENSE = "template/{% if core_include_license %}LICENSE.md{% endif %}.jinja"
-PATH_README = "template/{% if core_include_readme %}README.md{% endif %}.jinja"
+PATH_LICENSE = "template/{% if 'core' in modules and core_include_license %}LICENSE.md{% endif %}.jinja"
+PATH_README = "template/{% if 'core' in modules and core_include_readme %}README.md{% endif %}.jinja"
 PATH_MAKEFILE = "template/{% if sphinx_include_makefile %}doc{% endif %}/sphinx/Makefile"
 PATH_MAKEBAT = "template/{% if sphinx_include_makebat %}doc{% endif %}/sphinx/make.bat"
 PATH_API = "template/{% if sphinx_include_api %}doc{% endif %}/api.md.jinja"
