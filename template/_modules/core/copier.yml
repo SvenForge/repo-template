@@ -21,6 +21,15 @@ core_repository_host:
     ) if core_repository_url else 'gitlab.com' }}
   when: false
 
+core_repository_path:
+  type: str
+  help: At which path is the repository hosted?
+  default: >-
+    {%- set path = core_repository_url.split(core_repository_host, 1)[1]
+      .lstrip(':/').split('?', 1)[0].split('#', 1)[0].rstrip('/') if core_repository_url else '' -%}
+    {{- path[:-4] if path.endswith('.git') else path -}}
+  when: false
+
 core_owner_name:
   type: str
   help: Who is the repository owner? (optional)

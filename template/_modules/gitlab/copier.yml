@@ -54,7 +54,12 @@ gitlab_include_pipeline_sphinx:
 gitlab_pages_url:
   type: str
   help: At which URL is the Sphinx documentation published by GitLab Pages? (optional)
-  default: ""
+  default: >-
+    {%- set path = core_repository_path.split('/') -%}
+    {{- 'https://' ~ path[0] ~ '.gitlab.io/' ~ (
+      '' if path | length == 2 and path[1] == path[0] ~ '.gitlab.io'
+      else path[1:] | join('/') ~ '/'
+    ) if core_repository_host == 'gitlab.com' and core_repository_path else '' -}}
   when: "{{ gitlab_include_pipeline_sphinx and core_include_readme }}"
 
 gitlab_include_pipeline:
