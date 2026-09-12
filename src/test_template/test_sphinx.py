@@ -92,15 +92,15 @@ def test_sphinx_without_readme(
 def test_sphinx_integrations(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
-    pages_url = "https://example-library.gitlab.io/"
+    pages_url = "https://example.gitlab.io/example-library/"
     with copier_case(
         features=["sphinx", "gitlab", "python"],
         core_repository_name="Example Library",
+        core_repository_url="git@gitlab.com:example/example-library.git",
         core_owner_name="Example Owner",
         sphinx_needs=True,
         sphinx_needs_pages=list(PATH_NEEDS),
         gitlab_pipeline=["sphinx"],
-        gitlab_pages_url=pages_url,
     ) as case:
         context = case.context
         config = case.render(PATH_CONFIG)
