@@ -10,8 +10,8 @@ from .conftest import CopierCase
 
 PATH_CONFIG = "template/{% if sphinx_include_config %}conf.py{% endif %}.jinja"
 PATH_INDEX = "template/{% if sphinx_include_index %}index.md{% endif %}.jinja"
-PATH_LICENSE = "template/{% if 'core' in modules and core_include_license %}LICENSE.md{% endif %}.jinja"
-PATH_README = "template/{% if 'core' in modules and core_include_readme %}README.md{% endif %}.jinja"
+PATH_LICENSE = "template/{% if core_include_license %}LICENSE.md{% endif %}.jinja"
+PATH_README = "template/{% if core_include_readme %}README.md{% endif %}.jinja"
 PATH_MAKEFILE = "template/{% if sphinx_include_makefile %}doc{% endif %}/sphinx/Makefile"
 PATH_MAKEBAT = "template/{% if sphinx_include_makebat %}doc{% endif %}/sphinx/make.bat"
 PATH_API = "template/{% if sphinx_include_api %}doc{% endif %}/api.md.jinja"
@@ -50,7 +50,7 @@ def test_sphinx_without_readme(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
-        features=["sphinx", "python"],
+        features=["core", "sphinx", "python"],
         core_repository_name="Example Repository",
         core_include_readme=False,
         sphinx_needs=False,
@@ -94,7 +94,7 @@ def test_sphinx_integrations(
 ) -> None:
     pages_url = "https://example.gitlab.io/example-library/"
     with copier_case(
-        features=["sphinx", "gitlab", "python"],
+        features=["core", "sphinx", "gitlab", "python"],
         core_repository_name="Example Library",
         core_repository_url="git@gitlab.com:example/example-library.git",
         core_owner_name="Example Owner",

@@ -23,7 +23,7 @@ def test_python_file_selection_and_defaults(
     assert context["python_include_testpackage"] == False
 
     with copier_case(
-        features=["python"],
+        features=["core", "python"],
         core_repository_name="Example Repository",
     ) as case:
         context = case.context
@@ -53,7 +53,7 @@ def test_python_answer_validation(
     question: str,
 ) -> None:
     with pytest.raises(ValueError, match=question):
-        with copier_case(features=["python"], **answers):
+        with copier_case(features=["core", "python"], **answers):
             pass
 
 
@@ -61,7 +61,7 @@ def test_python_project_configuration(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
-        features=["python"],
+        features=["core", "python"],
         core_repository_name="Acme Widget",
         python_distribution_name="acme-widget-library",
         python_package_name="acme_widget_library",

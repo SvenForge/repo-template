@@ -35,7 +35,7 @@ def test_gitlab_python_pipeline(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
-        features=["gitlab", "python"],
+        features=["core", "gitlab", "python"],
         gitlab_pipeline=["python"],
         python_version="3.13",
     ) as case:
@@ -78,7 +78,7 @@ def test_gitlab_contribution_templates(
             (True, True, True, False, False, True),
         ),
         (
-            {"features": ["gitlab", "python"]},
+            {"features": ["core", "gitlab", "python"]},
             (True, True, True, True, True, True),
         ),
     ],

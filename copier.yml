@@ -23,6 +23,9 @@ features:
     - python
     - sphinx
   validator: >-
+    {% if 'python' in features and 'core' not in features %}
+    Select Core when selecting Python.
+    {% endif %}
     {% if 'sphinx' in features and 'python' not in features %}
     Select Python when selecting Sphinx.
     {% endif %}

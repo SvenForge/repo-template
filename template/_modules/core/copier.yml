@@ -57,7 +57,7 @@ core_year:
 core_include_readme:
   type: bool
   help: Create README.md file?
-  default: true
+  default: "{{ 'core' in modules }}"
   when: "{{ 'core' in modules }}"
 
 core_license:
@@ -73,11 +73,11 @@ core_license:
 core_include_license:
   type: bool
   help: Create LICENSE.md file?
-  default: "{{ core_license != 'NOASSERTION' }}"
+  default: "{{ 'core' in modules and core_license != 'NOASSERTION' }}"
   when: false
 
 core_include_gitignore:
   type: bool
   help: Create .gitignore file?
-  default: true
+  default: "{{ 'core' in modules }}"
   when: "{{ 'core' in modules }}"
