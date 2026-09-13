@@ -75,9 +75,6 @@ COPY_CASES = {
     "empty-repository": CopyCase(
         answers={
             "features": "[]",
-            "core_include_readme": "false",
-            "core_license": "NOASSERTION",
-            "core_include_gitignore": "false",
         },
         expected_files={
             Path(".copier-answers.yml"): [],
@@ -102,7 +99,7 @@ COPY_CASES = {
     ),
     "codex": CopyCase(
         answers={
-            "features": "[codex, devcontainer, gitlab]",
+            "features": "[codex, core, devcontainer, gitlab]",
         },
         expected_files={
             Path(".codex/maintenance.sh"): [

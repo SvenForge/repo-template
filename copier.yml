@@ -9,6 +9,7 @@ features:
   help: Which template features shall be used?
   multiselect: true
   choices:
+    Core: core
     Codex: codex
     Copier: copier
     DevContainer: devcontainer
@@ -16,20 +17,18 @@ features:
     Python: python
     Sphinx: sphinx
   default:
+    - core
     - devcontainer
     - gitlab
     - python
     - sphinx
   validator: >-
+    {% if 'python' in features and 'core' not in features %}
+    Select Core when selecting Python.
+    {% endif %}
     {% if 'sphinx' in features and 'python' not in features %}
     Select Python when selecting Sphinx.
     {% endif %}
-
-modules:
-  type: yaml
-  help: Which template modules shall be used?
-  default: "{{ ['core'] + features }}"
-  when: false
 
 copier_version:
   type: str

@@ -64,7 +64,7 @@ def test_python_devcontainer_integration(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
-        features=["devcontainer", "python"],
+        features=["core", "devcontainer", "python"],
         python_version="3.13",
     ) as case:
         rendered = case.render(PATH_DEVCONTAINER_CONFIG)

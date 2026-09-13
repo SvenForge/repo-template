@@ -6,6 +6,6 @@ set -euo pipefail
 {% if python_include_pyproject %}
 {% include "template/_modules/python/setup.sh.jinja" -%}
 {% endif -%}
-{% if 'gitlab' in modules %}
+{% if 'gitlab' in features %}
 {% include "template/_modules/gitlab/setup.sh.jinja" -%}
 {% endif -%}

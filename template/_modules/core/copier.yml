@@ -2,13 +2,13 @@ core_repository_name:
   type: str
   help: What is the name of the repository?
   default: My Repository
-  when: "{{ 'core' in modules }}"
+  when: "{{ 'core' in features }}"
 
 core_repository_url:
   type: str
   help: At which URL is the repository hosted? (optional)
   default: ""
-  when: "{{ 'core' in modules }}"
+  when: "{{ 'core' in features }}"
 
 core_repository_host:
   type: str
@@ -34,19 +34,19 @@ core_owner_name:
   type: str
   help: Who is the repository owner? (optional)
   default: ""
-  when: "{{ 'core' in modules }}"
+  when: "{{ 'core' in features }}"
 
 core_owner_email:
   type: str
   help: What is the owner's email address? (optional)
   default: ""
-  when: "{{ 'core' in modules and core_owner_name }}"
+  when: "{{ 'core' in features and core_owner_name }}"
 
 core_owner_user:
   type: str
   help: What is the owner's username? (optional)
   default: ""
-  when: "{{ 'core' in modules and core_owner_name }}"
+  when: "{{ 'core' in features and core_owner_name }}"
 
 core_year:
   type: int
@@ -57,8 +57,8 @@ core_year:
 core_include_readme:
   type: bool
   help: Create README.md file?
-  default: true
-  when: "{{ 'core' in modules }}"
+  default: "{{ 'core' in features }}"
+  when: "{{ 'core' in features }}"
 
 core_license:
   type: str
@@ -68,16 +68,16 @@ core_license:
     MIT License: MIT
     No license defined: NOASSERTION
   default: NONE
-  when: "{{ 'core' in modules }}"
+  when: "{{ 'core' in features }}"
 
 core_include_license:
   type: bool
   help: Create LICENSE.md file?
-  default: "{{ core_license != 'NOASSERTION' }}"
+  default: "{{ 'core' in features and core_license != 'NOASSERTION' }}"
   when: false
 
 core_include_gitignore:
   type: bool
   help: Create .gitignore file?
-  default: true
-  when: "{{ 'core' in modules }}"
+  default: "{{ 'core' in features }}"
+  when: "{{ 'core' in features }}"

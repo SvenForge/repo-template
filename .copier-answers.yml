@@ -11,6 +11,7 @@ core_repository_name: Repo Template
 core_repository_url: https://gitlab.com/sventerprise/repo-template.git
 features:
 - copier
+- core
 - gitlab
 gitlab_pipeline:
 - copier

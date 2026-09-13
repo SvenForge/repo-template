@@ -2,7 +2,7 @@ sphinx_needs:
   type: bool
   help: Include Sphinx-Needs support?
   default: false
-  when: "{{ 'sphinx' in modules }}"
+  when: "{{ 'sphinx' in features }}"
 
 sphinx_needs_pages:
   type: str
@@ -18,58 +18,58 @@ sphinx_needs_pages:
     - architecture
     - implementation
     - verification
-  when: "{{ 'sphinx' in modules and sphinx_needs }}"
+  when: "{{ 'sphinx' in features and sphinx_needs }}"
 
 sphinx_include_config:
   type: bool
   help: Create conf.py?
-  default: "{{ 'sphinx' in modules }}"
+  default: "{{ 'sphinx' in features }}"
   when: false
 
 sphinx_include_index:
   type: bool
   help: Create index.md?
-  default: "{{ 'sphinx' in modules }}"
+  default: "{{ 'sphinx' in features }}"
   when: false
 
 sphinx_include_makefile:
   type: bool
   help: Create the Sphinx Makefile?
-  default: "{{ 'sphinx' in modules }}"
+  default: "{{ 'sphinx' in features }}"
   when: false
 
 sphinx_include_makebat:
   type: bool
   help: Create the Sphinx Windows build script?
-  default: "{{ 'sphinx' in modules }}"
+  default: "{{ 'sphinx' in features }}"
   when: false
 
 sphinx_include_api:
   type: bool
   help: Create the Python API page?
-  default: "{{ 'sphinx' in modules and python_include_package }}"
+  default: "{{ 'sphinx' in features and python_include_package }}"
   when: false
 
 sphinx_include_requirements:
   type: bool
   help: Create the requirements page?
-  default: "{{ 'sphinx' in modules and sphinx_needs and 'requirements' in sphinx_needs_pages }}"
+  default: "{{ 'sphinx' in features and sphinx_needs and 'requirements' in sphinx_needs_pages }}"
   when: false
 
 sphinx_include_architecture:
   type: bool
   help: Create the architecture page?
-  default: "{{ 'sphinx' in modules and sphinx_needs and 'architecture' in sphinx_needs_pages }}"
+  default: "{{ 'sphinx' in features and sphinx_needs and 'architecture' in sphinx_needs_pages }}"
   when: false
 
 sphinx_include_implementation:
   type: bool
   help: Create the implementation page?
-  default: "{{ 'sphinx' in modules and sphinx_needs and 'implementation' in sphinx_needs_pages }}"
+  default: "{{ 'sphinx' in features and sphinx_needs and 'implementation' in sphinx_needs_pages }}"
   when: false
 
 sphinx_include_verification:
   type: bool
   help: Create the verification page?
-  default: "{{ 'sphinx' in modules and sphinx_needs and 'verification' in sphinx_needs_pages }}"
+  default: "{{ 'sphinx' in features and sphinx_needs and 'verification' in sphinx_needs_pages }}"
   when: false

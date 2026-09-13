@@ -8,14 +8,10 @@ features:
   type: str
   help: Which template features shall be used?
   multiselect: true
-  choices: []
-  default: []
-
-modules:
-  type: yaml
-  help: Which template modules shall be used?
-  default: "{% raw %}{{ ['core'] + features }}{% endraw %}"
-  when: false
+  choices:
+    Core: core
+  default:
+    - core
 
 copier_version:
   type: str

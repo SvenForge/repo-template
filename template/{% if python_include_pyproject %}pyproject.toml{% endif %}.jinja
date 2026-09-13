@@ -32,7 +32,7 @@ lint = [
     "mypy-gitlab-code-quality",
     "ruff",
 ]
-{% if 'sphinx' in modules -%}
+{% if 'sphinx' in features -%}
 doc = [
     "furo",
     "myst-parser",
@@ -45,7 +45,7 @@ doc = [
 dev = [
     { include-group = "test" },
     { include-group = "lint" },
-{% if 'sphinx' in modules -%}
+{% if 'sphinx' in features -%}
     { include-group = "doc" },
 {% endif -%}
 ]

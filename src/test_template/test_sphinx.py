@@ -50,12 +50,12 @@ def test_sphinx_without_readme(
     copier_case: Callable[..., AbstractContextManager[CopierCase]],
 ) -> None:
     with copier_case(
-        features=["sphinx", "python"],
+        features=["core", "sphinx", "python"],
         core_repository_name="Example Repository",
         core_include_readme=False,
         sphinx_needs=False,
     ) as case:
-        modules = case.context["modules"]
+        features = case.context["features"]
         included = tuple(
             case.context[name]
             for name in (
@@ -74,7 +74,7 @@ def test_sphinx_without_readme(
         makefile = case.render(PATH_MAKEFILE)
         makebat = case.render(PATH_MAKEBAT)
 
-    assert "python" in modules
+    assert "python" in features
     assert included == (True, True, True, True, True, False, False, False, False)
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
@@ -94,7 +94,7 @@ def test_sphinx_integrations(
 ) -> None:
     pages_url = "https://example.gitlab.io/example-library/"
     with copier_case(
-        features=["sphinx", "gitlab", "python"],
+        features=["core", "sphinx", "gitlab", "python"],
         core_repository_name="Example Library",
         core_repository_url="git@gitlab.com:example/example-library.git",
         core_owner_name="Example Owner",
@@ -115,7 +115,7 @@ def test_sphinx_integrations(
         pipeline = yaml.safe_load(case.render(PATH_PIPELINE))
         root_pipeline = yaml.safe_load(case.render(PATH_ROOT_PIPELINE))
 
-    assert {"sphinx", "python", "gitlab"}.issubset(context["modules"])
+    assert {"sphinx", "python", "gitlab"}.issubset(context["features"])
     assert context["gitlab_include_pipeline_sphinx"] is True
     assert all(
         context[f"sphinx_include_{page}"]

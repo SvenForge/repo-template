@@ -1,29 +1,29 @@
 codex_cloud:
   type: bool
   help: Set up Codex Cloud integration?
-  default: "{{ 'codex' in modules }}"
-  when: "{{ 'codex' in modules }}"
+  default: "{{ 'codex' in features }}"
+  when: "{{ 'codex' in features }}"
 
 codex_devcontainer:
   type: bool
   help: Add Codex integration to the Dev Container?
-  default: "{{ 'codex' in modules and 'devcontainer' in modules }}"
-  when: "{{ 'codex' in modules and 'devcontainer' in modules }}"
+  default: "{{ 'codex' in features and 'devcontainer' in features }}"
+  when: "{{ 'codex' in features and 'devcontainer' in features }}"
 
 codex_include_agents:
   type: bool
   help: Create the Codex agent instructions?
-  default: "{{ 'codex' in modules }}"
+  default: "{{ 'codex' in features }}"
   when: false
 
 codex_include_setup:
   type: bool
   help: Create the Codex Cloud setup script?
-  default: "{{ 'codex' in modules and codex_cloud }}"
+  default: "{{ 'codex' in features and codex_cloud }}"
   when: false
 
 codex_include_maintenance:
   type: bool
   help: Create the Codex Cloud maintenance script?
-  default: "{{ 'codex' in modules and codex_cloud }}"
+  default: "{{ 'codex' in features and codex_cloud }}"
   when: false
