@@ -30,12 +30,6 @@ features:
     Select Python when selecting Sphinx.
     {% endif %}
 
-modules:
-  type: yaml
-  help: Which template modules shall be used?
-  default: "{{ features }}"
-  when: false
-
 copier_version:
   type: str
   help: Which Copier version does this template require?

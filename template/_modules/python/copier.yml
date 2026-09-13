@@ -7,7 +7,7 @@ python_distribution_name:
     {% if not (python_distribution_name | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
     Use lowercase letters and numbers separated by single hyphens.
     {% endif %}
-  when: "{{ 'python' in modules }}"
+  when: "{{ 'python' in features }}"
 
 python_package_name:
   type: str
@@ -18,7 +18,7 @@ python_package_name:
     {% if not (python_package_name | regex_search('^[a-z_][a-z0-9_]*$')) %}
     Use a valid lowercase Python identifier with underscores as separators.
     {% endif %}
-  when: "{{ 'python' in modules }}"
+  when: "{{ 'python' in features }}"
 
 python_version:
   type: str
@@ -28,22 +28,22 @@ python_version:
     {% if not (python_version | regex_search('^[0-9]+[.][0-9]+$')) %}
     Use a numeric Python major and minor version, such as 3.12.
     {% endif %}
-  when: "{{ 'python' in modules }}"
+  when: "{{ 'python' in features }}"
 
 python_include_pyproject:
   type: bool
   help: Create pyproject.toml?
-  default: "{{ 'python' in modules }}"
+  default: "{{ 'python' in features }}"
   when: false
 
 python_include_package:
   type: bool
   help: Create the Python package?
-  default: "{{ 'python' in modules }}"
+  default: "{{ 'python' in features }}"
   when: false
 
 python_include_testpackage:
   type: bool
   help: Create the Python test package?
-  default: "{{ 'python' in modules }}"
+  default: "{{ 'python' in features }}"
   when: false

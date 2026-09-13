@@ -55,7 +55,7 @@ def test_sphinx_without_readme(
         core_include_readme=False,
         sphinx_needs=False,
     ) as case:
-        modules = case.context["modules"]
+        features = case.context["features"]
         included = tuple(
             case.context[name]
             for name in (
@@ -74,7 +74,7 @@ def test_sphinx_without_readme(
         makefile = case.render(PATH_MAKEFILE)
         makebat = case.render(PATH_MAKEBAT)
 
-    assert "python" in modules
+    assert "python" in features
     assert included == (True, True, True, True, True, False, False, False, False)
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
@@ -115,7 +115,7 @@ def test_sphinx_integrations(
         pipeline = yaml.safe_load(case.render(PATH_PIPELINE))
         root_pipeline = yaml.safe_load(case.render(PATH_ROOT_PIPELINE))
 
-    assert {"sphinx", "python", "gitlab"}.issubset(context["modules"])
+    assert {"sphinx", "python", "gitlab"}.issubset(context["features"])
     assert context["gitlab_include_pipeline_sphinx"] is True
     assert all(
         context[f"sphinx_include_{page}"]

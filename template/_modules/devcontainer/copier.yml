@@ -1,5 +1,5 @@
 devcontainer_include_config:
   type: bool
   help: Create the Dev Container configuration?
-  default: "{{ 'devcontainer' in modules }}"
+  default: "{{ 'devcontainer' in features }}"
   when: false

@@ -13,12 +13,6 @@ features:
   default:
     - core
 
-modules:
-  type: yaml
-  help: Which template modules shall be used?
-  default: "{% raw %}{{ features }}{% endraw %}"
-  when: false
-
 copier_version:
   type: str
   help: Which Copier version does this template require?

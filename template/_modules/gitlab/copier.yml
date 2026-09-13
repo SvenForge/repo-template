@@ -1,13 +1,13 @@
 gitlab_include_issue_template:
   type: bool
   help: Create the default GitLab issue template?
-  default: "{{ 'gitlab' in modules }}"
+  default: "{{ 'gitlab' in features }}"
   when: false
 
 gitlab_include_merge_request_template:
   type: bool
   help: Create the default GitLab merge request template?
-  default: "{{ 'gitlab' in modules }}"
+  default: "{{ 'gitlab' in features }}"
   when: false
 
 gitlab_pipeline:
@@ -17,38 +17,38 @@ gitlab_pipeline:
   choices: |
     Check for Copier template updates: copier
     Run the demonstration job: demo
-    {% if 'python' in modules %}
+    {% if 'python' in features %}
     Run the Python test and quality jobs: python
     {% endif %}
-    {% if 'sphinx' in modules %}
+    {% if 'sphinx' in features %}
     Build and deploy the Sphinx documentation: sphinx
     {% endif %}
   default: >-
-    [copier, demo{% if 'python' in modules %}, python{% endif %}{% if 'sphinx' in modules %}, sphinx{% endif %}]
-  when: "{{ 'gitlab' in modules }}"
+    [copier, demo{% if 'python' in features %}, python{% endif %}{% if 'sphinx' in features %}, sphinx{% endif %}]
+  when: "{{ 'gitlab' in features }}"
 
 gitlab_include_pipeline_copier:
   type: bool
   help: Create the Copier pipeline module?
-  default: "{{ 'gitlab' in modules and 'copier' in gitlab_pipeline }}"
+  default: "{{ 'gitlab' in features and 'copier' in gitlab_pipeline }}"
   when: false
 
 gitlab_include_pipeline_demo:
   type: bool
   help: Create the demonstration pipeline module?
-  default: "{{ 'gitlab' in modules and 'demo' in gitlab_pipeline }}"
+  default: "{{ 'gitlab' in features and 'demo' in gitlab_pipeline }}"
   when: false
 
 gitlab_include_pipeline_python:
   type: bool
   help: Create the Python pipeline module?
-  default: "{{ 'gitlab' in modules and 'python' in modules and 'python' in gitlab_pipeline }}"
+  default: "{{ 'gitlab' in features and 'python' in features and 'python' in gitlab_pipeline }}"
   when: false
 
 gitlab_include_pipeline_sphinx:
   type: bool
   help: Create the Sphinx pipeline module?
-  default: "{{ 'gitlab' in modules and 'sphinx' in modules and 'sphinx' in gitlab_pipeline }}"
+  default: "{{ 'gitlab' in features and 'sphinx' in features and 'sphinx' in gitlab_pipeline }}"
   when: false
 
 gitlab_pages_url:
@@ -65,5 +65,5 @@ gitlab_pages_url:
 gitlab_include_pipeline:
   type: bool
   help: Create the GitLab CI/CD pipeline?
-  default: "{{ 'gitlab' in modules and gitlab_pipeline | length > 0 }}"
+  default: "{{ 'gitlab' in features and gitlab_pipeline | length > 0 }}"
   when: false
