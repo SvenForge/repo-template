@@ -44,24 +44,24 @@ COPY_CASES = {
                 "_TODO: Link or add documentation._",
                 "_TODO: Add contact information._",
             ],
-            Path("conf.py"): [
+            Path("doc/sphinx/conf.py"): [
                 'project = "My Repository"',
                 "sphinx.ext.apidoc",
             ],
             Path("doc/api.md"): ["sphinx/_apidoc/modules"],
             Path("doc/sphinx/Makefile"): [
-                "sphinx-build",
+                '-c "$(CONFDIR)"',
                 "SOURCEDIR     = ../..",
                 "BUILDDIR      = _build",
             ],
             Path("doc/sphinx/make.bat"): [
-                "sphinx-build",
+                "-c %CONFDIR%",
                 'SOURCEDIR="..\\.."',
                 "BUILDDIR=_build",
             ],
-            Path("index.md"): [
+            Path("doc/sphinx/index.md"): [
                 "{toctree}",
-                "doc/*",
+                "../*",
             ],
             Path("pyproject.toml"): ['name = "my-repository"'],
             Path("src/my_repository/__init__.py"): [],

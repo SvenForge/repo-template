@@ -1,5 +1,6 @@
 {% if core_include_readme -%}
-```{include} README.md
+```{include} ../../README.md
+:relative-docs: LICENSE.md
 ```
 {% else -%}
 # {{ core_repository_name }}
@@ -14,8 +15,8 @@ Documentation for {{ core_repository_name }}.
 :maxdepth: 1
 :glob:
 
-doc/*
+../*
 {% if core_include_license -%}
-License <LICENSE>
+License <../../LICENSE>
 {% endif -%}
 ```

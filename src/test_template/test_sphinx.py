@@ -8,8 +8,8 @@ import yaml
 from .conftest import CopierCase
 
 
-PATH_CONFIG = "template/{% if sphinx_include_config %}conf.py{% endif %}.jinja"
-PATH_INDEX = "template/{% if sphinx_include_index %}index.md{% endif %}.jinja"
+PATH_CONFIG = "template/{% if sphinx_include_config %}doc{% endif %}/sphinx/conf.py.jinja"
+PATH_INDEX = "template/{% if sphinx_include_index %}doc{% endif %}/sphinx/index.md.jinja"
 PATH_LICENSE = "template/{% if core_include_license %}LICENSE.md{% endif %}.jinja"
 PATH_README = "template/{% if core_include_readme %}README.md{% endif %}.jinja"
 PATH_MAKEFILE = "template/{% if sphinx_include_makefile %}doc{% endif %}/sphinx/Makefile"
@@ -78,13 +78,13 @@ def test_sphinx_without_readme(
     assert included == (True, True, True, True, True, False, False, False, False)
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
-    assert "{include} README.md" not in index
+    assert "{include} ../../README.md" not in index
     assert ":glob:" in index
-    assert "doc/*" in index
-    assert "sphinx-build" in makefile
+    assert "../*" in index
+    assert '-c "$(CONFDIR)"' in makefile
     assert "SOURCEDIR     = ../.." in makefile
     assert "BUILDDIR      = _build" in makefile
-    assert "sphinx-build" in makebat
+    assert "-c %CONFDIR%" in makebat
     assert r'SOURCEDIR="..\.."' in makebat
     assert "BUILDDIR=_build" in makebat
 
@@ -149,7 +149,7 @@ def test_sphinx_integrations(
     assert assignments["needs_sphinx"] == "8.2"
     assert assignments["apidoc_modules"] == [
         {
-            "path": "src",
+            "path": "../../src",
             "destination": "doc/sphinx/_apidoc",
         },
     ]
@@ -171,14 +171,14 @@ def test_sphinx_integrations(
         "test",
     }
 
-    assert "{include} README.md" in index
+    assert "{include} ../../README.md" in index
     assert "{toctree}" in index
     assert ":maxdepth: 1" in index
     assert ":glob:" in index
-    assert "doc/*" in index
+    assert "../*" in index
     assert f"[GitLab Pages]({pages_url})" in readme
     assert "{toctree}" not in readme
-    assert "License <LICENSE>" in index
+    assert "License <../../LICENSE>" in index
     assert license_text.startswith("# License & Copyright Information\n")
     assert "{toctree}" in api
     assert "sphinx/_apidoc/modules" in api
