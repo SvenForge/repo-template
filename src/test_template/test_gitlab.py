@@ -63,6 +63,15 @@ def test_gitlab_contribution_templates(
     assert "## Problem" in issue
     assert "## How are the changes verified?" in merge_request
     assert "## GitLab development workflow" in agents_fragment
+    assert "native `@GitLab` plugin" in agents_fragment
+    assert "`name` and `commit_email`" in agents_fragment
+    assert "otherwise `glab api user`" in agents_fragment
+    assert "unavailable or empty" in agents_fragment
+    assert (
+        'git -c user.name="<name>" -c user.email="<commit_email>" commit ...'
+        in agents_fragment
+    )
+    assert "bot-on-duty" not in agents_fragment
 
 
 @pytest.mark.parametrize(

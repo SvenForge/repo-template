@@ -14,6 +14,7 @@
 * Treat the GitLab project linked in the title of `README.md` as the authoritative source of truth. Push branches and commits only to this remote.
 * Use other remotes, such as GitHub mirrors, only to clone the repository. Do not push to or make changes on those services.
 * Use the native `@GitLab` plugin for GitLab interactions when available. Otherwise, use the `glab` CLI if installed. If neither is available, interact only with the local Git repository, remain in the current workflow stage, and report which required GitLab actions could not be completed.
+* Before every local commit created autonomously by an agent, retrieve the authenticated GitLab user's `name` and `commit_email` through the selected interface (the native `@GitLab` plugin when available, otherwise `glab api user`). If either value is unavailable or empty, stop and report the blocker. Apply the values only to that commit with command-scoped configuration, for example `git -c user.name="<name>" -c user.email="<commit_email>" commit ...`; do not change the stored repository or global Git identity.
 
 ### Workflow stage transitions
 
