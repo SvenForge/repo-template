@@ -44,8 +44,8 @@ copier_version:
 ---
 !include template/_modules/devcontainer/copier.yml
 ---
-!include template/_modules/gitlab/copier.yml
----
 !include template/_modules/python/copier.yml
+---
+!include template/_modules/gitlab/copier.yml
 ---
 !include template/_modules/sphinx/copier.yml

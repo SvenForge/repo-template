@@ -1,23 +1,36 @@
-python_distribution_name:
+python_package_name:
   type: str
-  help: What is the Python distribution name?
-  default: >-
-    {{ core_repository_name | lower | regex_replace('[^a-z0-9]+', '-') | regex_replace('(^-+|-+$)', '') }}
+  help: What is the Python import package name? (optional)
+  default: ""
   validator: >-
-    {% if not (python_distribution_name | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
-    Use lowercase letters and numbers separated by single hyphens.
+    {% if python_package_name and not (python_package_name | regex_search('^[a-z_][a-z0-9_]*$')) %}
+    Use a valid lowercase Python identifier with underscores as separators.
     {% endif %}
   when: "{{ 'python' in features }}"
 
-python_package_name:
+python_distribution_name:
   type: str
-  help: What is the Python import package name?
+  help: What is the Python distribution name? (optional)
   default: >-
-    {{ '_' if python_distribution_name[0] in '0123456789' else '' }}{{ python_distribution_name | replace('-', '_') }}
+    {{ python_package_name | replace('_', '-') | regex_replace('-+', '-') | regex_replace('(^-+|-+$)', '') }}
   validator: >-
-    {% if not (python_package_name | regex_search('^[a-z_][a-z0-9_]*$')) %}
-    Use a valid lowercase Python identifier with underscores as separators.
+    {% if python_distribution_name and not (python_distribution_name | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
+    Use lowercase letters and numbers separated by single hyphens.
     {% endif %}
+  when: "{{ 'python' in features and python_package_name }}"
+
+python_tools:
+  type: str
+  help: Which Python tools shall be set up?
+  multiselect: true
+  choices:
+    pytest: pytest
+    Ruff: ruff
+    mypy: mypy
+  default:
+    - pytest
+    - ruff
+    - mypy
   when: "{{ 'python' in features }}"
 
 python_version:
@@ -30,6 +43,12 @@ python_version:
     {% endif %}
   when: "{{ 'python' in features }}"
 
+python_testpackage_name:
+  type: str
+  help: What is the Python test package name?
+  default: "test_{{ python_package_name if python_package_name else 'project' }}"
+  when: false
+
 python_include_pyproject:
   type: bool
   help: Create pyproject.toml?
@@ -39,11 +58,35 @@ python_include_pyproject:
 python_include_package:
   type: bool
   help: Create the Python package?
-  default: "{{ 'python' in features }}"
+  default: "{{ 'python' in features and python_package_name }}"
+  when: false
+
+python_include_distribution:
+  type: bool
+  help: Configure the Python distribution?
+  default: "{{ 'python' in features and python_package_name and python_distribution_name }}"
   when: false
 
 python_include_testpackage:
   type: bool
   help: Create the Python test package?
-  default: "{{ 'python' in features }}"
+  default: "{{ 'python' in features and 'pytest' in python_tools }}"
+  when: false
+
+python_include_importtest:
+  type: bool
+  help: Create the Python package import test?
+  default: "{{ python_include_package and python_include_testpackage }}"
+  when: false
+
+python_include_devgroup:
+  type: bool
+  help: Create the Python development dependency group?
+  default: "{{ 'python' in features and (python_tools | length > 0 or 'sphinx' in features) }}"
+  when: false
+
+python_include_setup:
+  type: bool
+  help: Install the Python project or development dependencies?
+  default: "{{ python_include_distribution or python_include_devgroup }}"
   when: false

@@ -54,6 +54,7 @@ def test_codex_cloud_scripts(
 ) -> None:
     with copier_case(
         features=["codex", "core", "gitlab", "python"],
+        python_package_name="repository",
         core_repository_url="https://gitlab.example.com/group/repository.git",
     ) as case:
         setup = case.render(PATH_SETUP)
