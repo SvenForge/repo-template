@@ -1,3 +1,4 @@
+{% if python_include_distribution -%}
 [build-system]
 requires = [
     "setuptools>=84",
@@ -22,16 +23,26 @@ authors = [
     { name = {{ core_owner_name | tojson }}{% if core_owner_email %}, email = {{ core_owner_email | tojson }}{% endif %} },
 ]
 {% endif %}
+{% endif -%}
+{% if python_include_devgroup -%}
 [dependency-groups]
+{% if 'pytest' in python_tools -%}
 test = [
     "pytest",
     "pytest-cov",
 ]
+{% endif -%}
+{% if 'ruff' in python_tools or 'mypy' in python_tools -%}
 lint = [
+{% if 'mypy' in python_tools -%}
     "mypy",
     "mypy-gitlab-code-quality",
+{% endif -%}
+{% if 'ruff' in python_tools -%}
     "ruff",
+{% endif -%}
 ]
+{% endif -%}
 {% if 'sphinx' in features -%}
 doc = [
     "furo",
@@ -43,13 +54,19 @@ doc = [
 ]
 {% endif -%}
 dev = [
+{% if 'pytest' in python_tools -%}
     { include-group = "test" },
+{% endif -%}
+{% if 'ruff' in python_tools or 'mypy' in python_tools -%}
     { include-group = "lint" },
+{% endif -%}
 {% if 'sphinx' in features -%}
     { include-group = "doc" },
 {% endif -%}
 ]
+{% endif %}
 
+{% if python_include_distribution -%}
 [tool.setuptools]
 package-dir = { "" = "src" }
 
@@ -60,7 +77,9 @@ namespaces = false
 
 [tool.setuptools_scm]
 fallback_version = "0.0.0"
+{% endif %}
 
+{% if 'pytest' in python_tools -%}
 [tool.pytest.ini_options]
 addopts = [
     "--cov",
@@ -69,6 +88,9 @@ addopts = [
     "--junitxml=pytest.xml",
 ]
 testpaths = ["src/test_*"]
+{% if python_include_package and not python_include_distribution -%}
+pythonpath = ["src"]
+{% endif %}
 
 [tool.coverage.run]
 branch = true
@@ -76,7 +98,9 @@ omit = ["test_*"]
 
 [tool.coverage.report]
 show_missing = true
+{% endif %}
 
+{% if 'ruff' in python_tools -%}
 [tool.ruff]
 src = ["src"]
 exclude = [
@@ -109,7 +133,10 @@ convention = "google"
 
 [tool.ruff.format]
 quote-style = "single"
+{% endif %}
 
+{% if 'mypy' in python_tools -%}
 [tool.mypy]
 files = ["src"]
 strict = true
+{% endif %}

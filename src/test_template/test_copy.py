@@ -21,6 +21,7 @@ COPY_CASES = {
             Path(".devcontainer/devcontainer.json"): [
                 '"image": "mcr.microsoft.com/devcontainers/python:3-3.12-bookworm"',
                 '"remoteUser": "vscode"',
+                "python -m pip install --group dev",
                 '"setupPython"',
             ],
             Path(".gitignore"): ["### Python ###", "__pypackages__/"],
@@ -31,10 +32,12 @@ COPY_CASES = {
                 "python:pytest:",
                 "python:ruff:",
                 "python:mypy:",
+                'python -m pip install --group "$PYTHON_DEPENDENCY_GROUP"',
             ],
             Path(".gitlab/ci/sphinx.yml"): [
                 "sphinx:build:",
                 "sphinx:pages:",
+                "python -m pip install --group doc",
             ],
             Path(".gitlab/issue_templates/default.md"): ["## Problem"],
             Path(".gitlab/merge_request_templates/default.md"): ["## What is changed?"],
@@ -46,9 +49,8 @@ COPY_CASES = {
             ],
             Path("doc/sphinx/conf.py"): [
                 'project = "My Repository"',
-                "sphinx.ext.apidoc",
+                "sphinx.ext.intersphinx",
             ],
-            Path("doc/api.md"): ["sphinx/_apidoc/modules"],
             Path("doc/sphinx/Makefile"): [
                 '-c "$(CONFDIR)"',
                 "SOURCEDIR     = ../..",
@@ -63,13 +65,12 @@ COPY_CASES = {
                 "{toctree}",
                 "../*",
             ],
-            Path("pyproject.toml"): ['name = "my-repository"'],
-            Path("src/my_repository/__init__.py"): [],
-            Path("src/test_my_repository/__init__.py"): [],
-            Path("src/test_my_repository/test_import.py"): [
-                "import my_repository",
+            Path("pyproject.toml"): [
+                "[dependency-groups]",
+                "[tool.pytest.ini_options]",
             ],
-            Path("src/test_my_repository/test_self.py"): [],
+            Path("src/test_project/__init__.py"): [],
+            Path("src/test_project/test_self.py"): [],
         },
     ),
     "empty-repository": CopyCase(

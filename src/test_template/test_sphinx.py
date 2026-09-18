@@ -75,7 +75,7 @@ def test_sphinx_without_readme(
         makebat = case.render(PATH_MAKEBAT)
 
     assert "python" in features
-    assert included == (True, True, True, True, True, False, False, False, False)
+    assert included == (True, True, True, True, False, False, False, False, False)
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
     assert "{include} ../../README.md" not in index
@@ -98,6 +98,7 @@ def test_sphinx_integrations(
         core_repository_name="Example Library",
         core_repository_url="git@gitlab.com:example/example-library.git",
         core_owner_name="Example Owner",
+        python_package_name="example_library",
         sphinx_needs=True,
         sphinx_needs_pages=list(PATH_NEEDS),
         gitlab_pipeline=["sphinx"],

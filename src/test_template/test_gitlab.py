@@ -38,6 +38,7 @@ def test_gitlab_python_pipeline(
     with copier_case(
         features=["core", "gitlab", "python"],
         gitlab_pipeline=["python"],
+        python_tools=["pytest", "mypy"],
         python_version="3.13",
     ) as case:
         rendered_python = case.render(PATH_PYTHON_PIPELINE)
@@ -45,12 +46,14 @@ def test_gitlab_python_pipeline(
     python_pipeline = yaml.safe_load(rendered_python)
 
     visible_jobs = {key for key in python_pipeline if not key.startswith(".")}
-    assert visible_jobs == {"python:pytest", "python:ruff", "python:mypy"}
+    assert visible_jobs == {"python:pytest", "python:mypy"}
     assert python_pipeline[".python:base"]["image"] == "python:3.13-bookworm"
+    install = python_pipeline[".python:base"]["before_script"][1]
+    assert "python -m pip install --group" in install
+    assert "--editable" not in install
     assert "coverage_report" in python_pipeline["python:pytest"]["artifacts"]["reports"]
-    for job_name in ("python:ruff", "python:mypy"):
-        assert python_pipeline[job_name]["allow_failure"] is True
-        assert "codequality" in python_pipeline[job_name]["artifacts"]["reports"]
+    assert python_pipeline["python:mypy"]["allow_failure"] is True
+    assert "codequality" in python_pipeline["python:mypy"]["artifacts"]["reports"]
 
 
 def test_gitlab_contribution_templates(
@@ -82,12 +85,20 @@ def test_gitlab_contribution_templates(
             {"features": ["core", "gitlab", "python"]},
             (True, True, True, True, True, True),
         ),
+        (
+            {
+                "features": ["core", "gitlab", "python"],
+                "python_tools": [],
+            },
+            (True, True, True, True, False, True),
+        ),
     ],
     ids=[
         "without-gitlab",
         "without-pipeline",
         "copier-only",
         "python-default-pipelines",
+        "python-without-tools",
     ],
 )
 def test_gitlab_file_selection(

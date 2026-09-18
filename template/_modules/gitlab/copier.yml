@@ -17,14 +17,14 @@ gitlab_pipeline:
   choices: |
     Check for Copier template updates: copier
     Run the demonstration job: demo
-    {% if 'python' in features %}
+    {% if 'python' in features and python_tools | length > 0 %}
     Run the Python test and quality jobs: python
     {% endif %}
     {% if 'sphinx' in features %}
     Build and deploy the Sphinx documentation: sphinx
     {% endif %}
   default: >-
-    [copier, demo{% if 'python' in features %}, python{% endif %}{% if 'sphinx' in features %}, sphinx{% endif %}]
+    [copier, demo{% if 'python' in features and python_tools | length > 0 %}, python{% endif %}{% if 'sphinx' in features %}, sphinx{% endif %}]
   when: "{{ 'gitlab' in features }}"
 
 gitlab_include_pipeline_copier:
@@ -42,7 +42,7 @@ gitlab_include_pipeline_demo:
 gitlab_include_pipeline_python:
   type: bool
   help: Create the Python pipeline module?
-  default: "{{ 'gitlab' in features and 'python' in features and 'python' in gitlab_pipeline }}"
+  default: "{{ 'gitlab' in features and 'python' in features and python_tools | length > 0 and 'python' in gitlab_pipeline }}"
   when: false
 
 gitlab_include_pipeline_sphinx:
