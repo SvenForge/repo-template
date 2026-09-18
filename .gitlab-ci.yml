@@ -16,8 +16,8 @@ stages:
   - test
 
 default:
-    image: ubuntu:26.04
-    interruptible: true
+  image: ubuntu:26.04
+  interruptible: true
 
 include:
   - local: .gitlab/ci/*.yml

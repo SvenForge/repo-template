@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-# Set up GitLab access for a Codex Cloud environment.
+# Set up a Codex Cloud environment.
 # Add the following setup command to the Codex Cloud Environment configuration:
 #   bash .codex/setup.sh
 set -euo pipefail
 
+# Install the Python project and/or its development dependency group.
+python -m pip install --upgrade pip
+python -m pip install --group dev
+
+# Set up GitLab access for the Codex Cloud environment.
 : "${GITLAB_TOKEN:?GITLAB_TOKEN must be provided as a Codex Cloud Environment Secret.}"
 
 readonly GLAB_VERSION="1.113.0"
@@ -18,10 +23,6 @@ glab_version() {
     glab --version 2>/dev/null |
         sed -nE '1s/^glab( version)? ([^[:space:]]+).*/\2/p'
 }
-
-# Install Python dependencies.
-repo_root="$(git rev-parse --show-toplevel)"
-python -m pip install --requirement "$repo_root/env/dev/requirements.txt"
 
 # Install the pinned glab release when needed.
 if [[ "$(glab_version)" != "$GLAB_VERSION" ]]; then

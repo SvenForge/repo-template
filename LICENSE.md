@@ -1,3 +1,5 @@
+# License & Copyright Information
+
 Copyright © 2026 Sven Krummen. All rights reserved.
 
 All rights reserved.

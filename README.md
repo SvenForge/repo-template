@@ -35,14 +35,14 @@ copier update
 
 ## Documentation
 
-_TODO: Link or add documentation._
+The documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
+
 
 ## Contributing
 
 ### Maintainer
 
 * [Sven Krummen](mailto:sven@nichtgerade.de) - @krum_sv
-
 
 ## License
 
