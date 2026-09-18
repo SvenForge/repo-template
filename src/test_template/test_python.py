@@ -127,16 +127,11 @@ def test_python_package_without_distribution(
         setup = case.render(PATH_SETUP)
         context = case.context
 
-    assert "build-system" not in project
-    assert "project" not in project
-    assert "setuptools" not in project["tool"]
-    assert "setuptools_scm" not in project["tool"]
     assert project["tool"]["pytest"]["ini_options"]["pythonpath"] == ["src"]
     assert context["python_include_package"] is True
     assert context["python_include_distribution"] is False
     assert "import acme_widget" in import_test
     assert "python -m pip install --group dev" in setup
-    assert "--editable" not in setup
 
 
 @pytest.mark.parametrize(

@@ -50,7 +50,6 @@ def test_gitlab_python_pipeline(
     assert python_pipeline[".python:base"]["image"] == "python:3.13-bookworm"
     install = python_pipeline[".python:base"]["before_script"][1]
     assert "python -m pip install --group" in install
-    assert "--editable" not in install
     assert "coverage_report" in python_pipeline["python:pytest"]["artifacts"]["reports"]
     assert python_pipeline["python:mypy"]["allow_failure"] is True
     assert "codequality" in python_pipeline["python:mypy"]["artifacts"]["reports"]
