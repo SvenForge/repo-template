@@ -1,6 +1,6 @@
 [dependency-groups]
 test = [
-    "copier>=9.17.2",
+    "copier==9.17.2",
     "PyYAML",
     "pytest",
     "pytest-cov",
