@@ -1,3 +1,9 @@
+{# Fragments contain JSON members or items, without enclosing containers or trailing commas. #}
+{%- macro render_contributions(extensionpoint, indentation=8) -%}
+{%- for contribution in contributions | selectattr('id', 'equalto', extensionpoint) %}
+{% filter trim | indent(indentation, true) %}{% include contribution.template %}{% endfilter %}{% if not loop.last %},{% endif %}
+{%- endfor %}
+{%- endmacro -%}
 {
 {%- if 'python' in features %}
     "image": "mcr.microsoft.com/devcontainers/python:3-{{ python_version }}-bookworm",
@@ -5,16 +11,11 @@
     "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
 {%- endif %}
     "features": {
-{%- if codex_devcontainer %}
-        "ghcr.io/devcontainers/features/node:2": {},
-        "ghcr.io/dirien/devcontainer-feature-codex/codex:0": {}
-{%- endif %}
+        {{- render_contributions('devcontainer.features') }}
     },
     "remoteUser": "vscode",
     "mounts": [
-{%- if codex_devcontainer %}
-        "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
-{%- endif %}
+        {{- render_contributions('devcontainer.mounts') }}
     ],
     "initializeCommand": {
         "exportGitIdentity": ["git", "-C", "${localWorkspaceFolder}", "-c", "alias.export-identity=!f() { git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null) || exit 0; name=$(git config --get user.name 2>/dev/null) || exit 0; email=$(git config --get user.email 2>/dev/null) || exit 0; file=\"$git_dir/devcontainer-identity.gitconfig\"; git config --file \"$file\" user.name \"$name\"; git config --file \"$file\" user.email \"$email\"; }; f", "export-identity"]
@@ -29,22 +30,16 @@
 %}
 {%- set postcreate_commands = [
     '"setupPython": ' ~ (python_setup_command | tojson) if python_include_setup else none,
-    '"setupCodex": ' ~ ('set -eu; config_dir="$HOME/.codex"; mkdir -p "$config_dir"; sudo chown -R "$(id -u):$(id -g)" "$config_dir"; chmod 700 "$config_dir"' | tojson) if codex_devcontainer else none,
+    (render_contributions('devcontainer.postCreateCommand', 0) | trim) or none,
 ] | reject('none') | list %}
 {%- if postcreate_commands %}
-        {{ postcreate_commands | join(',\n        ') }}
+        {{ postcreate_commands | join(',\n') | indent(8) }}
 {%- endif %}
     },
     "customizations": {
         "vscode": {
             "extensions": [
-{%- if codex_devcontainer %}
-                "openai.chatgpt",
-{%- endif %}
-                "mhutchie.git-graph",
-                "Gruntfuggly.todo-tree",
-                "mutantdino.resourcemonitor",
-                "streetsidesoftware.code-spell-checker"
+                {{- render_contributions('devcontainer.extensions', 16) }}
             ],
             "settings": {
                 "telemetry.telemetryLevel": "off",

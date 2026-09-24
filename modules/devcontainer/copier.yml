@@ -15,3 +15,15 @@ devcontainer_files:
       template: files/devcontainer.json.jinja
     {%- endif %}
     {%- endfilter %}
+
+devcontainer_contributions:
+  type: yaml
+  help: Which contributions shall be made to other files?
+  when: false
+  default: |
+    {%- filter trim | default('[]', true) %}
+    {%- if devcontainer_include_config %}
+    - id: devcontainer.extensions
+      template: fragments/devcontainer.extensions.json.jinja
+    {%- endif %}
+    {%- endfilter %}

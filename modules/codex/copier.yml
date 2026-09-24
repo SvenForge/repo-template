@@ -54,12 +54,14 @@ codex_contributions:
   when: false
   default: |
     {%- filter trim | default('[]', true) %}
-    {%- if codex_cloud %}
+    {%- if codex_devcontainer %}
     - id: devcontainer.features
       template: fragments/devcontainer.features.json.jinja
     - id: devcontainer.mounts
       template: fragments/devcontainer.mounts.json.jinja
     - id: devcontainer.extensions
       template: fragments/devcontainer.extensions.json.jinja
+    - id: devcontainer.postCreateCommand
+      template: fragments/devcontainer.postCreateCommand.json.jinja
     {%- endif %}
     {%- endfilter %}

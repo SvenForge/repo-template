@@ -48,3 +48,23 @@ files:
       {%- endfor -%}
     {%- endfor -%}
     {{ result.files | to_json }}
+
+contributions:
+  type: yaml
+  help: Which contributions shall be made to other files?
+  when: false
+  default: |
+    {%- set module_contributions = {
+      'codex': codex_contributions,
+      'devcontainer': devcontainer_contributions,
+    } -%}
+    {%- set result = namespace(contributions=[]) -%}
+    {%- for feature in features -%}
+      {%- for contribution in module_contributions[feature.module] -%}
+        {%- set result.contributions = result.contributions + [{
+          'id': contribution.id,
+          'template': feature.path ~ '/' ~ contribution.template,
+        }] -%}
+      {%- endfor -%}
+    {%- endfor -%}
+    {{ result.contributions | to_json }}
