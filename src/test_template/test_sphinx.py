@@ -61,6 +61,7 @@ def test_sphinx_without_readme(
             for name in (
                 "sphinx_include_config",
                 "sphinx_include_index",
+                "sphinx_include_notes",
                 "sphinx_include_makefile",
                 "sphinx_include_makebat",
                 "sphinx_include_api",
@@ -75,7 +76,7 @@ def test_sphinx_without_readme(
         makebat = case.render(PATH_MAKEBAT)
 
     assert "python" in features
-    assert included == (True, True, True, True, False, False, False, False, False)
+    assert included == (True, True, True, True, True, False, False, False, False, False)
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
     assert "{include} ../../README.md" not in index

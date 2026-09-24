@@ -41,7 +41,7 @@ def test_readme_with_owner_contact(
 
     assert "# [Example Repository](https://example.com/repository)" in rendered
     assert "* [Example Owner](mailto:owner@example.com) - @example-owner" in rendered
-    assert "Please see: [LICENSE.md](LICENSE.md)" in rendered
+    assert "Please see: [LICENSE.md](./LICENSE.md)" in rendered
 
 
 def test_readme_without_optional_owner_contact(

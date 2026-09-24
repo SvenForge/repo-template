@@ -65,6 +65,7 @@ COPY_CASES = {
                 "{toctree}",
                 "../*",
             ],
+            Path("doc/notes.md"): ["# Notes"],
             Path("pyproject.toml"): [
                 "[dependency-groups]",
                 "[tool.pytest.ini_options]",
