@@ -3,3 +3,13 @@ devcontainer_include_config:
   help: Create the Dev Container configuration?
   default: "{{ 'devcontainer' in features }}"
   when: false
+
+devcontainer_files:
+  type: yaml
+  help: Which files shall be generated?
+  when: false
+  default: |
+    {%- if devcontainer_include_config %}
+    - path: .devcontainer/devcontainer.json
+      template: files/devcontainer.json.jinja
+    {%- endif %}

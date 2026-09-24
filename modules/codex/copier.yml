@@ -27,3 +27,21 @@ codex_include_maintenance:
   help: Create the Codex Cloud maintenance script?
   default: "{{ 'codex' in features and codex_cloud }}"
   when: false
+
+codex_files:
+  type: yaml
+  help: Which files shall be generated?
+  when: false
+  default: |
+    {%- if codex_include_agents %}
+    - path: AGENTS.md
+      template: files/AGENTS.md.jinja
+    {%- endif %}
+    {%- if codex_include_setup %}
+    - path: .codex/setup.sh
+      template: files/setup.sh.jinja
+    {%- endif %}
+    {%- if codex_include_maintenance %}
+    - path: .codex/maintenance.sh
+      template: files/maintenance.sh.jinja
+    {%- endif %}
