@@ -1,8 +1,6 @@
 ---
 _min_copier_version: &min_copier_version "9.17.2"
-_subdirectory: template
-_exclude:
-  - /_modules
+_subdirectory: template_new  # TODO: Switch back to template after refactoring is completed
 
 features:
   type: str
@@ -35,17 +33,24 @@ copier_version:
   help: Which Copier version does this template require?
   default: *min_copier_version
   when: false
+
+files:
+  type: yaml
+  help: Which files shall be generated?
+  when: false
+  default: []  # TODO: Assemble file list from module outputs
+
+# ---
+# !include modules/core/copier.yml
 ---
-!include template/_modules/core/copier.yml
+!include modules/codex/copier.yml
+# ---
+# !include modules/copier/copier.yml
 ---
-!include template/_modules/codex/copier.yml
----
-!include template/_modules/copier/copier.yml
----
-!include template/_modules/devcontainer/copier.yml
----
-!include template/_modules/python/copier.yml
----
-!include template/_modules/gitlab/copier.yml
----
-!include template/_modules/sphinx/copier.yml
+!include modules/devcontainer/copier.yml
+# ---
+# !include modules/python/copier.yml
+# ---
+# !include modules/gitlab/copier.yml
+# ---
+# !include modules/sphinx/copier.yml
