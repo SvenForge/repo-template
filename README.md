@@ -24,7 +24,7 @@ copier copy . path/to/new-project
 
 Use one of the supported development environments:
 
-* Open this repository in its included [development container](.devcontainer/devcontainer.json). VS Code with the Dev Containers extension is recommended for creating and accessing the container. Please note that a Docker-compliant CLI must be installed on your machine to start the Dev Container.
+* Open this repository in its included [development container](./.devcontainer/devcontainer.json). VS Code with the Dev Containers extension is recommended for creating and accessing the container. Please note that a Docker-compliant CLI must be installed on your machine to start the Dev Container.
 * Start an AI task in [Codex Cloud](https://chatgpt.com/codex/cloud) using the preconfigured environment for this repository.
 
 To update this repository from its own template simply run the following command:
@@ -46,4 +46,4 @@ The documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/
 
 ## License
 
-Please see: [LICENSE.md](LICENSE.md)
+Please see: [LICENSE.md](./LICENSE.md)
