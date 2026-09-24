@@ -5,8 +5,8 @@
 {%- endfor %}
 {%- endmacro -%}
 {
-{%- if devcontainer_inputs.python_enabled %}
-    "image": "mcr.microsoft.com/devcontainers/python:3-{{ devcontainer_inputs.python_version }}-bookworm",
+{%- if devcontainer.vars.python_enabled %}
+    "image": "mcr.microsoft.com/devcontainers/python:3-{{ devcontainer.vars.python_version }}-bookworm",
 {%- else %}
     "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
 {%- endif %}
@@ -25,11 +25,11 @@
     },
     "postCreateCommand": {
 {%- set python_setup_command = 'set -eu; python -m pip install --upgrade pip; python -m pip install'
-    ~ (' --editable .' if devcontainer_inputs.python_include_distribution else '')
-    ~ (' --group dev' if devcontainer_inputs.python_include_devgroup else '')
+    ~ (' --editable .' if devcontainer.vars.python_include_distribution else '')
+    ~ (' --group dev' if devcontainer.vars.python_include_devgroup else '')
 %}
 {%- set postcreate_commands = [
-    '"setupPython": ' ~ (python_setup_command | tojson) if devcontainer_inputs.python_include_setup else none,
+    '"setupPython": ' ~ (python_setup_command | tojson) if devcontainer.vars.python_include_setup else none,
     (render_contributions('devcontainer.postCreateCommand', 0) | trim) or none,
 ] | reject('none') | list %}
 {%- if postcreate_commands %}

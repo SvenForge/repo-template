@@ -1,54 +1,57 @@
 # Module Inputs
-# codex_inputs:
-#   enabled: bool
-#   devcontainer_enabled: bool
+codex_inputs:  # These defaults can be overridden by the including template
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: |
+    enabled: true
+    devcontainer: false
 
 # Module Questions
 codex_cloud:
   type: bool
   help: Set up Codex Cloud integration?
-  default: "{{ codex_inputs.enabled }}"
+  default: "{{ codex_inputs.cloud | default(codex_inputs.enabled) }}"
   when: "{{ codex_inputs.enabled }}"
 
 codex_devcontainer:
   type: bool
   help: Add Codex integration to the Dev Container?
-  default: "{{ codex_inputs.enabled and codex_inputs.devcontainer_enabled }}"
-  when: "{{ codex_inputs.enabled and codex_inputs.devcontainer_enabled }}"
+  default: "{{ codex_inputs.enabled and codex_inputs.devcontainer | default(false) }}"
+  when: "{{ codex_inputs.enabled and codex_inputs.devcontainer | default(false) }}"
 
 # Module Outputs
-codex_files:
+codex:
   type: yaml
-  help: Which files shall be generated?
   when: false
   default: |
-    {%- filter trim | default('[]', true) %}
-    {%- if codex_inputs.enabled %}
-    - path: AGENTS.md
-      template: files/AGENTS.md.jinja
-    {%- if codex_cloud %}
-    - path: .codex/setup.sh
-      template: files/setup.sh.jinja
-    - path: .codex/maintenance.sh
-      template: files/maintenance.sh.jinja
-    {%- endif %}
-    {%- endif %}
-    {%- endfilter %}
-
-codex_contributions:
-  type: yaml
-  help: Which contributions shall be made to other files?
-  when: false
-  default: |
-    {%- filter trim | default('[]', true) %}
-    {%- if codex_devcontainer %}
-    - id: devcontainer.features
-      template: fragments/devcontainer.features.json.jinja
-    - id: devcontainer.mounts
-      template: fragments/devcontainer.mounts.json.jinja
-    - id: devcontainer.extensions
-      template: fragments/devcontainer.extensions.json.jinja
-    - id: devcontainer.postCreateCommand
-      template: fragments/devcontainer.postCreateCommand.json.jinja
-    {%- endif %}
-    {%- endfilter %}
+    vars:
+      enabled: {{ codex_inputs.enabled }}  # TODO: Decide later if "enabled" shall be treated as a special variable
+      cloud: {{ codex_cloud }}
+      devcontainer: {{ codex_devcontainer }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if codex_inputs.enabled %}
+      - path: AGENTS.md
+        template: files/AGENTS.md.jinja
+      {%- if codex_cloud %}
+      - path: .codex/setup.sh
+        template: files/setup.sh.jinja
+      - path: .codex/maintenance.sh
+        template: files/maintenance.sh.jinja
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if codex_devcontainer %}
+      - id: devcontainer.features
+        template: fragments/devcontainer.features.json.jinja
+      - id: devcontainer.mounts
+        template: fragments/devcontainer.mounts.json.jinja
+      - id: devcontainer.extensions
+        template: fragments/devcontainer.extensions.json.jinja
+      - id: devcontainer.postCreateCommand
+        template: fragments/devcontainer.postCreateCommand.json.jinja
+      {%- endif %}
+      {%- endfilter %}

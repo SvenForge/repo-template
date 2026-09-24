@@ -1,13 +1,14 @@
----
+# General Configuration
 _min_copier_version: &min_copier_version "9.17.2"
 _subdirectory: template_new  # TODO: Switch back to template after refactoring is completed
 
-copier_version:
+copier_version:  # TODO: Maybe remove if *min_copier_version can directly be used as module input
   type: str
   help: Which Copier version does this template require?
   default: *min_copier_version
   when: false
 
+# Select Modules
 features:
   type: yaml
   help: Which template features shall be used?
@@ -22,43 +23,46 @@ features:
         module: devcontainer
         path: modules/devcontainer
 
+# Include Modules
 ---
+!include modules/codex/copier.yml
+
+---
+!include modules/devcontainer/copier.yml
+
+---
+
+# Module Inputs
 codex_inputs:
   type: yaml
   help: Which inputs should be used for the module?
   when: false
   default: |
     enabled: {{ 'codex' in features | map(attribute='module') }}
-    devcontainer_enabled: {{ 'devcontainer' in features | map(attribute='module') }}
+    devcontainer: {{ 'devcontainer' in features | map(attribute='module') }}
 
----
-!include modules/codex/copier.yml
-
----
 devcontainer_inputs:
   type: yaml
   help: Which inputs should be used for the module?
   when: false
   default: |
+    {%- set python_vars = python.vars if python is defined else {} -%}
     enabled: {{ 'devcontainer' in features | map(attribute='module') }}
-    python_enabled: {{ 'python' in features | map(attribute='module') }}
-    python_version: {{ python_version | default('3.12') | to_json }}
-    python_include_setup: {{ python_include_setup | default(false) | to_json }}
-    python_include_distribution: {{ python_include_distribution | default(false) | to_json }}
-    python_include_devgroup: {{ python_include_devgroup | default(false) | to_json }}
+    python_enabled: {{ python_vars.enabled | default(false) }}
+    python_version: {{ python_vars.version | default('3.12') | to_json }}
+    python_include_setup: {{ python_vars.include_setup | default(false) }}
+    python_include_distribution: {{ python_vars.include_distribution | default(false) }}
+    python_include_devgroup: {{ python_vars.include_devgroup | default(false) }}
 
----
-!include modules/devcontainer/copier.yml
-
----
+# Output Aggregation
 files:
   type: yaml
   help: Which files shall be generated?
   when: false
   default: |
     {%- set module_files = {
-      'codex': codex_files,
-      'devcontainer': devcontainer_files,
+      'codex': codex.files,
+      'devcontainer': devcontainer.files,
     } -%}
     {%- set result = namespace(files=[]) -%}
     {%- for feature in features -%}
@@ -77,8 +81,8 @@ contributions:
   when: false
   default: |
     {%- set module_contributions = {
-      'codex': codex_contributions,
-      'devcontainer': devcontainer_contributions,
+      'codex': codex.contributions,
+      'devcontainer': devcontainer.contributions,
     } -%}
     {%- set result = namespace(contributions=[]) -%}
     {%- for feature in features -%}

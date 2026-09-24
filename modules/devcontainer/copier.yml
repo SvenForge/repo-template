@@ -1,35 +1,36 @@
 # Module Inputs
-# devcontainer_inputs:
-#   enabled: bool
-#   python_enabled: bool
-#   python_version: str
-#   python_include_setup: bool
-#   python_include_distribution: bool
-#   python_include_devgroup: bool
+devcontainer_inputs:  # These defaults can be overridden by the including template
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: |
+    enabled: true
 
 # Module Questions
 
 # Module Outputs
-devcontainer_files:
+devcontainer:
   type: yaml
-  help: Which files shall be generated?
   when: false
   default: |
-    {%- filter trim | default('[]', true) %}
-    {%- if devcontainer_inputs.enabled %}
-    - path: .devcontainer/devcontainer.json
-      template: files/devcontainer.json.jinja
-    {%- endif %}
-    {%- endfilter %}
-
-devcontainer_contributions:
-  type: yaml
-  help: Which contributions shall be made to other files?
-  when: false
-  default: |
-    {%- filter trim | default('[]', true) %}
-    {%- if devcontainer_inputs.enabled %}
-    - id: devcontainer.extensions
-      template: fragments/devcontainer.extensions.json.jinja
-    {%- endif %}
-    {%- endfilter %}
+    vars:
+      enabled: {{ devcontainer_inputs.enabled }}
+      python_enabled: {{ devcontainer_inputs.python_enabled | default(false) }}
+      python_version: {{ devcontainer_inputs.python_version | default('3.12') | to_json }}
+      python_include_setup: {{ devcontainer_inputs.python_include_setup | default(false) }}
+      python_include_distribution: {{ devcontainer_inputs.python_include_distribution | default(false) }}
+      python_include_devgroup: {{ devcontainer_inputs.python_include_devgroup | default(false) }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if devcontainer_inputs.enabled %}
+      - path: .devcontainer/devcontainer.json
+        template: files/devcontainer.json.jinja
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if devcontainer_inputs.enabled %}
+      - id: devcontainer.extensions
+        template: fragments/devcontainer.extensions.json.jinja
+      {%- endif %}
+      {%- endfilter %}
