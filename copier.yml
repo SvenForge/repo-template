@@ -56,18 +56,16 @@ devcontainer_inputs:
     python_include_devgroup: {{ python_vars.include_devgroup | default(false) }}
 
 # Output Aggregation
+# Each selected module exposes its output through exports.jinja.
 files:
   type: yaml
   help: Which files shall be generated?
   when: false
   default: |
-    {%- set module_files = {
-      'codex': codex.files,
-      'devcontainer': devcontainer.files,
-    } -%}
     {%- set result = namespace(files=[]) -%}
     {%- for feature in features -%}
-      {%- for file in module_files[feature.module] -%}
+      {%- from feature.path ~ '/exports.jinja' import output with context -%}
+      {%- for file in output.files -%}
         {%- set result.files = result.files + [{
           'path': file.path,
           'template': feature.path ~ '/' ~ file.template,
@@ -81,13 +79,10 @@ contributions:
   help: Which contributions shall be made to other files?
   when: false
   default: |
-    {%- set module_contributions = {
-      'codex': codex.contributions,
-      'devcontainer': devcontainer.contributions,
-    } -%}
     {%- set result = namespace(contributions=[]) -%}
     {%- for feature in features -%}
-      {%- for contribution in module_contributions[feature.module] -%}
+      {%- from feature.path ~ '/exports.jinja' import output with context -%}
+      {%- for contribution in output.contributions -%}
         {%- set result.contributions = result.contributions + [{
           'id': contribution.id,
           'template': feature.path ~ '/' ~ contribution.template,
