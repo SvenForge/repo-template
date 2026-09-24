@@ -15,13 +15,16 @@ features:
   multiselect: true
   choices:
     Codex:
-      value:
+      value: &codex
         module: codex
         path: modules/codex
     DevContainer:
-      value:
+      value: &devcontainer
         module: devcontainer
         path: modules/devcontainer
+  default:
+    - *codex
+    - *devcontainer
 
 # Include Modules
 ---
