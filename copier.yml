@@ -18,6 +18,10 @@ features:
       value:
         module: core
         path: modules/core
+    Copier:
+      value:
+        module: copier
+        path: modules/copier
     Codex:
       value: &codex
         module: codex
@@ -34,12 +38,22 @@ features:
 ---
 !include modules/core/copier.yml
 ---
+!include modules/copier/copier.yml
+---
 !include modules/codex/copier.yml
 ---
 !include modules/devcontainer/copier.yml
 ---
 
 # Module Inputs
+copier_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'copier' in features | map(attribute='module') }}
+    version: {{ copier_version | to_json }}
+
 core_inputs:
   type: yaml
   help: Which inputs should be used for the module?

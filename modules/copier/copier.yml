@@ -1,5 +1,33 @@
-copier_include_template:
-  type: bool
-  help: Create the Copier template configuration?
-  default: "{{ 'copier' in features }}"
+# Module Inputs
+copier_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
   when: false
+  default: |
+    enabled: true
+    version: "9.17.2"
+
+# Module Questions
+
+# Module Outputs
+copier:
+  type: yaml
+  when: false
+  default: |
+    vars:
+      enabled: {{ copier_inputs.enabled }}
+      version: {{ copier_inputs.version | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if copier_inputs.enabled %}
+      - path: copier.yml
+        template: files/copier.yml.jinja
+      - path: modules/core/copier.yml
+        template: files/core.yml.jinja
+      - path: modules/core/exports.jinja
+        template: files/exports.jinja
+      - path: {{ 'template/{% yield file from files %}{{ file.path }}{% endyield %}.jinja' | to_json }}
+        template: files/file.jinja
+      {%- endif %}
+      {%- endfilter %}
+    contributions: []

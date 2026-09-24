@@ -1,0 +1,21 @@
+{% raw -%}
+# Module Inputs
+core_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: |
+    enabled: true
+
+# Module Questions
+
+# Module Outputs
+core:
+  type: yaml
+  when: false
+  default: |
+    vars:
+      enabled: {{ core_inputs.enabled }}
+    files: []
+    contributions: []
+{% endraw -%}

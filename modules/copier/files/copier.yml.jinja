@@ -1,0 +1,67 @@
+# General Configuration
+_min_copier_version: "{{ copier.vars.version }}"
+_subdirectory: template
+
+{% raw -%}
+# Select Modules
+features:
+  type: yaml
+  help: Which template features shall be used?
+  multiselect: true
+  choices:
+    Core:
+      value: &core
+        module: core
+        path: modules/core
+  default:
+    - *core
+
+# Include Modules
+---
+!include modules/core/copier.yml
+---
+
+# Module Inputs
+core_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'core' in features | map(attribute='module') }}
+
+# Output Aggregation
+# Each selected module exposes its output through exports.jinja.
+files:
+  type: yaml
+  help: Which files shall be generated?
+  when: false
+  default: |
+    {%- set result = namespace(files=[]) -%}
+    {%- for feature in features -%}
+      {%- from feature.path ~ '/exports.jinja' import output with context -%}
+      {%- for file in output.files -%}
+        {%- set result.files = result.files + [{
+          'path': file.path,
+          'template': feature.path ~ '/' ~ file.template,
+        }] -%}
+      {%- endfor -%}
+    {%- endfor -%}
+    {{ result.files | to_json }}
+
+contributions:
+  type: yaml
+  help: Which contributions shall be made to other files?
+  when: false
+  default: |
+    {%- set result = namespace(contributions=[]) -%}
+    {%- for feature in features -%}
+      {%- from feature.path ~ '/exports.jinja' import output with context -%}
+      {%- for contribution in output.contributions -%}
+        {%- set result.contributions = result.contributions + [{
+          'id': contribution.id,
+          'template': feature.path ~ '/' ~ contribution.template,
+        }] -%}
+      {%- endfor -%}
+    {%- endfor -%}
+    {{ result.contributions | to_json }}
+{% endraw -%}
