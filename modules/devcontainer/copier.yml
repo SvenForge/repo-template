@@ -1,16 +1,10 @@
-devcontainer_include_config:
-  type: bool
-  help: Create the Dev Container configuration?
-  default: "{{ 'devcontainer' in features | map(attribute='module') }}"
-  when: false
-
 devcontainer_files:
   type: yaml
   help: Which files shall be generated?
   when: false
   default: |
     {%- filter trim | default('[]', true) %}
-    {%- if devcontainer_include_config %}
+    {%- if 'devcontainer' in features | map(attribute='module') %}
     - path: .devcontainer/devcontainer.json
       template: files/devcontainer.json.jinja
     {%- endif %}
@@ -22,7 +16,7 @@ devcontainer_contributions:
   when: false
   default: |
     {%- filter trim | default('[]', true) %}
-    {%- if devcontainer_include_config %}
+    {%- if 'devcontainer' in features | map(attribute='module') %}
     - id: devcontainer.extensions
       template: fragments/devcontainer.extensions.json.jinja
     {%- endif %}
