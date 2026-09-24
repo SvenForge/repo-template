@@ -22,6 +22,10 @@ features:
       value:
         module: copier
         path: modules/copier
+    Python:
+      value:
+        module: python
+        path: modules/python
     Codex:
       value: &codex
         module: codex
@@ -40,12 +44,28 @@ features:
 ---
 !include modules/copier/copier.yml
 ---
+!include modules/python/copier.yml
+---
 !include modules/codex/copier.yml
 ---
 !include modules/devcontainer/copier.yml
 ---
 
 # Module Inputs
+python_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'python' in features | map(attribute='module') }}
+    repository_name: {{ core.vars.repository_name | to_json }}
+    include_readme: {{ core.vars.include_readme }}
+    include_license: {{ core.vars.include_license }}
+    license: {{ core.vars.license | to_json }}
+    owner_name: {{ core.vars.owner_name | to_json }}
+    owner_email: {{ core.vars.owner_email | to_json }}
+    sphinx_enabled: {{ 'sphinx' in features | map(attribute='module') }}
+
 copier_inputs:
   type: yaml
   help: Which inputs should be used for the module?

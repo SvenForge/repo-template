@@ -1,4 +1,4 @@
-{% if python_include_distribution -%}
+{% if python.vars.include_distribution -%}
 [build-system]
 requires = [
     "setuptools>=84",
@@ -7,66 +7,59 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = {{ python_distribution_name | tojson }}
+name = {{ python.vars.distribution_name | tojson }}
 dynamic = ["version"]
-requires-python = ">={{ python_version }}"
+requires-python = ">={{ python.vars.version }}"
 dependencies = []
-{% if core_include_readme -%}
+{% if python.vars.include_readme -%}
 readme = "README.md"
 {% endif -%}
-{% if core_include_license -%}
-license = {% if core_license == 'NONE' %}"LicenseRef-Proprietary"{% else %}{{ core_license | tojson }}{% endif %}
+{% if python.vars.include_license -%}
+license = {% if python.vars.license == 'NONE' %}"LicenseRef-Proprietary"{% else %}{{ python.vars.license | tojson }}{% endif %}
 license-files = ["LICENSE.md"]
 {% endif -%}
-{% if core_owner_name -%}
+{% if python.vars.owner_name -%}
 authors = [
-    { name = {{ core_owner_name | tojson }}{% if core_owner_email %}, email = {{ core_owner_email | tojson }}{% endif %} },
+    { name = {{ python.vars.owner_name | tojson }}{% if python.vars.owner_email %}, email = {{ python.vars.owner_email | tojson }}{% endif %} },
 ]
 {% endif %}
 {% endif -%}
-{% if python_include_devgroup -%}
+{% if python.vars.include_devgroup -%}
 [dependency-groups]
-{% if 'pytest' in python_tools -%}
+{% if 'pytest' in python.vars.tools -%}
 test = [
     "pytest",
     "pytest-cov",
 ]
 {% endif -%}
-{% if 'ruff' in python_tools or 'mypy' in python_tools -%}
+{% if 'ruff' in python.vars.tools or 'mypy' in python.vars.tools -%}
 lint = [
-{% if 'mypy' in python_tools -%}
+{% if 'mypy' in python.vars.tools -%}
     "mypy",
     "mypy-gitlab-code-quality",
 {% endif -%}
-{% if 'ruff' in python_tools -%}
+{% if 'ruff' in python.vars.tools -%}
     "ruff",
 {% endif -%}
 ]
 {% endif -%}
-{% if 'sphinx' in features -%}
-doc = [
-    "furo",
-    "myst-parser",
-    "sphinx>=8.2",
-{% if sphinx_needs -%}
-    "sphinx-needs",
-{% endif -%}
-]
-{% endif -%}
+{% for contribution in contributions | selectattr('id', 'equalto', 'python.dependency_groups') -%}
+{% include contribution.template -%}
+{% endfor -%}
 dev = [
-{% if 'pytest' in python_tools -%}
+{% if 'pytest' in python.vars.tools -%}
     { include-group = "test" },
 {% endif -%}
-{% if 'ruff' in python_tools or 'mypy' in python_tools -%}
+{% if 'ruff' in python.vars.tools or 'mypy' in python.vars.tools -%}
     { include-group = "lint" },
 {% endif -%}
-{% if 'sphinx' in features -%}
-    { include-group = "doc" },
-{% endif -%}
+{% for contribution in contributions | selectattr('id', 'equalto', 'python.dev_dependencies') -%}
+{% include contribution.template -%}
+{% endfor -%}
 ]
 {% endif %}
 
-{% if python_include_distribution -%}
+{% if python.vars.include_distribution -%}
 [tool.setuptools]
 package-dir = { "" = "src" }
 
@@ -79,7 +72,7 @@ namespaces = false
 fallback_version = "0.0.0"
 {% endif %}
 
-{% if 'pytest' in python_tools -%}
+{% if 'pytest' in python.vars.tools -%}
 [tool.pytest.ini_options]
 addopts = [
     "--cov",
@@ -88,7 +81,7 @@ addopts = [
     "--junitxml=pytest.xml",
 ]
 testpaths = ["src/test_*"]
-{% if python_include_package and not python_include_distribution -%}
+{% if python.vars.include_package and not python.vars.include_distribution -%}
 pythonpath = ["src"]
 {% endif %}
 
@@ -100,7 +93,7 @@ omit = ["test_*"]
 show_missing = true
 {% endif %}
 
-{% if 'ruff' in python_tools -%}
+{% if 'ruff' in python.vars.tools -%}
 [tool.ruff]
 src = ["src"]
 exclude = [
@@ -135,7 +128,7 @@ convention = "google"
 quote-style = "single"
 {% endif %}
 
-{% if 'mypy' in python_tools -%}
+{% if 'mypy' in python.vars.tools -%}
 [tool.mypy]
 files = ["src"]
 strict = true
