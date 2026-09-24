@@ -2,37 +2,23 @@
 _min_copier_version: &min_copier_version "9.17.2"
 _subdirectory: template_new  # TODO: Switch back to template after refactoring is completed
 
-features:
-  type: str
-  help: Which template features shall be used?
-  multiselect: true
-  choices:
-    # Core: core
-    Codex: codex
-    # Copier: copier
-    DevContainer: devcontainer
-    # GitLab: gitlab
-    # Python: python
-    # Sphinx: sphinx
-  # default:
-  #   - core
-  #   - devcontainer
-  #   - gitlab
-  #   - python
-  #   - sphinx
-  # validator: >-
-  #   {% if 'python' in features and 'core' not in features %}
-  #   Select Core when selecting Python.
-  #   {% endif %}
-  #   {% if 'sphinx' in features and 'python' not in features %}
-  #   Select Python when selecting Sphinx.
-  #   {% endif %}
-
 copier_version:
   type: str
   help: Which Copier version does this template require?
   default: *min_copier_version
   when: false
+
+features:
+  type: str
+  help: Which template features shall be used?
+  multiselect: true
+  choices:
+    Codex:
+      module: codex
+      path: modules/codex
+    DevContainer:
+      module: devcontainer
+      path: modules/devcontainer
 
 files:
   type: yaml
@@ -40,17 +26,8 @@ files:
   when: false
   default: []  # TODO: Assemble file list from module outputs
 
-# ---
-# !include modules/core/copier.yml
 ---
 !include modules/codex/copier.yml
-# ---
-# !include modules/copier/copier.yml
+
 ---
 !include modules/devcontainer/copier.yml
-# ---
-# !include modules/python/copier.yml
-# ---
-# !include modules/gitlab/copier.yml
-# ---
-# !include modules/sphinx/copier.yml
