@@ -1,3 +1,7 @@
+# Module Inputs
+# codex_inputs
+
+# Module Questions
 codex_cloud:
   type: bool
   help: Set up Codex Cloud integration?
@@ -10,6 +14,7 @@ codex_devcontainer:
   default: "{{ 'codex' in features | map(attribute='module') and 'devcontainer' in features | map(attribute='module') }}"
   when: "{{ 'codex' in features | map(attribute='module') and 'devcontainer' in features | map(attribute='module') }}"
 
+# Module Outputs
 codex_files:
   type: yaml
   help: Which files shall be generated?

@@ -1,3 +1,9 @@
+# Module Inputs
+# devcontainer_inputs
+
+# Module Questions
+
+# Module Outputs
 devcontainer_files:
   type: yaml
   help: Which files shall be generated?
