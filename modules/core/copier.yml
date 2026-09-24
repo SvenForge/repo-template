@@ -1,65 +1,65 @@
+# Module Inputs
+core_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: |
+    enabled: true
+
+# Module Questions
 core_repository_name:
   type: str
   help: What is the name of the repository?
-  default: My Repository
-  when: "{{ 'core' in features }}"
-
+  default: '{{ core_inputs.repository_name | default(''My Repository'') }}'
+  when: '{{ core_inputs.enabled }}'
 core_repository_url:
   type: str
   help: At which URL is the repository hosted? (optional)
-  default: ""
-  when: "{{ 'core' in features }}"
-
+  default: '{{ core_inputs.repository_url | default('''') }}'
+  when: '{{ core_inputs.enabled }}'
 core_repository_host:
   type: str
   help: At which host is the repository hosted?
-  default: >-
-    {{ (
+  default: |
+    {{ core_inputs.repository_host | default((
       core_repository_url.split('://', 1)[1].rsplit('@', 1)[-1].split('/', 1)[0]
       if '://' in core_repository_url
       else core_repository_url.rsplit('@', 1)[-1].split(':', 1)[0].split('/', 1)[0]
-    ) if core_repository_url else 'gitlab.com' }}
+    ) if core_repository_url else 'gitlab.com') -}}
   when: false
-
 core_repository_path:
   type: str
   help: At which path is the repository hosted?
-  default: >-
+  default: |
     {%- set path = core_repository_url.split(core_repository_host, 1)[1]
       .lstrip(':/').split('?', 1)[0].split('#', 1)[0].rstrip('/') if core_repository_url else '' -%}
-    {{- path[:-4] if path.endswith('.git') else path -}}
+    {{- core_inputs.repository_path | default(path[:-4] if path.endswith('.git') else path) -}}
   when: false
-
 core_owner_name:
   type: str
   help: Who is the repository owner? (optional)
-  default: ""
-  when: "{{ 'core' in features }}"
-
+  default: '{{ core_inputs.owner_name | default('''') }}'
+  when: '{{ core_inputs.enabled }}'
 core_owner_email:
   type: str
   help: What is the owner's email address? (optional)
-  default: ""
-  when: "{{ 'core' in features and core_owner_name }}"
-
+  default: '{{ core_inputs.owner_email | default('''') }}'
+  when: '{{ core_inputs.enabled and core_owner_name }}'
 core_owner_user:
   type: str
   help: What is the owner's username? (optional)
-  default: ""
-  when: "{{ 'core' in features and core_owner_name }}"
-
+  default: '{{ core_inputs.owner_user | default('''') }}'
+  when: '{{ core_inputs.enabled and core_owner_name }}'
 core_year:
   type: int
   help: What is the current year?
-  default: "{{ '%Y' | strftime }}"
+  default: '{{ core_inputs.year | default(''%Y'' | strftime) }}'
   when: false
-
 core_include_readme:
   type: bool
   help: Create README.md file?
-  default: "{{ 'core' in features }}"
-  when: "{{ 'core' in features }}"
-
+  default: '{{ core_inputs.include_readme | default(core_inputs.enabled) }}'
+  when: '{{ core_inputs.enabled }}'
 core_license:
   type: str
   help: Under which license shall this repository provided?
@@ -67,17 +67,54 @@ core_license:
     All rights reserved: NONE
     MIT License: MIT
     No license defined: NOASSERTION
-  default: NONE
-  when: "{{ 'core' in features }}"
-
-core_include_license:
-  type: bool
-  help: Create LICENSE.md file?
-  default: "{{ 'core' in features and core_license != 'NOASSERTION' }}"
-  when: false
-
+  default: '{{ core_inputs.license | default(''NONE'') }}'
+  when: '{{ core_inputs.enabled }}'
 core_include_gitignore:
   type: bool
   help: Create .gitignore file?
-  default: "{{ 'core' in features }}"
-  when: "{{ 'core' in features }}"
+  default: '{{ core_inputs.include_gitignore | default(core_inputs.enabled) }}'
+  when: '{{ core_inputs.enabled }}'
+
+# Module Outputs
+core:
+  type: yaml
+  when: false
+  default: |
+    vars:
+      enabled: {{ core_inputs.enabled }}
+      repository_name: {{ core_repository_name | to_json }}
+      repository_url: {{ core_repository_url | to_json }}
+      repository_host: {{ core_repository_host | to_json }}
+      repository_path: {{ core_repository_path | to_json }}
+      owner_name: {{ core_owner_name | to_json }}
+      owner_email: {{ core_owner_email | to_json }}
+      owner_user: {{ core_owner_user | to_json }}
+      year: {{ core_year }}
+      include_readme: {{ core_inputs.enabled and core_include_readme }}
+      license: {{ core_license | to_json }}
+      include_license: {{ core_inputs.enabled and core_license != 'NOASSERTION' }}
+      include_gitignore: {{ core_inputs.enabled and core_include_gitignore }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if core_inputs.enabled %}
+      {%- if core_include_readme %}
+      - path: README.md
+        template: files/README.md.jinja
+      {%- endif %}
+      {%- if core_license != 'NOASSERTION' %}
+      - path: LICENSE.md
+        template: files/LICENSE_{{ core_license }}.md.jinja
+      {%- endif %}
+      {%- if core_include_gitignore %}
+      - path: .gitignore
+        template: files/gitignore.jinja
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if core_inputs.enabled and core_include_gitignore %}
+      - id: core.gitignore
+        template: fragments/gitignore.jinja
+      {%- endif %}
+      {%- endfilter %}

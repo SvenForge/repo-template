@@ -14,6 +14,10 @@ features:
   help: Which template features shall be used?
   multiselect: true
   choices:
+    Core:
+      value:
+        module: core
+        path: modules/core
     Codex:
       value: &codex
         module: codex
@@ -28,12 +32,21 @@ features:
 
 # Include Modules
 ---
+!include modules/core/copier.yml
+---
 !include modules/codex/copier.yml
 ---
 !include modules/devcontainer/copier.yml
 ---
 
 # Module Inputs
+core_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'core' in features | map(attribute='module') }}
+
 codex_inputs:
   type: yaml
   help: Which inputs should be used for the module?

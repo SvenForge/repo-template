@@ -1,0 +1,5 @@
+{% for contribution in contributions | selectattr('id', 'equalto', 'core.gitignore') -%}
+{% include contribution.template -%}
+{% endfor -%}
+
+### Project Customization ###
