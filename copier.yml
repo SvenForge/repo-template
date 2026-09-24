@@ -26,10 +26,8 @@ features:
 # Include Modules
 ---
 !include modules/codex/copier.yml
-
 ---
 !include modules/devcontainer/copier.yml
-
 ---
 
 # Module Inputs
