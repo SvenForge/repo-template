@@ -47,3 +47,19 @@ codex_files:
       template: files/maintenance.sh.jinja
     {%- endif %}
     {%- endfilter %}
+
+codex_contributions:
+  type: yaml
+  help: Which contributions shall be made to other files?
+  when: false
+  default: |
+    {%- filter trim | default('[]', true) %}
+    {%- if codex_cloud %}
+    - id: devcontainer.features
+      template: fragments/devcontainer.features.json.jinja
+    - id: devcontainer.mounts
+      template: fragments/devcontainer.mounts.json.jinja
+    - id: devcontainer.extensions
+      template: fragments/devcontainer.extensions.json.jinja
+    {%- endif %}
+    {%- endfilter %}
