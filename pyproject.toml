@@ -56,7 +56,7 @@ indent-width = 4
 extend-select = [
     "D",    # pydocstyle
     "N",    # pep8-naming
-    "Q",    # flake8-quotes
+#    "Q",    # flake8-quotes
     "COM",  # flake8-commas
     "C4",   # flake8-comprehensions
     "FIX",  # flake8-fixme
@@ -74,6 +74,7 @@ inline-quotes = "single"
 "conf.py" = ["D100"]
 "src/test_*" = ["S101", "D101", "D102", "D103", "B011", "D107"]
 "notebook/*.ipynb" = ["T201"]
+"template/*" = ["N999"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
