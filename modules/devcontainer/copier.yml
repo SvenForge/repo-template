@@ -1,7 +1,7 @@
 devcontainer_include_config:
   type: bool
   help: Create the Dev Container configuration?
-  default: "{{ 'devcontainer' in features }}"
+  default: "{{ 'devcontainer' in features | map(attribute='module') }}"
   when: false
 
 devcontainer_files:
@@ -9,7 +9,8 @@ devcontainer_files:
   help: Which files shall be generated?
   when: false
   default: |
+    [
     {%- if devcontainer_include_config %}
-    - path: .devcontainer/devcontainer.json
-      template: files/devcontainer.json.jinja
+      {path: .devcontainer/devcontainer.json, template: files/devcontainer.json.jinja},
     {%- endif %}
+    ]

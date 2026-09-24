@@ -9,25 +9,42 @@ copier_version:
   when: false
 
 features:
-  type: str
+  type: yaml
   help: Which template features shall be used?
   multiselect: true
   choices:
     Codex:
-      module: codex
-      path: modules/codex
+      value:
+        module: codex
+        path: modules/codex
     DevContainer:
-      module: devcontainer
-      path: modules/devcontainer
-
-files:
-  type: yaml
-  help: Which files shall be generated?
-  when: false
-  default: []  # TODO: Assemble file list from module outputs
+      value:
+        module: devcontainer
+        path: modules/devcontainer
 
 ---
 !include modules/codex/copier.yml
 
 ---
 !include modules/devcontainer/copier.yml
+
+---
+files:
+  type: yaml
+  help: Which files shall be generated?
+  when: false
+  default: |
+    {%- set module_files = {
+      'codex': codex_files,
+      'devcontainer': devcontainer_files,
+    } -%}
+    {%- set result = namespace(files=[]) -%}
+    {%- for feature in features -%}
+      {%- for file in module_files[feature.module] -%}
+        {%- set result.files = result.files + [{
+          'path': file.path,
+          'template': feature.path ~ '/' ~ file.template,
+        }] -%}
+      {%- endfor -%}
+    {%- endfor -%}
+    {{ result.files | to_json }}
