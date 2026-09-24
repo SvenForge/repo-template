@@ -1,5 +1,5 @@
 ```{include} ../../README.md
-:relative-docs: LICENSE.md
+:relative-docs: ./
 ```
 ## Table of Contents
 
