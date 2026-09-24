@@ -6,9 +6,9 @@
 * Keep changes focused and minimal.
 * Preserve existing style and conventions.
 * Use American English in all files in this repository, unless a specific topic requires another language, such as German.
-{% if 'gitlab' in features %}
-{% include "template/_modules/gitlab/AGENTS.md.jinja" -%}
-{% endif %}
+{% for contribution in contributions | selectattr('id', 'equalto', 'codex.agents') %}
+{% include contribution.template -%}
+{% endfor %}
 ## Safety and boundaries
 
 * Do not edit or publish any secrets or credentials.

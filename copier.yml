@@ -23,7 +23,29 @@ features:
         path: modules/devcontainer
 
 ---
+codex_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'codex' in features | map(attribute='module') }}
+    devcontainer_enabled: {{ 'devcontainer' in features | map(attribute='module') }}
+
+---
 !include modules/codex/copier.yml
+
+---
+devcontainer_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'devcontainer' in features | map(attribute='module') }}
+    python_enabled: {{ 'python' in features | map(attribute='module') }}
+    python_version: {{ python_version | default('3.12') | to_json }}
+    python_include_setup: {{ python_include_setup | default(false) | to_json }}
+    python_include_distribution: {{ python_include_distribution | default(false) | to_json }}
+    python_include_devgroup: {{ python_include_devgroup | default(false) | to_json }}
 
 ---
 !include modules/devcontainer/copier.yml

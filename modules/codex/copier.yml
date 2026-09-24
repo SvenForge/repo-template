@@ -1,18 +1,20 @@
 # Module Inputs
-# codex_inputs
+# codex_inputs:
+#   enabled: bool
+#   devcontainer_enabled: bool
 
 # Module Questions
 codex_cloud:
   type: bool
   help: Set up Codex Cloud integration?
-  default: "{{ 'codex' in features | map(attribute='module') }}"
-  when: "{{ 'codex' in features | map(attribute='module') }}"
+  default: "{{ codex_inputs.enabled }}"
+  when: "{{ codex_inputs.enabled }}"
 
 codex_devcontainer:
   type: bool
   help: Add Codex integration to the Dev Container?
-  default: "{{ 'codex' in features | map(attribute='module') and 'devcontainer' in features | map(attribute='module') }}"
-  when: "{{ 'codex' in features | map(attribute='module') and 'devcontainer' in features | map(attribute='module') }}"
+  default: "{{ codex_inputs.enabled and codex_inputs.devcontainer_enabled }}"
+  when: "{{ codex_inputs.enabled and codex_inputs.devcontainer_enabled }}"
 
 # Module Outputs
 codex_files:
@@ -21,7 +23,7 @@ codex_files:
   when: false
   default: |
     {%- filter trim | default('[]', true) %}
-    {%- if 'codex' in features | map(attribute='module') %}
+    {%- if codex_inputs.enabled %}
     - path: AGENTS.md
       template: files/AGENTS.md.jinja
     {%- if codex_cloud %}

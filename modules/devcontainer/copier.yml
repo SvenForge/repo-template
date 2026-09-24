@@ -1,5 +1,11 @@
 # Module Inputs
-# devcontainer_inputs
+# devcontainer_inputs:
+#   enabled: bool
+#   python_enabled: bool
+#   python_version: str
+#   python_include_setup: bool
+#   python_include_distribution: bool
+#   python_include_devgroup: bool
 
 # Module Questions
 
@@ -10,7 +16,7 @@ devcontainer_files:
   when: false
   default: |
     {%- filter trim | default('[]', true) %}
-    {%- if 'devcontainer' in features | map(attribute='module') %}
+    {%- if devcontainer_inputs.enabled %}
     - path: .devcontainer/devcontainer.json
       template: files/devcontainer.json.jinja
     {%- endif %}
@@ -22,7 +28,7 @@ devcontainer_contributions:
   when: false
   default: |
     {%- filter trim | default('[]', true) %}
-    {%- if 'devcontainer' in features | map(attribute='module') %}
+    {%- if devcontainer_inputs.enabled %}
     - id: devcontainer.extensions
       template: fragments/devcontainer.extensions.json.jinja
     {%- endif %}
