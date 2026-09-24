@@ -7,26 +7,26 @@ features:
   help: Which template features shall be used?
   multiselect: true
   choices:
-    Core: core
+    # Core: core
     Codex: codex
-    Copier: copier
+    # Copier: copier
     DevContainer: devcontainer
-    GitLab: gitlab
-    Python: python
-    Sphinx: sphinx
-  default:
-    - core
-    - devcontainer
-    - gitlab
-    - python
-    - sphinx
-  validator: >-
-    {% if 'python' in features and 'core' not in features %}
-    Select Core when selecting Python.
-    {% endif %}
-    {% if 'sphinx' in features and 'python' not in features %}
-    Select Python when selecting Sphinx.
-    {% endif %}
+    # GitLab: gitlab
+    # Python: python
+    # Sphinx: sphinx
+  # default:
+  #   - core
+  #   - devcontainer
+  #   - gitlab
+  #   - python
+  #   - sphinx
+  # validator: >-
+  #   {% if 'python' in features and 'core' not in features %}
+  #   Select Core when selecting Python.
+  #   {% endif %}
+  #   {% if 'sphinx' in features and 'python' not in features %}
+  #   Select Python when selecting Sphinx.
+  #   {% endif %}
 
 copier_version:
   type: str
