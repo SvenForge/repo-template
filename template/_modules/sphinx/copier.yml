@@ -32,6 +32,12 @@ sphinx_include_index:
   default: "{{ 'sphinx' in features }}"
   when: false
 
+sphinx_include_notes:
+  type: bool
+  help: Create notes.md?
+  default: "{{ 'sphinx' in features }}"
+  when: false
+
 sphinx_include_makefile:
   type: bool
   help: Create the Sphinx Makefile?
