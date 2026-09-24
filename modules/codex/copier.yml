@@ -33,14 +33,17 @@ codex_files:
   help: Which files shall be generated?
   when: false
   default: |
-    [
+    {%- filter trim | default('[]', true) %}
     {%- if codex_include_agents %}
-      {path: AGENTS.md, template: files/AGENTS.md.jinja},
+    - path: AGENTS.md
+      template: files/AGENTS.md.jinja
     {%- endif %}
     {%- if codex_include_setup %}
-      {path: .codex/setup.sh, template: files/setup.sh.jinja},
+    - path: .codex/setup.sh
+      template: files/setup.sh.jinja
     {%- endif %}
     {%- if codex_include_maintenance %}
-      {path: .codex/maintenance.sh, template: files/maintenance.sh.jinja},
+    - path: .codex/maintenance.sh
+      template: files/maintenance.sh.jinja
     {%- endif %}
-    ]
+    {%- endfilter %}

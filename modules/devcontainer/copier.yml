@@ -9,8 +9,9 @@ devcontainer_files:
   help: Which files shall be generated?
   when: false
   default: |
-    [
+    {%- filter trim | default('[]', true) %}
     {%- if devcontainer_include_config %}
-      {path: .devcontainer/devcontainer.json, template: files/devcontainer.json.jinja},
+    - path: .devcontainer/devcontainer.json
+      template: files/devcontainer.json.jinja
     {%- endif %}
-    ]
+    {%- endfilter %}
