@@ -1,3 +1,5 @@
+"""Check GitLab module files, pipelines, and contributions."""
+
 from collections.abc import Callable
 from contextlib import AbstractContextManager
 from typing import Any
@@ -7,13 +9,12 @@ import yaml
 
 from .conftest import CopierCase
 
-
-PATH_ROOT_PIPELINE = "template/{% if gitlab_include_pipeline %}.gitlab-ci.yml{% endif %}"
-PATH_COPIER_PIPELINE = "template/{% if gitlab_include_pipeline_copier %}.gitlab{% endif %}/ci/copier.yml.jinja"
-PATH_DEMO_PIPELINE = "template/{% if gitlab_include_pipeline_demo %}.gitlab{% endif %}/ci/demo.yml"
-PATH_PYTHON_PIPELINE = "template/{% if gitlab_include_pipeline_python %}.gitlab{% endif %}/ci/python.yml.jinja"
-PATH_MR_TEMPLATE = "template/{% if gitlab_include_merge_request_template %}.gitlab{% endif %}/merge_request_templates/default.md"
-PATH_ISSUE_TEMPLATE = "template/{% if gitlab_include_issue_template %}.gitlab{% endif %}/issue_templates/default.md"
+PATH_ROOT_PIPELINE = "modules/gitlab/files/gitlab-ci.yml.jinja"
+PATH_COPIER_PIPELINE = "modules/gitlab/files/ci/copier.yml.jinja"
+PATH_DEMO_PIPELINE = "modules/gitlab/files/ci/demo.yml.jinja"
+PATH_PYTHON_PIPELINE = "modules/gitlab/files/ci/python.yml.jinja"
+PATH_MR_TEMPLATE = "modules/gitlab/files/merge_request.md.jinja"
+PATH_ISSUE_TEMPLATE = "modules/gitlab/files/issue.md.jinja"
 
 
 def test_gitlab_pipeline(
@@ -61,7 +62,7 @@ def test_gitlab_contribution_templates(
     with copier_case(features=["gitlab"]) as case:
         issue = case.render(PATH_ISSUE_TEMPLATE)
         merge_request = case.render(PATH_MR_TEMPLATE)
-        agents_fragment = case.render("template/_modules/gitlab/AGENTS.md.jinja")
+        agents_fragment = case.render("modules/gitlab/fragments/AGENTS.md.jinja")
 
     assert "## Problem" in issue
     assert "## How are the changes verified?" in merge_request
@@ -106,13 +107,17 @@ def test_gitlab_file_selection(
     expected: tuple[bool, bool, bool, bool, bool, bool],
 ) -> None:
     with copier_case(**answers) as case:
-        selected = (
-            case.context["gitlab_include_issue_template"],
-            case.context["gitlab_include_merge_request_template"],
-            case.context["gitlab_include_pipeline_copier"],
-            case.context["gitlab_include_pipeline_demo"],
-            case.context["gitlab_include_pipeline_python"],
-            case.context["gitlab_include_pipeline"],
+        files = {file["path"] for file in case.context["gitlab"]["files"]}
+        selected = tuple(
+            path in files
+            for path in (
+                ".gitlab/issue_templates/default.md",
+                ".gitlab/merge_request_templates/default.md",
+                ".gitlab/ci/copier.yml",
+                ".gitlab/ci/demo.yml",
+                ".gitlab/ci/python.yml",
+                ".gitlab-ci.yml",
+            )
         )
 
     assert selected == expected

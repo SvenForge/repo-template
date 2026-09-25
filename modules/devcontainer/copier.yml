@@ -1,0 +1,39 @@
+# Module Defaults
+devcontainer_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    image: mcr.microsoft.com/devcontainers/base:2-bookworm
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+devcontainer_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Questions
+
+# Module Outputs
+devcontainer:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(devcontainer_defaults, **devcontainer_inputs) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: .devcontainer/devcontainer.json
+        template: files/devcontainer.json.jinja
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - target: devcontainer.extensions
+        template: fragments/devcontainer.extensions.json.jinja
+      {%- endif %}
+      {%- endfilter %}

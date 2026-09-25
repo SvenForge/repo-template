@@ -1,0 +1,118 @@
+# Module Defaults
+gitlab_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    pipeline:
+      - copier
+      - demo
+    pages_url: ''
+    repository_host: gitlab.com
+    repository_path: ''
+    has_readme: false
+    copier_version: 9.17.2
+    python_enabled: false
+    python_tools: []
+    python_version: '3.12'
+    has_python_distribution: false
+    sphinx_enabled: false
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+gitlab_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Questions
+gitlab_pipeline:
+  type: str
+  help: Which jobs shall be included in the GitLab pipeline?
+  multiselect: true
+  choices: |
+    {%- set vars = dict(gitlab_defaults, **gitlab_inputs) %}
+    Check for Copier template updates: copier
+    Run the demonstration job: demo
+    {% if vars.python_enabled and vars.python_tools | length > 0 %}
+    Run the Python test and quality jobs: python
+    {% endif %}
+    {% if vars.sphinx_enabled %}
+    Build and deploy the Sphinx documentation: sphinx
+    {% endif %}
+  default: |
+    {%- set vars = dict(gitlab_defaults, **gitlab_inputs) -%}
+    {%- if gitlab_inputs.pipeline is defined -%}
+    {{ gitlab_inputs.pipeline | to_json }}
+    {%- else -%}
+    {{ (gitlab_defaults.pipeline
+      + (['python'] if vars.python_enabled and vars.python_tools | length > 0 else [])
+      + (['sphinx'] if vars.sphinx_enabled else [])) | to_json }}
+    {%- endif -%}
+  when: "{{ gitlab_inputs.enabled | default(gitlab_defaults.enabled) }}"
+
+gitlab_pages_url:
+  type: str
+  help: At which URL is the Sphinx documentation published by GitLab Pages? (optional)
+  default: |
+    {%- if gitlab_inputs.pages_url is defined -%}
+    {{ gitlab_inputs.pages_url }}
+    {%- else -%}
+    {%- set vars = dict(gitlab_defaults, **gitlab_inputs) -%}
+    {%- if vars.repository_host == 'gitlab.com' and vars.repository_path -%}
+    {%- set path = vars.repository_path.split('/') -%}
+    {{ 'https://' ~ path[0] ~ '.gitlab.io/' ~ (
+      '' if path | length == 2 and path[1] == path[0] ~ '.gitlab.io'
+      else path[1:] | join('/') ~ '/') }}
+    {%- else -%}
+    {{ gitlab_defaults.pages_url }}
+    {%- endif -%}
+    {%- endif -%}
+  when: >-
+    {%- set vars = dict(gitlab_defaults, **gitlab_inputs) -%}
+    {{ vars.enabled and vars.sphinx_enabled and 'sphinx' in gitlab_pipeline and vars.has_readme }}
+
+# Module Outputs
+gitlab:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(gitlab_defaults, **gitlab_inputs) -%}
+    {%- set vars = dict(vars,
+      pipeline=gitlab_pipeline,
+      pages_url=gitlab_pages_url,
+    ) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: .gitlab/issue_templates/default.md
+        template: files/issue.md.jinja
+      - path: .gitlab/merge_request_templates/default.md
+        template: files/merge_request.md.jinja
+      {%- if vars.pipeline %}
+      - path: .gitlab-ci.yml
+        template: files/gitlab-ci.yml.jinja
+      {%- for pipeline in vars.pipeline %}
+      - path: .gitlab/ci/{{ pipeline }}.yml
+        template: files/ci/{{ pipeline }}.yml.jinja
+      {%- endfor %}
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - target: codex.agents
+        template: fragments/AGENTS.md.jinja
+      - target: codex.setup
+        template: fragments/setup.sh.jinja
+      - target: codex.maintenance
+        template: fragments/maintenance.sh.jinja
+      {%- if 'sphinx' in vars.pipeline and vars.pages_url %}
+      - target: core.readme.documentation
+        template: fragments/readme.documentation.md.jinja
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}

@@ -1,0 +1,35 @@
+# Module Defaults
+copier_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    version: 9.17.2
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+copier_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Questions
+
+# Module Outputs
+copier:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(copier_defaults, **copier_inputs) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: copier.yml
+        template: files/copier.yml.jinja
+      - path: template/_modules/core/copier.yml
+        template: files/core.yml.jinja
+      {%- endif %}
+      {%- endfilter %}
+    contributions: []

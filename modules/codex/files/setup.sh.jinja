@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Set up a Codex Cloud environment.
+# Add the following setup command to the Codex Cloud Environment configuration:
+#   bash .codex/setup.sh
+set -euo pipefail
+{% for contribution in contributions | selectattr('target', 'equalto', 'codex.setup') %}
+{% include contribution.template -%}
+{% endfor -%}

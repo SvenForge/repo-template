@@ -1,17 +1,18 @@
+"""Check Codex module outputs and contributed integrations."""
+
+import json
 from collections.abc import Callable
 from contextlib import AbstractContextManager
-import json
 from typing import Any
 
 import pytest
 
 from .conftest import CopierCase
 
-
-PATH_AGENTS = "template/{% if codex_include_agents %}AGENTS.md{% endif %}.jinja"
-PATH_SETUP = "template/{% if codex_include_setup %}.codex{% endif %}/setup.sh.jinja"
-PATH_MAINTENANCE = "template/{% if codex_include_maintenance %}.codex{% endif %}/maintenance.sh.jinja"
-PATH_DEVCONTAINER_CONFIG = "template/{% if devcontainer_include_config %}.devcontainer{% endif %}/devcontainer.json.jinja"
+PATH_AGENTS = "modules/codex/files/AGENTS.md.jinja"
+PATH_SETUP = "modules/codex/files/setup.sh.jinja"
+PATH_MAINTENANCE = "modules/codex/files/maintenance.sh.jinja"
+PATH_DEVCONTAINER_CONFIG = "modules/devcontainer/files/devcontainer.json.jinja"
 
 
 @pytest.mark.parametrize(
@@ -38,12 +39,13 @@ def test_codex_file_selection(
     expected: tuple[bool, bool, bool, bool, bool],
 ) -> None:
     with copier_case(**answers) as case:
+        files = {file["path"] for file in case.context["codex"]["files"]}
         selected = (
-            case.context["codex_cloud"],
-            case.context["codex_devcontainer"],
-            case.context["codex_include_agents"],
-            case.context["codex_include_setup"],
-            case.context["codex_include_maintenance"],
+            case.context["codex"]["vars"]["cloud_integration"],
+            case.context["codex"]["vars"]["devcontainer_integration"],
+            "AGENTS.md" in files,
+            ".codex/setup.sh" in files,
+            ".codex/maintenance.sh" in files,
         )
 
     assert selected == expected
@@ -97,7 +99,7 @@ def test_codex_devcontainer_integration(
 
     assert "ghcr.io/dirien/devcontainer-feature-codex/codex:0" in config["features"]
     assert config["mounts"] == [
-        "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume"
+        "source=codex-config-${devcontainerId},target=/home/vscode/.codex,type=volume",
     ]
     assert "setupCodex" in config["postCreateCommand"]
     assert "setupPython" in config["postCreateCommand"]

@@ -1,3 +1,5 @@
+"""Check Sphinx module files and their project integrations."""
+
 import ast
 from collections.abc import Callable
 from contextlib import AbstractContextManager
@@ -7,21 +9,20 @@ import yaml
 
 from .conftest import CopierCase
 
-
-PATH_CONFIG = "template/{% if sphinx_include_config %}doc{% endif %}/sphinx/conf.py.jinja"
-PATH_INDEX = "template/{% if sphinx_include_index %}doc{% endif %}/sphinx/index.md.jinja"
-PATH_LICENSE = "template/{% if core_include_license %}LICENSE.md{% endif %}.jinja"
-PATH_README = "template/{% if core_include_readme %}README.md{% endif %}.jinja"
-PATH_MAKEFILE = "template/{% if sphinx_include_makefile %}doc{% endif %}/sphinx/Makefile"
-PATH_MAKEBAT = "template/{% if sphinx_include_makebat %}doc{% endif %}/sphinx/make.bat"
-PATH_API = "template/{% if sphinx_include_api %}doc{% endif %}/api.md.jinja"
-PATH_PIPELINE = "template/{% if gitlab_include_pipeline_sphinx %}.gitlab{% endif %}/ci/sphinx.yml.jinja"
-PATH_ROOT_PIPELINE = "template/{% if gitlab_include_pipeline %}.gitlab-ci.yml{% endif %}"
+PATH_CONFIG = "modules/sphinx/files/conf.py.jinja"
+PATH_INDEX = "modules/sphinx/files/index.md.jinja"
+PATH_LICENSE = "modules/core/files/LICENSE_NONE.md.jinja"
+PATH_README = "modules/core/files/README.md.jinja"
+PATH_MAKEFILE = "modules/sphinx/files/Makefile.jinja"
+PATH_MAKEBAT = "modules/sphinx/files/make.bat.jinja"
+PATH_API = "modules/sphinx/files/api.md.jinja"
+PATH_PIPELINE = "modules/gitlab/files/ci/sphinx.yml.jinja"
+PATH_ROOT_PIPELINE = "modules/gitlab/files/gitlab-ci.yml.jinja"
 PATH_NEEDS = {
-    "requirements": "template/{% if sphinx_include_requirements %}doc{% endif %}/requirements.md.jinja",
-    "architecture": "template/{% if sphinx_include_architecture %}doc{% endif %}/architecture.md.jinja",
-    "implementation": "template/{% if sphinx_include_implementation %}doc{% endif %}/implementation.md.jinja",
-    "verification": "template/{% if sphinx_include_verification %}doc{% endif %}/verification.md.jinja",
+    "requirements": "modules/sphinx/files/requirements.md.jinja",
+    "architecture": "modules/sphinx/files/architecture.md.jinja",
+    "implementation": "modules/sphinx/files/implementation.md.jinja",
+    "verification": "modules/sphinx/files/verification.md.jinja",
 }
 
 
@@ -56,27 +57,13 @@ def test_sphinx_without_readme(
         sphinx_needs=False,
     ) as case:
         features = case.context["features"]
-        included = tuple(
-            case.context[name]
-            for name in (
-                "sphinx_include_config",
-                "sphinx_include_index",
-                "sphinx_include_notes",
-                "sphinx_include_makefile",
-                "sphinx_include_makebat",
-                "sphinx_include_api",
-                "sphinx_include_requirements",
-                "sphinx_include_architecture",
-                "sphinx_include_implementation",
-                "sphinx_include_verification",
-            )
-        )
+        included = {file["path"] for file in case.context["sphinx"]["files"]}
         index = case.render(PATH_INDEX)
         makefile = case.render(PATH_MAKEFILE)
         makebat = case.render(PATH_MAKEBAT)
 
     assert "python" in features
-    assert included == (True, True, True, True, True, False, False, False, False, False)
+    assert included == {"doc/sphinx/conf.py", "doc/sphinx/index.md", "doc/notes.md", "doc/sphinx/Makefile", "doc/sphinx/make.bat"}
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
     assert "{include} ../../README.md" not in index
@@ -118,10 +105,9 @@ def test_sphinx_integrations(
         root_pipeline = yaml.safe_load(case.render(PATH_ROOT_PIPELINE))
 
     assert {"sphinx", "python", "gitlab"}.issubset(context["features"])
-    assert context["gitlab_include_pipeline_sphinx"] is True
-    assert all(
-        context[f"sphinx_include_{page}"]
-        for page in PATH_NEEDS
+    assert ".gitlab/ci/sphinx.yml" in {file["path"] for file in context["gitlab"]["files"]}
+    assert {f"doc/{page}.md" for page in PATH_NEEDS}.issubset(
+        file["path"] for file in context["sphinx"]["files"]
     )
 
     assignments = _literal_assignments(
@@ -203,7 +189,7 @@ def test_sphinx_integrations(
     build = pipeline["sphinx:build"]
     assert build["needs"] == []
     assert build["script"] == [
-        "make -C doc/sphinx html SPHINXOPTS='-W --keep-going'"
+        "make -C doc/sphinx html SPHINXOPTS='-W --keep-going'",
     ]
     assert build["rules"][-1] == {
         "when": "manual",
@@ -215,7 +201,7 @@ def test_sphinx_integrations(
         if rule.get("if") == '$CI_PIPELINE_SOURCE == "merge_request_event"'
     )
     assert {"**/*.py", "**/*.md", "doc/**/*", "src/**/*"}.issubset(
-        merge_request_rule["changes"]
+        merge_request_rule["changes"],
     )
     assert {
         path.rstrip("/")

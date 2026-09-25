@@ -1,13 +1,14 @@
+"""Check Dev Container configuration and Python module integration."""
+
+import json
 from collections.abc import Callable
 from contextlib import AbstractContextManager
-import json
 
 import pytest
 
 from .conftest import CopierCase
 
-
-PATH_DEVCONTAINER_CONFIG = "template/{% if devcontainer_include_config %}.devcontainer{% endif %}/devcontainer.json.jinja"
+PATH_DEVCONTAINER_CONFIG = "modules/devcontainer/files/devcontainer.json.jinja"
 
 
 @pytest.mark.parametrize(
@@ -21,7 +22,7 @@ def test_devcontainer_file_selection(
     expected: bool,
 ) -> None:
     with copier_case(features=features) as case:
-        assert case.context["devcontainer_include_config"] is expected
+        assert bool(case.context["devcontainer"]["files"]) is expected
 
 
 def test_devcontainer_configuration(

@@ -1,3 +1,5 @@
+"""Check the Copier module and its generated starter template."""
+
 from collections.abc import Callable
 from contextlib import AbstractContextManager
 
@@ -5,9 +7,8 @@ import pytest
 
 from .conftest import CopierCase
 
-
-PATH_COPIER_CONFIG = "template/{% if copier_include_template %}copier.yml{% endif %}.jinja"
-PATH_CORE_CONFIG = "template/{% if copier_include_template %}template{% endif %}/_modules/core/copier.yml"
+PATH_COPIER_CONFIG = "modules/copier/files/copier.yml.jinja"
+PATH_CORE_CONFIG = "modules/copier/files/core.yml.jinja"
 
 
 @pytest.mark.parametrize(
@@ -21,7 +22,8 @@ def test_copier_file_selection(
     expected: bool,
 ) -> None:
     with copier_case(features=features) as case:
-        assert case.context["copier_include_template"] is expected
+        assert case.context["copier"]["vars"]["enabled"] is expected
+        assert bool(case.context["copier"]["files"]) is expected
 
 
 def test_copier_configuration(

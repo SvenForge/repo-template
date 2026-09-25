@@ -1,0 +1,22 @@
+{% if sphinx.vars.has_readme -%}
+```{include} ../../README.md
+:relative-docs: ./
+```
+{% else -%}
+# {{ sphinx.vars.repository_name }}
+
+Documentation for {{ sphinx.vars.repository_name }}.
+
+{% endif -%}
+
+## Table of Contents
+
+```{toctree}
+:maxdepth: 1
+:glob:
+
+../*
+{% if sphinx.vars.has_license -%}
+License <../../LICENSE>
+{% endif -%}
+```

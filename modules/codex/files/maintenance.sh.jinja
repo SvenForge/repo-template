@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Refresh a Codex Cloud environment after a cached container resumes.
+# Add the following maintenance command to the Codex Cloud Environment configuration:
+#   bash .codex/maintenance.sh
+set -euo pipefail
+{% for contribution in contributions | selectattr('target', 'equalto', 'codex.maintenance') %}
+{% include contribution.template -%}
+{% endfor -%}

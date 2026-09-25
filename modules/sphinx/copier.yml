@@ -1,0 +1,93 @@
+# Module Defaults
+sphinx_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    needs: false
+    needs_pages:
+      - requirements
+      - architecture
+      - implementation
+      - verification
+    repository_name: My Repository
+    owner_name: ''
+    has_readme: false
+    has_license: false
+    has_python_package: false
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+sphinx_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Questions
+sphinx_needs:
+  type: bool
+  help: Include Sphinx-Needs support?
+  default: "{{ sphinx_inputs.needs | default(sphinx_defaults.needs) }}"
+  when: "{{ (sphinx_inputs.enabled | default(sphinx_defaults.enabled)) }}"
+
+sphinx_needs_pages:
+  type: str
+  help: Which Sphinx-Needs starter pages shall be created?
+  multiselect: true
+  choices:
+    Requirements: requirements
+    Architecture: architecture
+    Implementation: implementation
+    Verification: verification
+  default: "{{ sphinx_inputs.needs_pages | default(sphinx_defaults.needs_pages) | to_json }}"
+  when: "{{ (sphinx_inputs.enabled | default(sphinx_defaults.enabled)) and sphinx_needs }}"
+
+# Module Outputs
+sphinx:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(sphinx_defaults, **sphinx_inputs) -%}
+    {%- set vars = dict(vars,
+      needs=sphinx_needs,
+      needs_pages=sphinx_needs_pages,
+      year=sphinx_inputs.year if sphinx_inputs.year is defined else '%Y' | strftime | int,
+    ) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: doc/sphinx/conf.py
+        template: files/conf.py.jinja
+      - path: doc/sphinx/index.md
+        template: files/index.md.jinja
+      - path: doc/notes.md
+        template: files/notes.md.jinja
+      - path: doc/sphinx/Makefile
+        template: files/Makefile.jinja
+      - path: doc/sphinx/make.bat
+        template: files/make.bat.jinja
+      {%- if vars.has_python_package %}
+      - path: doc/api.md
+        template: files/api.md.jinja
+      {%- endif %}
+      {%- if vars.needs %}
+      {%- for page in vars.needs_pages %}
+      - path: doc/{{ page }}.md
+        template: files/{{ page }}.md.jinja
+      {%- endfor %}
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - target: core.gitignore
+        template: fragments/gitignore.jinja
+      - target: python.dependency_groups
+        template: fragments/dependency_groups.toml.jinja
+      - target: python.dev_dependencies
+        template: fragments/dev_dependencies.toml.jinja
+      {%- endif %}
+      {%- endfilter %}

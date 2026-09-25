@@ -1,0 +1,68 @@
+# Module Defaults
+codex_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    cloud_integration: true
+    devcontainer_available: false
+    devcontainer_integration: true
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+codex_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Questions
+codex_cloud:
+  type: bool
+  help: Set up Codex Cloud integration?
+  default: "{{ codex_inputs.cloud_integration | default((codex_inputs.enabled | default(codex_defaults.enabled)) and codex_defaults.cloud_integration) }}"
+  when: "{{ codex_inputs.enabled | default(codex_defaults.enabled) }}"
+
+codex_devcontainer:
+  type: bool
+  help: Add Codex integration to the Dev Container?
+  default: "{{ codex_inputs.devcontainer_integration | default((codex_inputs.devcontainer_available | default(codex_defaults.devcontainer_available)) and codex_defaults.devcontainer_integration) }}"
+  when: "{{ (codex_inputs.enabled | default(codex_defaults.enabled)) and (codex_inputs.devcontainer_available | default(codex_defaults.devcontainer_available)) }}"
+
+# Module Outputs
+codex:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(codex_defaults, **codex_inputs) -%}
+    {%- set vars = dict(vars,
+      cloud_integration=vars.enabled and codex_cloud,
+      devcontainer_integration=vars.enabled and vars.devcontainer_available and codex_devcontainer,
+    ) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: AGENTS.md
+        template: files/AGENTS.md.jinja
+      {%- if vars.cloud_integration %}
+      - path: .codex/setup.sh
+        template: files/setup.sh.jinja
+      - path: .codex/maintenance.sh
+        template: files/maintenance.sh.jinja
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.devcontainer_integration %}
+      - target: devcontainer.features
+        template: fragments/devcontainer.features.json.jinja
+      - target: devcontainer.mounts
+        template: fragments/devcontainer.mounts.json.jinja
+      - target: devcontainer.extensions
+        template: fragments/devcontainer.extensions.json.jinja
+      - target: devcontainer.postCreateCommand
+        template: fragments/devcontainer.postCreateCommand.json.jinja
+      {%- endif %}
+      {%- endfilter %}

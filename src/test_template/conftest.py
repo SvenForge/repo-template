@@ -1,3 +1,6 @@
+"""Fixtures for testing module templates without Git side effects."""
+
+import shutil
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -6,7 +9,6 @@ from typing import Any
 
 import pytest
 from copier._main import Worker
-
 
 TEMPLATE_ROOT = Path(__file__).parents[2]
 
@@ -25,13 +27,22 @@ class CopierCase:
 
 
 @pytest.fixture
-def copier_case(tmp_path: Path):
+def template_source(tmp_path: Path) -> Path:
+    source = tmp_path / 'template-source'
+    source.mkdir()
+    shutil.copy2(TEMPLATE_ROOT / 'copier.yml', source / 'copier.yml')
+    for name in ('modules', 'template'):
+        shutil.copytree(TEMPLATE_ROOT / name, source / name)
+    return source
+
+
+@pytest.fixture
+def copier_case(tmp_path: Path, template_source: Path):
     @contextmanager
     def create(**answers: Any) -> Iterator[CopierCase]:
         with Worker(
-            src_path=str(TEMPLATE_ROOT),
+            src_path=str(template_source),
             dst_path=tmp_path / "unused",
-            vcs_ref="HEAD",
             data=answers,
             defaults=True,
             skip_tasks=True,

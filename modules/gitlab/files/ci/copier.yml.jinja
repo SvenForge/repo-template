@@ -1,0 +1,21 @@
+# Copier Pipeline Definition
+
+.copier:base:
+  image: python:3.12-bookworm
+  variables:
+    COPIER_VERSION: "{{ gitlab.vars.copier_version }}"
+  before_script:
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/".insteadOf "https://${CI_SERVER_HOST}/"
+    - python -m pip install "copier==$COPIER_VERSION"
+
+copier:check:
+  extends: .copier:base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - when: manual
+  allow_failure: true
+  script:
+    - copier check-update
+    - copier check-update --quiet

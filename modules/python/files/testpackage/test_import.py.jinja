@@ -1,0 +1,8 @@
+"""Test package imports."""
+
+
+def test_import() -> None:
+    """Test importing the package."""
+    import {{ python.vars.package_name }}
+
+    assert {{ python.vars.package_name }}.__name__ == '{{ python.vars.package_name }}'

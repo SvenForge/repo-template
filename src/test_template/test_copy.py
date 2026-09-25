@@ -1,10 +1,10 @@
+"""Check complete project generation through the Copier CLI."""
+
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-import subprocess
 
 import pytest
-
-from .conftest import TEMPLATE_ROOT
 
 
 @dataclass(frozen=True)
@@ -137,15 +137,14 @@ COPY_CASES = {
 
 
 @pytest.mark.parametrize("case", COPY_CASES.values(), ids=COPY_CASES.keys())
-def test_copy(tmp_path: Path, case: CopyCase) -> None:
+def test_copy(tmp_path: Path, template_source: Path, case: CopyCase) -> None:
     destination = tmp_path / "repository"
     command = [
         "copier",
         "copy",
         "--defaults",
         "--quiet",
-        "--vcs-ref=HEAD",
-        str(TEMPLATE_ROOT),
+        str(template_source),
         str(destination),
     ]
     for name, value in case.answers.items():

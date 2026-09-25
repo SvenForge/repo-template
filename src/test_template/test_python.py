@@ -1,16 +1,17 @@
+"""Check Python module outputs and generated project configuration."""
+
 from collections.abc import Callable
 from contextlib import AbstractContextManager
-import tomllib
 
 import pytest
+import tomllib
 
 from .conftest import CopierCase
 
-
-PATH_PROJECT = "template/{% if python_include_pyproject %}pyproject.toml{% endif %}.jinja"
-PATH_PACKAGE = "template/{% if python_include_package %}src{% endif %}/{{ python_package_name }}/__init__.py.jinja"
-PATH_IMPORT_TEST = "template/{% if python_include_testpackage %}src{% endif %}/{{ python_testpackage_name }}/{% if python_include_importtest %}test_import.py{% endif %}.jinja"
-PATH_SETUP = "template/_modules/python/setup.sh.jinja"
+PATH_PROJECT = "modules/python/files/pyproject.toml.jinja"
+PATH_PACKAGE = "modules/python/files/package/__init__.py.jinja"
+PATH_IMPORT_TEST = "modules/python/files/testpackage/test_import.py.jinja"
+PATH_SETUP = "modules/python/fragments/setup.sh.jinja"
 
 
 def test_python_file_selection_and_defaults(
@@ -19,29 +20,25 @@ def test_python_file_selection_and_defaults(
     with copier_case(features=[]) as case:
         context = case.context
 
-    assert context["python_include_pyproject"] == False
-    assert context["python_include_package"] == False
-    assert context["python_include_distribution"] == False
-    assert context["python_include_testpackage"] == False
-    assert context["python_include_importtest"] == False
-    assert context["python_include_devgroup"] == False
-    assert context["python_include_setup"] == False
+    assert context["python"]["files"] == []
+    assert context["python"]["vars"]["has_distribution"] is False
+    assert context["python"]["vars"]["has_dev_dependencies"] is False
+    assert context["python"]["contributions"] == []
 
     with copier_case(features=["core", "python"]) as case:
         context = case.context
 
-    assert context["python_include_pyproject"] == True
-    assert context["python_include_package"] == False
-    assert context["python_include_distribution"] == False
-    assert context["python_include_testpackage"] == True
-    assert context["python_include_importtest"] == False
-    assert context["python_include_devgroup"] == True
-    assert context["python_include_setup"] == True
-    assert context["python_package_name"] == ""
-    assert context["python_distribution_name"] == ""
-    assert context["python_testpackage_name"] == "test_project"
-    assert context["python_tools"] == ["pytest", "ruff", "mypy"]
-    assert context["python_version"] == "3.12"
+    assert {file["path"] for file in context["python"]["files"]} == {
+        "pyproject.toml", "src/test_project/__init__.py", "src/test_project/test_self.py",
+    }
+    assert context["python"]["vars"]["has_distribution"] is False
+    assert context["python"]["vars"]["has_dev_dependencies"] is True
+    assert any(item["target"] == "codex.setup" for item in context["python"]["contributions"])
+    assert context["python"]["vars"]["package_name"] == ""
+    assert context["python"]["vars"]["distribution_name"] == ""
+    assert context["python"]["vars"]["testpackage_name"] == "test_project"
+    assert context["python"]["vars"]["tools"] == ["pytest", "ruff", "mypy"]
+    assert context["python"]["vars"]["version"] == "3.12"
 
 
 @pytest.mark.parametrize(
@@ -63,9 +60,8 @@ def test_python_answer_validation(
     answers: dict[str, str],
     question: str,
 ) -> None:
-    with pytest.raises(ValueError, match=question):
-        with copier_case(features=["core", "python"], **answers):
-            pass
+    with pytest.raises(ValueError, match=question), copier_case(features=["core", "python"], **answers):
+        pass
 
 
 def test_python_distribution_name_default(
@@ -77,8 +73,8 @@ def test_python_distribution_name_default(
     ) as case:
         context = case.context
 
-    assert context["python_distribution_name"] == "example-package"
-    assert context["python_include_distribution"] is True
+    assert context["python"]["vars"]["distribution_name"] == "example-package"
+    assert context["python"]["vars"]["has_distribution"] is True
 
 
 def test_python_project_configuration(
@@ -105,8 +101,8 @@ def test_python_project_configuration(
     assert project["tool"]["coverage"]["run"]["omit"] == ["test_*"]
     assert project["tool"]["ruff"]["src"] == ["src"]
     assert project["tool"]["mypy"]["files"] == ["src"]
-    assert context["python_testpackage_name"] == "test_acme_widget_library"
-    assert context["python_include_distribution"] is True
+    assert context["python"]["vars"]["testpackage_name"] == "test_acme_widget_library"
+    assert context["python"]["vars"]["has_distribution"] is True
     assert '"""Acme Widget package."""' in package
     assert "import acme_widget_library" in import_test
     assert "python -m pip install --editable . --group dev" in setup
@@ -128,8 +124,8 @@ def test_python_package_without_distribution(
         context = case.context
 
     assert project["tool"]["pytest"]["ini_options"]["pythonpath"] == ["src"]
-    assert context["python_include_package"] is True
-    assert context["python_include_distribution"] is False
+    assert "src/acme_widget/__init__.py" in {file["path"] for file in context["python"]["files"]}
+    assert context["python"]["vars"]["has_distribution"] is False
     assert "import acme_widget" in import_test
     assert "python -m pip install --group dev" in setup
 
@@ -159,6 +155,6 @@ def test_python_tool_selection(
 
     assert set(project.get("dependency-groups", {})) == dependency_groups
     assert set(project.get("tool", {})) == tool_sections
-    assert context["python_include_testpackage"] is ("pytest" in python_tools)
-    assert context["python_include_devgroup"] is bool(python_tools)
-    assert context["python_include_setup"] is bool(python_tools)
+    assert ("src/test_project/test_self.py" in {file["path"] for file in context["python"]["files"]}) is ("pytest" in python_tools)
+    assert context["python"]["vars"]["has_dev_dependencies"] is bool(python_tools)
+    assert any(item["target"] == "codex.setup" for item in context["python"]["contributions"]) is bool(python_tools)
