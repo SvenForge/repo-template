@@ -36,8 +36,11 @@ features:
     Codex: codex
     DevContainer: devcontainer
   default:
-    - codex
+    - core
     - devcontainer
+    - gitlab
+    - python
+    - sphinx
   validator: >-
     {%- for feature in features -%}
     {%- if feature not in module_paths.keys() -%}

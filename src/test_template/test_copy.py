@@ -14,8 +14,8 @@ class CopyCase:
 
 
 COPY_CASES = {
-    "project": CopyCase(
-        answers={"features": "[core, devcontainer, gitlab, python, sphinx]"},
+    "defaults": CopyCase(
+        answers={},
         expected_files={
             Path(".copier-answers.yml"): [],
             Path(".devcontainer/devcontainer.json"): [
