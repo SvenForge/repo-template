@@ -60,9 +60,9 @@ copier check-update
 ## Documentation
 
 <!-- toctree-start -->
-The documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
+The template documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
 
-For module reuse and template development, see [Template structure](./doc/template-structure.md) and [Module guide](./doc/module-guide.md). For Copier commands and concepts, see the [Copier documentation](https://copier.readthedocs.io/en/stable/).
+For Copier commands and concepts, see the [Copier documentation](https://copier.readthedocs.io/en/stable/).
 <!-- toctree-end -->
 
 ## Contributing
