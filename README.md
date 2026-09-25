@@ -37,6 +37,8 @@ copier update
 
 <!-- toctree-start -->
 The documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
+
+For basic use, see Getting started above. For module reuse and template development, see [Template structure](./doc/template-structure.md) and [Module guide](./doc/module-guide.md).
 <!-- toctree-end -->
 
 ## Contributing
