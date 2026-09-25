@@ -1,6 +1,6 @@
 # General Configuration
 _min_copier_version: &min_copier_version "9.17.2"
-_subdirectory: template_new  # TODO: Switch back to template after refactoring is completed
+_subdirectory: template
 
 copier_version:  # TODO: Maybe remove if *min_copier_version can directly be used as module input
   type: str
