@@ -62,7 +62,7 @@ def test_sphinx_without_readme(
         makefile = case.render(PATH_MAKEFILE)
         makebat = case.render(PATH_MAKEBAT)
 
-    assert "python" in {feature["module"] for feature in features}
+    assert "python" in features
     assert included == {"doc/sphinx/conf.py", "doc/sphinx/index.md", "doc/notes.md", "doc/sphinx/Makefile", "doc/sphinx/make.bat"}
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
@@ -104,7 +104,7 @@ def test_sphinx_integrations(
         pipeline = yaml.safe_load(case.render(PATH_PIPELINE))
         root_pipeline = yaml.safe_load(case.render(PATH_ROOT_PIPELINE))
 
-    assert {"sphinx", "python", "gitlab"}.issubset(feature["module"] for feature in context["features"])
+    assert {"sphinx", "python", "gitlab"}.issubset(context["features"])
     assert ".gitlab/ci/sphinx.yml" in {file["path"] for file in context["gitlab"]["files"]}
     assert {f"doc/{page}.md" for page in PATH_NEEDS}.issubset(
         file["path"] for file in context["sphinx"]["files"]

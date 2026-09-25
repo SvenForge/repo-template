@@ -40,11 +40,6 @@ def template_source(tmp_path: Path) -> Path:
 def copier_case(tmp_path: Path, template_source: Path):
     @contextmanager
     def create(**answers: Any) -> Iterator[CopierCase]:
-        if 'features' in answers:
-            answers['features'] = [
-                {'module': name, 'path': f'modules/{name}'} if isinstance(name, str) else name
-                for name in answers['features']
-            ]
         with Worker(
             src_path=str(template_source),
             dst_path=tmp_path / "unused",

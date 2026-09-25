@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
-import yaml
 
 
 @dataclass(frozen=True)
@@ -149,11 +148,6 @@ def test_copy(tmp_path: Path, template_source: Path, case: CopyCase) -> None:
         str(destination),
     ]
     for name, value in case.answers.items():
-        if name == "features":
-            value = yaml.safe_dump([
-                {"module": module, "path": f"modules/{module}"}
-                for module in yaml.safe_load(value)
-            ], default_flow_style=True)
         command.extend(("--data", f"{name}={value}"))
 
     subprocess.run(command, check=True)

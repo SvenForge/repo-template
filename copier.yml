@@ -8,43 +8,36 @@ copier_version:  # TODO: Maybe remove if *min_copier_version can directly be use
   default: *min_copier_version
   when: false
 
+# Module Paths
+# Update the corresponding !include below when moving a module.
+module_paths:
+  type: yaml
+  when: false
+  default:
+    core: modules/core
+    copier: modules/copier
+    python: modules/python
+    sphinx: modules/sphinx
+    gitlab: modules/gitlab
+    codex: modules/codex
+    devcontainer: modules/devcontainer
+
 # Select Modules
 features:
-  type: yaml
+  type: str
   help: Which template features shall be used?
   multiselect: true
   choices:
-    Core:
-      value:
-        module: core
-        path: modules/core
-    Copier:
-      value:
-        module: copier
-        path: modules/copier
-    Python:
-      value:
-        module: python
-        path: modules/python
-    Sphinx:
-      value:
-        module: sphinx
-        path: modules/sphinx
-    GitLab:
-      value:
-        module: gitlab
-        path: modules/gitlab
-    Codex:
-      value: &codex
-        module: codex
-        path: modules/codex
-    DevContainer:
-      value: &devcontainer
-        module: devcontainer
-        path: modules/devcontainer
+    Core: core
+    Copier: copier
+    Python: python
+    Sphinx: sphinx
+    GitLab: gitlab
+    Codex: codex
+    DevContainer: devcontainer
   default:
-    - *codex
-    - *devcontainer
+    - codex
+    - devcontainer
 
 # Include Modules
 ---
@@ -69,7 +62,7 @@ gitlab_inputs:
   help: Which inputs should be used for the module?
   when: false
   default: |
-    enabled: {{ 'gitlab' in features | map(attribute='module') }}
+    enabled: {{ 'gitlab' in features }}
     repository_host: {{ core.vars.repository_host | to_json }}
     repository_path: {{ core.vars.repository_path | to_json }}
     include_readme: {{ core.vars.include_readme }}
@@ -85,7 +78,7 @@ sphinx_inputs:
   help: Which inputs should be used for the module?
   when: false
   default: |
-    enabled: {{ 'sphinx' in features | map(attribute='module') }}
+    enabled: {{ 'sphinx' in features }}
     repository_name: {{ core.vars.repository_name | to_json }}
     owner_name: {{ core.vars.owner_name | to_json }}
     year: {{ core.vars.year }}
@@ -98,21 +91,21 @@ python_inputs:
   help: Which inputs should be used for the module?
   when: false
   default: |
-    enabled: {{ 'python' in features | map(attribute='module') }}
+    enabled: {{ 'python' in features }}
     repository_name: {{ core.vars.repository_name | to_json }}
     include_readme: {{ core.vars.include_readme }}
     include_license: {{ core.vars.include_license }}
     license: {{ core.vars.license | to_json }}
     owner_name: {{ core.vars.owner_name | to_json }}
     owner_email: {{ core.vars.owner_email | to_json }}
-    sphinx_enabled: {{ 'sphinx' in features | map(attribute='module') }}
+    sphinx_enabled: {{ 'sphinx' in features }}
 
 copier_inputs:
   type: yaml
   help: Which inputs should be used for the module?
   when: false
   default: |
-    enabled: {{ 'copier' in features | map(attribute='module') }}
+    enabled: {{ 'copier' in features }}
     version: {{ copier_version | to_json }}
 
 core_inputs:
@@ -120,15 +113,15 @@ core_inputs:
   help: Which inputs should be used for the module?
   when: false
   default: |
-    enabled: {{ 'core' in features | map(attribute='module') }}
+    enabled: {{ 'core' in features }}
 
 codex_inputs:
   type: yaml
   help: Which inputs should be used for the module?
   when: false
   default: |
-    enabled: {{ 'codex' in features | map(attribute='module') }}
-    devcontainer: {{ 'devcontainer' in features | map(attribute='module') }}
+    enabled: {{ 'codex' in features }}
+    devcontainer: {{ 'devcontainer' in features }}
 
 devcontainer_inputs:
   type: yaml
@@ -136,7 +129,7 @@ devcontainer_inputs:
   when: false
   default: |
     {%- set python_vars = python.vars if python is defined else {} -%}
-    enabled: {{ 'devcontainer' in features | map(attribute='module') }}
+    enabled: {{ 'devcontainer' in features }}
     python_enabled: {{ python_vars.enabled | default(false) }}
     python_version: {{ python_vars.version | default('3.12') | to_json }}
     python_include_setup: {{ python_vars.include_setup | default(false) }}
@@ -152,11 +145,12 @@ files:
   default: |
     {%- set result = namespace(files=[]) -%}
     {%- for feature in features -%}
-      {%- from feature.path ~ '/exports.jinja' import output with context -%}
+      {%- set module_path = module_paths[feature] -%}
+      {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for file in output.files -%}
         {%- set result.files = result.files + [{
           'path': file.path,
-          'template': feature.path ~ '/' ~ file.template,
+          'template': module_path ~ '/' ~ file.template,
         }] -%}
       {%- endfor -%}
     {%- endfor -%}
@@ -169,11 +163,12 @@ contributions:
   default: |
     {%- set result = namespace(contributions=[]) -%}
     {%- for feature in features -%}
-      {%- from feature.path ~ '/exports.jinja' import output with context -%}
+      {%- set module_path = module_paths[feature] -%}
+      {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for contribution in output.contributions -%}
         {%- set result.contributions = result.contributions + [{
           'id': contribution.id,
-          'template': feature.path ~ '/' ~ contribution.template,
+          'template': module_path ~ '/' ~ contribution.template,
         }] -%}
       {%- endfor -%}
     {%- endfor -%}
