@@ -1,10 +1,10 @@
 # Python Pipeline Definition
 
 .python:base:
-  image: python:{{ python_version }}-bookworm
+  image: python:{{ gitlab.vars.python_version }}-bookworm
   before_script:
     - python -m pip install --upgrade pip
-    - python -m pip install{% if python_include_distribution %} --editable .{% endif %} --group "$PYTHON_DEPENDENCY_GROUP"
+    - python -m pip install{% if gitlab.vars.python_include_distribution %} --editable .{% endif %} --group "$PYTHON_DEPENDENCY_GROUP"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -18,7 +18,7 @@
     - when: manual
       allow_failure: true
 
-{% if 'pytest' in python_tools -%}
+{% if 'pytest' in gitlab.vars.python_tools -%}
 python:pytest:
   extends: .python:base
   needs: []
@@ -35,7 +35,7 @@ python:pytest:
         path: coverage.xml
 
 {% endif -%}
-{% if 'ruff' in python_tools -%}
+{% if 'ruff' in gitlab.vars.python_tools -%}
 python:ruff:
   extends: .python:base
   needs: []
@@ -50,7 +50,7 @@ python:ruff:
       codequality: ruff-code-quality.json
 
 {% endif -%}
-{% if 'mypy' in python_tools -%}
+{% if 'mypy' in gitlab.vars.python_tools -%}
 python:mypy:
   extends: .python:base
   needs: []

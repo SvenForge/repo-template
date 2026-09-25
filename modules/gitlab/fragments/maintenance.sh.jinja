@@ -1,3 +1,3 @@
 # Authentication and glab are persisted in the cached environment by setup.sh.
-readonly GITLAB_HOST="{{ core_repository_host }}"
+readonly GITLAB_HOST="{{ gitlab.vars.repository_host }}"
 glab auth status --hostname "$GITLAB_HOST" >/dev/null

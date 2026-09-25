@@ -30,6 +30,10 @@ features:
       value:
         module: sphinx
         path: modules/sphinx
+    GitLab:
+      value:
+        module: gitlab
+        path: modules/gitlab
     Codex:
       value: &codex
         module: codex
@@ -52,12 +56,30 @@ features:
 ---
 !include modules/sphinx/copier.yml
 ---
+!include modules/gitlab/copier.yml
+---
 !include modules/codex/copier.yml
 ---
 !include modules/devcontainer/copier.yml
 ---
 
 # Module Inputs
+gitlab_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'gitlab' in features | map(attribute='module') }}
+    repository_host: {{ core.vars.repository_host | to_json }}
+    repository_path: {{ core.vars.repository_path | to_json }}
+    include_readme: {{ core.vars.include_readme }}
+    copier_version: {{ copier.vars.version | to_json }}
+    python_enabled: {{ python.vars.enabled }}
+    python_tools: {{ python.vars.tools | to_json }}
+    python_version: {{ python.vars.version | to_json }}
+    python_include_distribution: {{ python.vars.include_distribution }}
+    sphinx_enabled: {{ sphinx.vars.enabled }}
+
 sphinx_inputs:
   type: yaml
   help: Which inputs should be used for the module?

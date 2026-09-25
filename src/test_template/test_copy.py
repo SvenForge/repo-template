@@ -1,10 +1,11 @@
+"""Check complete project generation through the Copier CLI."""
+
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-import subprocess
 
 import pytest
-
-from .conftest import TEMPLATE_ROOT
+import yaml
 
 
 @dataclass(frozen=True)
@@ -14,8 +15,8 @@ class CopyCase:
 
 
 COPY_CASES = {
-    "defaults": CopyCase(
-        answers={},
+    "project": CopyCase(
+        answers={"features": "[core, devcontainer, gitlab, python, sphinx]"},
         expected_files={
             Path(".copier-answers.yml"): [],
             Path(".devcontainer/devcontainer.json"): [
@@ -93,10 +94,11 @@ COPY_CASES = {
             Path(".copier-answers.yml"): [],
             Path("copier.yml"): [
                 "_subdirectory: template",
-                "  - /_modules",
-                "!include template/_modules/core/copier.yml",
+                "!include modules/core/copier.yml",
             ],
-            Path("template/_modules/core/copier.yml"): [],
+            Path("modules/core/copier.yml"): ["core_inputs:", "files: []", "contributions: []"],
+            Path("modules/core/exports.jinja"): ["{% set output = core %}"],
+            Path("template/{% yield file from files %}{{ file.path }}{% endyield %}.jinja"): ["{% include file.template %}"],
         },
     ),
     "codex": CopyCase(
@@ -137,18 +139,22 @@ COPY_CASES = {
 
 
 @pytest.mark.parametrize("case", COPY_CASES.values(), ids=COPY_CASES.keys())
-def test_copy(tmp_path: Path, case: CopyCase) -> None:
+def test_copy(tmp_path: Path, template_source: Path, case: CopyCase) -> None:
     destination = tmp_path / "repository"
     command = [
         "copier",
         "copy",
         "--defaults",
         "--quiet",
-        "--vcs-ref=HEAD",
-        str(TEMPLATE_ROOT),
+        str(template_source),
         str(destination),
     ]
     for name, value in case.answers.items():
+        if name == "features":
+            value = yaml.safe_dump([
+                {"module": module, "path": f"modules/{module}"}
+                for module in yaml.safe_load(value)
+            ], default_flow_style=True)
         command.extend(("--data", f"{name}={value}"))
 
     subprocess.run(command, check=True)

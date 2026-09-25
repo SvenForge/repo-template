@@ -1,15 +1,12 @@
-gitlab_include_issue_template:
-  type: bool
-  help: Create the default GitLab issue template?
-  default: "{{ 'gitlab' in features }}"
+# Module Inputs
+gitlab_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
   when: false
+  default: |
+    enabled: true
 
-gitlab_include_merge_request_template:
-  type: bool
-  help: Create the default GitLab merge request template?
-  default: "{{ 'gitlab' in features }}"
-  when: false
-
+# Module Questions
 gitlab_pipeline:
   type: str
   help: Which jobs shall be included in the GitLab pipeline?
@@ -17,53 +14,87 @@ gitlab_pipeline:
   choices: |
     Check for Copier template updates: copier
     Run the demonstration job: demo
-    {% if 'python' in features and python_tools | length > 0 %}
+    {% if gitlab_inputs.python_enabled | default(false) and gitlab_inputs.python_tools | default([]) | length > 0 %}
     Run the Python test and quality jobs: python
     {% endif %}
-    {% if 'sphinx' in features %}
+    {% if gitlab_inputs.sphinx_enabled | default(false) %}
     Build and deploy the Sphinx documentation: sphinx
     {% endif %}
-  default: >-
-    [copier, demo{% if 'python' in features and python_tools | length > 0 %}, python{% endif %}{% if 'sphinx' in features %}, sphinx{% endif %}]
-  when: "{{ 'gitlab' in features }}"
-
-gitlab_include_pipeline_copier:
-  type: bool
-  help: Create the Copier pipeline module?
-  default: "{{ 'gitlab' in features and 'copier' in gitlab_pipeline }}"
-  when: false
-
-gitlab_include_pipeline_demo:
-  type: bool
-  help: Create the demonstration pipeline module?
-  default: "{{ 'gitlab' in features and 'demo' in gitlab_pipeline }}"
-  when: false
-
-gitlab_include_pipeline_python:
-  type: bool
-  help: Create the Python pipeline module?
-  default: "{{ 'gitlab' in features and 'python' in features and python_tools | length > 0 and 'python' in gitlab_pipeline }}"
-  when: false
-
-gitlab_include_pipeline_sphinx:
-  type: bool
-  help: Create the Sphinx pipeline module?
-  default: "{{ 'gitlab' in features and 'sphinx' in features and 'sphinx' in gitlab_pipeline }}"
-  when: false
+  default: |
+    {% if gitlab_inputs.pipeline is defined %}
+    {{ gitlab_inputs.pipeline | to_json }}
+    {% else %}
+    - copier
+    - demo
+    {% if gitlab_inputs.python_enabled | default(false) and gitlab_inputs.python_tools | default([]) | length > 0 %}
+    - python
+    {% endif %}
+    {% if gitlab_inputs.sphinx_enabled | default(false) %}
+    - sphinx
+    {% endif %}
+    {% endif %}
+  when: "{{ gitlab_inputs.enabled }}"
 
 gitlab_pages_url:
   type: str
   help: At which URL is the Sphinx documentation published by GitLab Pages? (optional)
-  default: >-
-    {%- set path = core_repository_path.split('/') -%}
-    {{- 'https://' ~ path[0] ~ '.gitlab.io/' ~ (
+  default: |
+    {%- set repository_path = gitlab_inputs.repository_path | default('') -%}
+    {%- set path = repository_path.split('/') -%}
+    {{- gitlab_inputs.pages_url | default('https://' ~ path[0] ~ '.gitlab.io/' ~ (
       '' if path | length == 2 and path[1] == path[0] ~ '.gitlab.io'
       else path[1:] | join('/') ~ '/'
-    ) if core_repository_host == 'gitlab.com' and core_repository_path else '' -}}
-  when: "{{ gitlab_include_pipeline_sphinx and core_include_readme }}"
+    ) if gitlab_inputs.repository_host | default('gitlab.com') == 'gitlab.com' and repository_path else '') -}}
+  when: >-
+    {{ gitlab_inputs.enabled and gitlab_inputs.sphinx_enabled | default(false) and 'sphinx' in gitlab_pipeline and gitlab_inputs.include_readme | default(false) }}
 
-gitlab_include_pipeline:
-  type: bool
-  help: Create the GitLab CI/CD pipeline?
-  default: "{{ 'gitlab' in features and gitlab_pipeline | length > 0 }}"
+# Module Outputs
+gitlab:
+  type: yaml
   when: false
+  default: |
+    vars:
+      enabled: {{ gitlab_inputs.enabled }}
+      pipeline: {{ gitlab_pipeline | to_json }}
+      pages_url: {{ gitlab_pages_url | to_json }}
+      repository_host: {{ gitlab_inputs.repository_host | default('gitlab.com') | to_json }}
+      repository_path: {{ gitlab_inputs.repository_path | default('') | to_json }}
+      include_readme: {{ gitlab_inputs.include_readme | default(false) }}
+      copier_version: {{ gitlab_inputs.copier_version | default('9.17.2') | to_json }}
+      python_enabled: {{ gitlab_inputs.python_enabled | default(false) }}
+      python_tools: {{ gitlab_inputs.python_tools | default([]) | to_json }}
+      python_version: {{ gitlab_inputs.python_version | default('3.12') | to_json }}
+      python_include_distribution: {{ gitlab_inputs.python_include_distribution | default(false) }}
+      sphinx_enabled: {{ gitlab_inputs.sphinx_enabled | default(false) }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if gitlab_inputs.enabled %}
+      - path: .gitlab/issue_templates/default.md
+        template: files/issue.md.jinja
+      - path: .gitlab/merge_request_templates/default.md
+        template: files/merge_request.md.jinja
+      {%- if gitlab_pipeline %}
+      - path: .gitlab-ci.yml
+        template: files/gitlab-ci.yml.jinja
+      {%- for pipeline in gitlab_pipeline %}
+      - path: .gitlab/ci/{{ pipeline }}.yml
+        template: files/ci/{{ pipeline }}.yml.jinja
+      {%- endfor %}
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if gitlab_inputs.enabled %}
+      - id: codex.agents
+        template: fragments/AGENTS.md.jinja
+      - id: codex.setup
+        template: fragments/setup.sh.jinja
+      - id: codex.maintenance
+        template: fragments/maintenance.sh.jinja
+      {%- if 'sphinx' in gitlab_pipeline and gitlab_pages_url %}
+      - id: core.readme.documentation
+        template: fragments/readme.documentation.md.jinja
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}

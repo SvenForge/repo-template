@@ -3,7 +3,7 @@
 .copier:base:
   image: python:3.12-bookworm
   variables:
-    COPIER_VERSION: "{{ copier_version }}"
+    COPIER_VERSION: "{{ gitlab.vars.copier_version }}"
   before_script:
     - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/".insteadOf "https://${CI_SERVER_HOST}/"
     - python -m pip install "copier==$COPIER_VERSION"

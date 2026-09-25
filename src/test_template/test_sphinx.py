@@ -16,8 +16,8 @@ PATH_README = "modules/core/files/README.md.jinja"
 PATH_MAKEFILE = "modules/sphinx/files/Makefile.jinja"
 PATH_MAKEBAT = "modules/sphinx/files/make.bat.jinja"
 PATH_API = "modules/sphinx/files/api.md.jinja"
-PATH_PIPELINE = "template/{% if gitlab_include_pipeline_sphinx %}.gitlab{% endif %}/ci/sphinx.yml.jinja"
-PATH_ROOT_PIPELINE = "template/{% if gitlab_include_pipeline %}.gitlab-ci.yml{% endif %}"
+PATH_PIPELINE = "modules/gitlab/files/ci/sphinx.yml.jinja"
+PATH_ROOT_PIPELINE = "modules/gitlab/files/gitlab-ci.yml.jinja"
 PATH_NEEDS = {
     "requirements": "modules/sphinx/files/requirements.md.jinja",
     "architecture": "modules/sphinx/files/architecture.md.jinja",
@@ -105,7 +105,7 @@ def test_sphinx_integrations(
         root_pipeline = yaml.safe_load(case.render(PATH_ROOT_PIPELINE))
 
     assert {"sphinx", "python", "gitlab"}.issubset(feature["module"] for feature in context["features"])
-    assert context["gitlab_include_pipeline_sphinx"] is True
+    assert ".gitlab/ci/sphinx.yml" in {file["path"] for file in context["gitlab"]["files"]}
     assert {f"doc/{page}.md" for page in PATH_NEEDS}.issubset(
         file["path"] for file in context["sphinx"]["files"]
     )
