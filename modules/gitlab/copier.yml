@@ -83,7 +83,7 @@ gitlab:
       pipeline=gitlab_pipeline,
       pages_url=gitlab_pages_url,
     ) -%}
-    vars: {{ dict(vars.items() | rejectattr(0, 'equalto', 'has_readme')) | to_json }}
+    vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
