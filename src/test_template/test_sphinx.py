@@ -157,7 +157,7 @@ def test_sphinx_integrations(
         "test",
     }
 
-    assert "{include} ../../README.md"
+    assert "{include} ../../README.md" in index
     assert ":end-before: <!-- toctree-start -->" in index
     assert ":start-after: <!-- toctree-end -->" in index
     assert "{toctree}" in index
