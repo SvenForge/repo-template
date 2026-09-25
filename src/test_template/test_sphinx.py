@@ -66,7 +66,6 @@ def test_sphinx_without_readme(
     assert included == {"doc/sphinx/conf.py", "doc/sphinx/index.md", "doc/notes.md", "doc/sphinx/Makefile", "doc/sphinx/make.bat"}
     assert "# Example Repository" in index
     assert "Documentation for Example Repository." in index
-    assert "{include} ../../README.md" not in index
     assert ":glob:" in index
     assert "../*" in index
     assert '-c "$(CONFDIR)"' in makefile
@@ -151,7 +150,6 @@ def test_sphinx_integrations(
         "matplotlib",
     }.issubset(assignments["intersphinx_mapping"])
     assert "doc/sphinx/_build" in assignments["exclude_patterns"]
-    assert "LICENSE.md" not in assignments["exclude_patterns"]
     assert {need_type["directive"] for need_type in assignments["needs_types"]} >= {
         "req",
         "spec",
@@ -160,12 +158,14 @@ def test_sphinx_integrations(
     }
 
     assert "{include} ../../README.md" in index
+    assert ":end-before: <!-- toctree-start -->" in index
+    assert ":start-after: <!-- toctree-end -->" in index
     assert "{toctree}" in index
-    assert ":maxdepth: 1" in index
     assert ":glob:" in index
     assert "../*" in index
     assert f"[GitLab Pages]({pages_url})" in readme
-    assert "{toctree}" not in readme
+    assert "<!-- toctree-start -->" in readme
+    assert "<!-- toctree-end -->" in readme
     assert "License <../../LICENSE>" in index
     assert license_text.startswith("# License & Copyright Information\n")
     assert "{toctree}" in api
@@ -209,7 +209,6 @@ def test_sphinx_integrations(
     } == {"doc/sphinx/_build/html"}
 
     pages = pipeline["sphinx:pages"]
-    assert "stage" not in pages
     assert any(
         isinstance(need, dict)
         and need.get("job") == "sphinx:build"

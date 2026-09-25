@@ -35,8 +35,9 @@ copier update
 
 ## Documentation
 
+<!-- toctree-start -->
 The documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
-
+<!-- toctree-end -->
 
 ## Contributing
 
