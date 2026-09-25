@@ -12,9 +12,9 @@ sphinx_defaults:
       - verification
     repository_name: My Repository
     owner_name: ''
-    include_readme: false
-    include_license: false
-    python_include_package: false
+    has_readme: false
+    has_license: false
+    has_python_package: false
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
@@ -68,7 +68,7 @@ sphinx:
         template: files/Makefile.jinja
       - path: doc/sphinx/make.bat
         template: files/make.bat.jinja
-      {%- if vars.python_include_package %}
+      {%- if vars.has_python_package %}
       - path: doc/api.md
         template: files/api.md.jinja
       {%- endif %}

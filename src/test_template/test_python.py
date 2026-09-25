@@ -21,10 +21,9 @@ def test_python_file_selection_and_defaults(
         context = case.context
 
     assert context["python"]["files"] == []
-    assert context["python"]["vars"]["include_package"] is False
-    assert context["python"]["vars"]["include_distribution"] is False
-    assert context["python"]["vars"]["include_devgroup"] is False
-    assert context["python"]["vars"]["include_setup"] is False
+    assert context["python"]["vars"]["has_distribution"] is False
+    assert context["python"]["vars"]["has_dev_dependencies"] is False
+    assert context["python"]["contributions"] == []
 
     with copier_case(features=["core", "python"]) as case:
         context = case.context
@@ -32,10 +31,9 @@ def test_python_file_selection_and_defaults(
     assert {file["path"] for file in context["python"]["files"]} == {
         "pyproject.toml", "src/test_project/__init__.py", "src/test_project/test_self.py",
     }
-    assert context["python"]["vars"]["include_package"] is False
-    assert context["python"]["vars"]["include_distribution"] is False
-    assert context["python"]["vars"]["include_devgroup"] is True
-    assert context["python"]["vars"]["include_setup"] is True
+    assert context["python"]["vars"]["has_distribution"] is False
+    assert context["python"]["vars"]["has_dev_dependencies"] is True
+    assert any(item["target"] == "codex.setup" for item in context["python"]["contributions"])
     assert context["python"]["vars"]["package_name"] == ""
     assert context["python"]["vars"]["distribution_name"] == ""
     assert context["python"]["vars"]["testpackage_name"] == "test_project"
@@ -76,7 +74,7 @@ def test_python_distribution_name_default(
         context = case.context
 
     assert context["python"]["vars"]["distribution_name"] == "example-package"
-    assert context["python"]["vars"]["include_distribution"] is True
+    assert context["python"]["vars"]["has_distribution"] is True
 
 
 def test_python_project_configuration(
@@ -104,7 +102,7 @@ def test_python_project_configuration(
     assert project["tool"]["ruff"]["src"] == ["src"]
     assert project["tool"]["mypy"]["files"] == ["src"]
     assert context["python"]["vars"]["testpackage_name"] == "test_acme_widget_library"
-    assert context["python"]["vars"]["include_distribution"] is True
+    assert context["python"]["vars"]["has_distribution"] is True
     assert '"""Acme Widget package."""' in package
     assert "import acme_widget_library" in import_test
     assert "python -m pip install --editable . --group dev" in setup
@@ -126,8 +124,8 @@ def test_python_package_without_distribution(
         context = case.context
 
     assert project["tool"]["pytest"]["ini_options"]["pythonpath"] == ["src"]
-    assert context["python"]["vars"]["include_package"] is True
-    assert context["python"]["vars"]["include_distribution"] is False
+    assert "src/acme_widget/__init__.py" in {file["path"] for file in context["python"]["files"]}
+    assert context["python"]["vars"]["has_distribution"] is False
     assert "import acme_widget" in import_test
     assert "python -m pip install --group dev" in setup
 
@@ -158,5 +156,5 @@ def test_python_tool_selection(
     assert set(project.get("dependency-groups", {})) == dependency_groups
     assert set(project.get("tool", {})) == tool_sections
     assert ("src/test_project/test_self.py" in {file["path"] for file in context["python"]["files"]}) is ("pytest" in python_tools)
-    assert context["python"]["vars"]["include_devgroup"] is bool(python_tools)
-    assert context["python"]["vars"]["include_setup"] is bool(python_tools)
+    assert context["python"]["vars"]["has_dev_dependencies"] is bool(python_tools)
+    assert any(item["target"] == "codex.setup" for item in context["python"]["contributions"]) is bool(python_tools)

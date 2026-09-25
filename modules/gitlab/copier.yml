@@ -10,12 +10,12 @@ gitlab_defaults:
     pages_url: ''
     repository_host: gitlab.com
     repository_path: ''
-    include_readme: false
+    has_readme: false
     copier_version: 9.17.2
     python_enabled: false
     python_tools: []
     python_version: '3.12'
-    python_include_distribution: false
+    has_python_distribution: false
     sphinx_enabled: false
 
 # Module Inputs
@@ -71,7 +71,7 @@ gitlab_pages_url:
     {%- endif -%}
   when: >-
     {%- set vars = dict(gitlab_defaults, **gitlab_inputs) -%}
-    {{ vars.enabled and vars.sphinx_enabled and 'sphinx' in gitlab_pipeline and vars.include_readme }}
+    {{ vars.enabled and vars.sphinx_enabled and 'sphinx' in gitlab_pipeline and vars.has_readme }}
 
 # Module Outputs
 gitlab:
@@ -83,7 +83,7 @@ gitlab:
       pipeline=gitlab_pipeline,
       pages_url=gitlab_pages_url,
     ) -%}
-    vars: {{ vars | to_json }}
+    vars: {{ dict(vars.items() | rejectattr(0, 'equalto', 'has_readme')) | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}

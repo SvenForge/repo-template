@@ -1,4 +1,4 @@
-{% if python.vars.include_distribution -%}
+{% if python.vars.has_distribution -%}
 [build-system]
 requires = [
     "setuptools>=84",
@@ -11,10 +11,10 @@ name = {{ python.vars.distribution_name | tojson }}
 dynamic = ["version"]
 requires-python = ">={{ python.vars.version }}"
 dependencies = []
-{% if python.vars.include_readme -%}
+{% if python.vars.has_readme -%}
 readme = "README.md"
 {% endif -%}
-{% if python.vars.include_license -%}
+{% if python.vars.has_license -%}
 license = {% if python.vars.license == 'NONE' %}"LicenseRef-Proprietary"{% else %}{{ python.vars.license | tojson }}{% endif %}
 license-files = ["LICENSE.md"]
 {% endif -%}
@@ -24,7 +24,7 @@ authors = [
 ]
 {% endif %}
 {% endif -%}
-{% if python.vars.include_devgroup -%}
+{% if python.vars.has_dev_dependencies -%}
 [dependency-groups]
 {% if 'pytest' in python.vars.tools -%}
 test = [
@@ -59,7 +59,7 @@ dev = [
 ]
 {% endif %}
 
-{% if python.vars.include_distribution -%}
+{% if python.vars.has_distribution -%}
 [tool.setuptools]
 package-dir = { "" = "src" }
 
@@ -81,7 +81,7 @@ addopts = [
     "--junitxml=pytest.xml",
 ]
 testpaths = ["src/test_*"]
-{% if python.vars.include_package and not python.vars.include_distribution -%}
+{% if python.vars.package_name and not python.vars.has_distribution -%}
 pythonpath = ["src"]
 {% endif %}
 

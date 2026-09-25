@@ -40,7 +40,7 @@ def test_readme_with_owner_contact(
         core_owner_user="example-owner",
     ) as case:
         rendered = case.render("modules/core/files/README.md.jinja")
-        assert case.context["core"]["vars"]["include_license"] is True
+        assert "LICENSE.md" in {file["path"] for file in case.context["core"]["files"]}
 
     assert "# [Example Repository](https://example.com/repository)" in rendered
     assert "* [Example Owner](mailto:owner@example.com) - @example-owner" in rendered
@@ -58,7 +58,7 @@ def test_readme_without_optional_owner_contact(
         core_license="NOASSERTION",
     ) as case:
         rendered = case.render("modules/core/files/README.md.jinja")
-        assert case.context["core"]["vars"]["include_license"] is False
+        assert "LICENSE.md" not in {file["path"] for file in case.context["core"]["files"]}
 
     assert "* Example Owner" in rendered
     assert "mailto:" not in rendered

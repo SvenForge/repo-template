@@ -4,7 +4,7 @@
   image: python:{{ gitlab.vars.python_version }}-bookworm
   before_script:
     - python -m pip install --upgrade pip
-    - python -m pip install{% if gitlab.vars.python_include_distribution %} --editable .{% endif %} --group "$PYTHON_DEPENDENCY_GROUP"
+    - python -m pip install{% if gitlab.vars.has_python_distribution %} --editable .{% endif %} --group "$PYTHON_DEPENDENCY_GROUP"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"

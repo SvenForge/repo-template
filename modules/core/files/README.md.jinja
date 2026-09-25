@@ -35,7 +35,7 @@ _TODO: Add contact information._
 {% endif %}
 ## License
 
-{% if core.vars.include_license -%}
+{% if 'LICENSE.md' in core.files | map(attribute='path') -%}
 Please see: [LICENSE.md](./LICENSE.md)
 {% else -%}
 _TODO: Add license information._

@@ -1,6 +1,6 @@
 """Sphinx configuration."""
 
-{% if sphinx.vars.python_include_package -%}
+{% if sphinx.vars.has_python_package -%}
 import sys
 from pathlib import Path
 
@@ -18,7 +18,7 @@ copyright = {{ sphinx.vars.year | string | tojson }}
 extensions = [
     'myst_parser',
     'sphinx.ext.intersphinx',
-{% if sphinx.vars.python_include_package -%}
+{% if sphinx.vars.has_python_package -%}
     'sphinx.ext.apidoc',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
@@ -61,7 +61,7 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org/stable/', None),
 }
 
-{% if sphinx.vars.python_include_package -%}
+{% if sphinx.vars.has_python_package -%}
 # -- Options for apidoc / autodoc extensions ---------------------------------
 
 apidoc_modules = [

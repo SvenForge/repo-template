@@ -41,8 +41,8 @@ def test_codex_file_selection(
     with copier_case(**answers) as case:
         files = {file["path"] for file in case.context["codex"]["files"]}
         selected = (
-            case.context["codex"]["vars"]["cloud"],
-            case.context["codex"]["vars"]["devcontainer"],
+            case.context["codex"]["vars"]["cloud_integration"],
+            case.context["codex"]["vars"]["devcontainer_integration"],
             "AGENTS.md" in files,
             ".codex/setup.sh" in files,
             ".codex/maintenance.sh" in files,

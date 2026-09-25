@@ -11,9 +11,9 @@ core_defaults:
     owner_name: ''
     owner_email: ''
     owner_user: ''
-    include_readme: true
+    readme: true
     license: NONE
-    include_gitignore: true
+    gitignore: true
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
@@ -93,7 +93,7 @@ core_year:
 core_include_readme:
   type: bool
   help: Create README.md file?
-  default: "{{ core_inputs.include_readme | default((core_inputs.enabled | default(core_defaults.enabled)) and core_defaults.include_readme) }}"
+  default: "{{ core_inputs.readme | default((core_inputs.enabled | default(core_defaults.enabled)) and core_defaults.readme) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 
 core_license:
@@ -109,7 +109,7 @@ core_license:
 core_include_gitignore:
   type: bool
   help: Create .gitignore file?
-  default: "{{ core_inputs.include_gitignore | default((core_inputs.enabled | default(core_defaults.enabled)) and core_defaults.include_gitignore) }}"
+  default: "{{ core_inputs.gitignore | default((core_inputs.enabled | default(core_defaults.enabled)) and core_defaults.gitignore) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 
 # Module Outputs
@@ -127,26 +127,21 @@ core:
       owner_email=core_owner_email,
       owner_user=core_owner_user,
       year=core_year,
-      include_readme=core_include_readme,
       license=core_license,
-      include_gitignore=core_include_gitignore,
     ) -%}
-    {%- set vars = dict(vars,
-      include_license=core_inputs.include_license if core_inputs.include_license is defined else vars.enabled and vars.license != 'NOASSERTION',
-    ) -%}
-    vars: {{ vars | to_json }}
+    vars: {{ dict(vars.items() | rejectattr(0, 'in', ['readme', 'gitignore', 'license_file'])) | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
-      {%- if vars.include_readme %}
+      {%- if core_include_readme %}
       - path: README.md
         template: files/README.md.jinja
       {%- endif %}
-      {%- if vars.include_license %}
+      {%- if core_inputs.license_file | default(vars.license != 'NOASSERTION') %}
       - path: LICENSE.md
         template: files/LICENSE_{{ vars.license }}.md.jinja
       {%- endif %}
-      {%- if vars.include_gitignore %}
+      {%- if core_include_gitignore %}
       - path: .gitignore
         template: files/gitignore.jinja
       {%- endif %}
@@ -154,7 +149,7 @@ core:
       {%- endfilter %}
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if vars.enabled and vars.include_gitignore %}
+      {%- if vars.enabled and core_include_gitignore %}
       - target: core.gitignore
         template: fragments/gitignore.jinja
       {%- endif %}

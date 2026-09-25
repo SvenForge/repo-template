@@ -65,12 +65,12 @@ gitlab_inputs:
     enabled: {{ 'gitlab' in features }}
     repository_host: {{ core.vars.repository_host | to_json }}
     repository_path: {{ core.vars.repository_path | to_json }}
-    include_readme: {{ core.vars.include_readme }}
+    has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
     copier_version: {{ copier.vars.version | to_json }}
     python_enabled: {{ python.vars.enabled }}
     python_tools: {{ python.vars.tools | to_json }}
     python_version: {{ python.vars.version | to_json }}
-    python_include_distribution: {{ python.vars.include_distribution }}
+    has_python_distribution: {{ python.vars.has_distribution }}
     sphinx_enabled: {{ sphinx.vars.enabled }}
 
 sphinx_inputs:
@@ -82,9 +82,9 @@ sphinx_inputs:
     repository_name: {{ core.vars.repository_name | to_json }}
     owner_name: {{ core.vars.owner_name | to_json }}
     year: {{ core.vars.year }}
-    include_readme: {{ core.vars.include_readme }}
-    include_license: {{ core.vars.include_license }}
-    python_include_package: {{ python.vars.include_package }}
+    has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
+    has_license: {{ 'LICENSE.md' in core.files | map(attribute='path') }}
+    has_python_package: {{ ('src/' ~ python.vars.package_name ~ '/__init__.py') in python.files | map(attribute='path') }}
 
 python_inputs:
   type: yaml
@@ -93,8 +93,8 @@ python_inputs:
   default: |
     enabled: {{ 'python' in features }}
     repository_name: {{ core.vars.repository_name | to_json }}
-    include_readme: {{ core.vars.include_readme }}
-    include_license: {{ core.vars.include_license }}
+    has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
+    has_license: {{ 'LICENSE.md' in core.files | map(attribute='path') }}
     license: {{ core.vars.license | to_json }}
     owner_name: {{ core.vars.owner_name | to_json }}
     owner_email: {{ core.vars.owner_email | to_json }}
@@ -122,7 +122,7 @@ codex_inputs:
   when: false
   default: |
     enabled: {{ 'codex' in features }}
-    devcontainer: {{ 'devcontainer' in features }}
+    devcontainer_available: {{ 'devcontainer' in features }}
 
 devcontainer_inputs:
   type: yaml
