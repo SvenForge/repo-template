@@ -35,9 +35,9 @@ copier update
 
 ## Documentation
 
-<!-- sphinx-toctree-start -->
+<!-- toctree-start -->
 The documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
-<!-- sphinx-toctree-end -->
+<!-- toctree-end -->
 
 ## Contributing
 

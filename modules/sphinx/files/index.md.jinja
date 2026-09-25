@@ -2,7 +2,7 @@
 <!-- Reuse modified README.md as index page -->
 ```{include} ../../README.md
 :relative-docs: ./
-:end-before: <!-- sphinx-toctree-start -->
+:end-before: <!-- toctree-start -->
 ```
 {% else -%}
 # {{ sphinx.vars.repository_name }}
@@ -21,6 +21,6 @@ License <../../LICENSE>
 {% if sphinx.vars.has_readme %}
 ```{include} ../../README.md
 :relative-docs: ./
-:start-after: <!-- sphinx-toctree-end -->
+:start-after: <!-- toctree-end -->
 ```
 {% endif -%}

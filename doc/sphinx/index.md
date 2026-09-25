@@ -1,7 +1,7 @@
 <!-- Reuse modified README.md as index page -->
 ```{include} ../../README.md
 :relative-docs: ./
-:end-before: <!-- sphinx-toctree-start -->
+:end-before: <!-- toctree-start -->
 ```
 
 ```{toctree}
@@ -14,5 +14,5 @@ License <../../LICENSE>
 
 ```{include} ../../README.md
 :relative-docs: ./
-:start-after: <!-- sphinx-toctree-end -->
+:start-after: <!-- toctree-end -->
 ```
