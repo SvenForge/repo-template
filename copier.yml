@@ -38,7 +38,12 @@ features:
   default:
     - codex
     - devcontainer
-  # TODO: Add validation that feature selection is in module_path.keys()
+  validator: >-
+    {%- for feature in features -%}
+    {%- if feature not in module_paths.keys() -%}
+    Path to template module "{{ feature }}" not found.
+    {%- endif -%}
+    {%- endfor -%}
 
 # Module Includes and Inputs
 # Keep each input definition after the corresponding !include.
