@@ -2,14 +2,14 @@
 _min_copier_version: &min_copier_version "9.17.2"
 _subdirectory: template
 
-copier_version:  # TODO: Maybe remove if *min_copier_version can directly be used as module input
+copier_version:
   type: str
   help: Which Copier version does this template require?
   default: *min_copier_version
   when: false
 
 # Module Paths
-# Update the corresponding !include below when moving a module.
+# When moving a module, update also the corresponding !include below.
 module_paths:
   type: yaml
   when: false
@@ -22,7 +22,7 @@ module_paths:
     codex: modules/codex
     devcontainer: modules/devcontainer
 
-# Select Modules
+# Module Selector
 features:
   type: str
   help: Which template features shall be used?
@@ -38,10 +38,12 @@ features:
   default:
     - codex
     - devcontainer
+  # TODO: Add validation that feature selection is in module_path.keys()
 
----
 # Module Includes and Inputs
-# Keep each !include beside its host override, in provider-before-consumer order.
+# Keep each input definition after the corresponding !include.
+# Keep modules in provider-before-consumer order.
+---
 !include modules/core/copier.yml
 ---
 core_inputs:
@@ -140,5 +142,40 @@ devcontainer_inputs:
     {% endif %}
 
 ---
-# Generic aggregation of module exports; contains no module-specific wiring.
-!include modules/aggregation/copier.yml
+# Output Aggregation
+# Module outputs are automatically recognized and aggregated through their exports.jinja.
+files:
+  type: yaml
+  help: Which files shall be generated?
+  when: false
+  default: |
+    {%- set result = namespace(files=[]) -%}
+    {%- for feature in features -%}
+      {%- set module_path = module_paths[feature] -%}
+      {%- from module_path ~ '/exports.jinja' import output with context -%}
+      {%- for file in output.files -%}
+        {%- set result.files = result.files + [{
+          'path': file.path,
+          'template': module_path ~ '/' ~ file.template,
+        }] -%}
+      {%- endfor -%}
+    {%- endfor -%}
+    {{ result.files | to_json }}
+
+contributions:
+  type: yaml
+  help: Which contributions shall be made to other files?
+  when: false
+  default: |
+    {%- set result = namespace(contributions=[]) -%}
+    {%- for feature in features -%}
+      {%- set module_path = module_paths[feature] -%}
+      {%- from module_path ~ '/exports.jinja' import output with context -%}
+      {%- for contribution in output.contributions -%}
+        {%- set result.contributions = result.contributions + [{
+          'target': contribution.target,
+          'template': module_path ~ '/' ~ contribution.template,
+        }] -%}
+      {%- endfor -%}
+    {%- endfor -%}
+    {{ result.contributions | to_json }}
