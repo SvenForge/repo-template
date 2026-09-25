@@ -1,17 +1,34 @@
+# Module Defaults
+sphinx_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    needs: false
+    needs_pages:
+      - requirements
+      - architecture
+      - implementation
+      - verification
+    repository_name: My Repository
+    owner_name: ''
+    include_readme: false
+    include_license: false
+    python_include_package: false
+
 # Module Inputs
 sphinx_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
   when: false
-  default: |
-    enabled: true
+  default: {}
 
 # Module Questions
 sphinx_needs:
   type: bool
   help: Include Sphinx-Needs support?
-  default: "{{ sphinx_inputs.needs | default(false) }}"
-  when: "{{ sphinx_inputs.enabled }}"
+  default: "{{ sphinx_inputs.needs | default(sphinx_defaults.needs) }}"
+  when: "{{ (sphinx_inputs.enabled | default(sphinx_defaults.enabled)) }}"
 
 sphinx_needs_pages:
   type: str
@@ -22,27 +39,24 @@ sphinx_needs_pages:
     Architecture: architecture
     Implementation: implementation
     Verification: verification
-  default: "{{ sphinx_inputs.needs_pages | default(['requirements', 'architecture', 'implementation', 'verification']) | to_json }}"
-  when: "{{ sphinx_inputs.enabled and sphinx_needs }}"
+  default: "{{ sphinx_inputs.needs_pages | default(sphinx_defaults.needs_pages) | to_json }}"
+  when: "{{ (sphinx_inputs.enabled | default(sphinx_defaults.enabled)) and sphinx_needs }}"
 
 # Module Outputs
 sphinx:
   type: yaml
   when: false
   default: |
-    vars:
-      enabled: {{ sphinx_inputs.enabled }}
-      needs: {{ sphinx_needs }}
-      needs_pages: {{ sphinx_needs_pages | to_json }}
-      repository_name: {{ sphinx_inputs.repository_name | default('My Repository') | to_json }}
-      owner_name: {{ sphinx_inputs.owner_name | default('') | to_json }}
-      year: {{ sphinx_inputs.year | default('%Y' | strftime) }}
-      include_readme: {{ sphinx_inputs.include_readme | default(false) }}
-      include_license: {{ sphinx_inputs.include_license | default(false) }}
-      python_include_package: {{ sphinx_inputs.python_include_package | default(false) }}
+    {%- set vars = dict(sphinx_defaults, **sphinx_inputs) -%}
+    {%- set vars = dict(vars,
+      needs=sphinx_needs,
+      needs_pages=sphinx_needs_pages,
+      year=sphinx_inputs.year if sphinx_inputs.year is defined else '%Y' | strftime | int,
+    ) -%}
+    vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if sphinx_inputs.enabled %}
+      {%- if vars.enabled %}
       - path: doc/sphinx/conf.py
         template: files/conf.py.jinja
       - path: doc/sphinx/index.md
@@ -53,12 +67,12 @@ sphinx:
         template: files/Makefile.jinja
       - path: doc/sphinx/make.bat
         template: files/make.bat.jinja
-      {%- if sphinx_inputs.python_include_package | default(false) %}
+      {%- if vars.python_include_package %}
       - path: doc/api.md
         template: files/api.md.jinja
       {%- endif %}
-      {%- if sphinx_needs %}
-      {%- for page in sphinx_needs_pages %}
+      {%- if vars.needs %}
+      {%- for page in vars.needs_pages %}
       - path: doc/{{ page }}.md
         template: files/{{ page }}.md.jinja
       {%- endfor %}
@@ -67,7 +81,7 @@ sphinx:
       {%- endfilter %}
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if sphinx_inputs.enabled %}
+      {%- if vars.enabled %}
       - id: core.gitignore
         template: fragments/gitignore.jinja
       - id: python.dependency_groups

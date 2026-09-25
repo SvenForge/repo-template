@@ -1,11 +1,17 @@
+# Module Defaults
+copier_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    version: 9.17.2
+
 # Module Inputs
 copier_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
   when: false
-  default: |
-    enabled: true
-    version: "9.17.2"
+  default: {}
 
 # Module Questions
 
@@ -14,12 +20,11 @@ copier:
   type: yaml
   when: false
   default: |
-    vars:
-      enabled: {{ copier_inputs.enabled }}
-      version: {{ copier_inputs.version | to_json }}
+    {%- set vars = dict(copier_defaults, **copier_inputs) -%}
+    vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if copier_inputs.enabled %}
+      {%- if vars.enabled %}
       - path: copier.yml
         template: files/copier.yml.jinja
       - path: template/_modules/core/copier.yml

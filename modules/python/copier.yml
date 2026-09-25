@@ -1,32 +1,55 @@
+# Module Defaults
+python_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    package_name: ''
+    distribution_name: ''
+    tools:
+      - pytest
+      - ruff
+      - mypy
+    version: '3.12'
+    testpackage_name: test_project
+    repository_name: My Repository
+    include_readme: false
+    include_license: false
+    license: NOASSERTION
+    owner_name: ''
+    owner_email: ''
+    sphinx_enabled: false
+
 # Module Inputs
 python_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
   when: false
-  default: |
-    enabled: true
+  default: {}
 
 # Module Questions
 python_package_name:
   type: str
   help: What is the Python import package name? (optional)
-  default: "{{ python_inputs.package_name | default('') }}"
+  default: "{{ python_inputs.package_name | default(python_defaults.package_name) }}"
   validator: >-
     {% if python_package_name and not (python_package_name | regex_search('^[a-z_][a-z0-9_]*$')) %}
     Use a valid lowercase Python identifier with underscores as separators.
     {% endif %}
-  when: "{{ python_inputs.enabled }}"
+  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) }}"
 
 python_distribution_name:
   type: str
   help: What is the Python distribution name? (optional)
   default: >-
-    {{ python_inputs.distribution_name | default(python_package_name | replace('_', '-') | regex_replace('-+', '-') | regex_replace('(^-+|-+$)', '')) }}
+    {{ python_inputs.distribution_name if python_inputs.distribution_name is defined else
+      (python_package_name | replace('_', '-') | regex_replace('-+', '-') | regex_replace('(^-+|-+$)', '')
+        if python_package_name else python_defaults.distribution_name) }}
   validator: >-
     {% if python_distribution_name and not (python_distribution_name | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
     Use lowercase letters and numbers separated by single hyphens.
     {% endif %}
-  when: "{{ python_inputs.enabled and python_package_name }}"
+  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) and python_package_name }}"
 
 python_tools:
   type: str
@@ -36,23 +59,25 @@ python_tools:
     pytest: pytest
     Ruff: ruff
     mypy: mypy
-  default: "{{ python_inputs.tools | default(['pytest', 'ruff', 'mypy']) | to_json }}"
-  when: "{{ python_inputs.enabled }}"
+  default: "{{ python_inputs.tools | default(python_defaults.tools) | to_json }}"
+  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) }}"
 
 python_version:
   type: str
   help: What is the minimum supported Python version?
-  default: "{{ python_inputs.version | default('3.12') }}"
+  default: "{{ python_inputs.version | default(python_defaults.version) }}"
   validator: >-
     {% if not (python_version | regex_search('^[0-9]+[.][0-9]+$')) %}
     Use a numeric Python major and minor version, such as 3.12.
     {% endif %}
-  when: "{{ python_inputs.enabled }}"
+  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) }}"
 
 python_testpackage_name:
   type: str
   help: What is the Python test package name?
-  default: "{{ python_inputs.testpackage_name | default('test_' ~ (python_package_name or 'project')) }}"
+  default: >-
+    {{ python_inputs.testpackage_name if python_inputs.testpackage_name is defined else
+      ('test_' ~ python_package_name if python_package_name else python_defaults.testpackage_name) }}
   when: false
 
 # Module Outputs
@@ -60,43 +85,45 @@ python:
   type: yaml
   when: false
   default: |
-    {%- set include_package = python_inputs.enabled and python_package_name | length > 0 -%}
-    {%- set include_distribution = include_package and python_distribution_name | length > 0 -%}
-    {%- set include_devgroup = python_inputs.enabled and (python_tools | length > 0 or python_inputs.sphinx_enabled | default(false)) -%}
-    vars:
-      enabled: {{ python_inputs.enabled }}
-      package_name: {{ python_package_name | to_json }}
-      distribution_name: {{ python_distribution_name | to_json }}
-      tools: {{ python_tools | to_json }}
-      version: {{ python_version | to_json }}
-      testpackage_name: {{ python_testpackage_name | to_json }}
-      repository_name: {{ python_inputs.repository_name | default('My Repository') | to_json }}
-      include_readme: {{ python_inputs.include_readme | default(false) }}
-      include_license: {{ python_inputs.include_license | default(false) }}
-      license: {{ python_inputs.license | default('NOASSERTION') | to_json }}
-      owner_name: {{ python_inputs.owner_name | default('') | to_json }}
-      owner_email: {{ python_inputs.owner_email | default('') | to_json }}
-      sphinx_enabled: {{ python_inputs.sphinx_enabled | default(false) }}
-      include_package: {{ include_package }}
-      include_distribution: {{ include_distribution }}
-      include_devgroup: {{ include_devgroup }}
-      include_setup: {{ include_distribution or include_devgroup }}
+    {%- set vars = dict(python_defaults, **python_inputs) -%}
+    {%- set vars = dict(vars,
+      package_name=python_package_name,
+      distribution_name=python_distribution_name,
+      tools=python_tools,
+      version=python_version,
+      testpackage_name=python_testpackage_name,
+    ) -%}
+    {%- set vars = dict(vars,
+      include_package=python_inputs.include_package if python_inputs.include_package is defined
+        else vars.enabled and vars.package_name | length > 0,
+      include_devgroup=python_inputs.include_devgroup if python_inputs.include_devgroup is defined
+        else vars.enabled and (vars.tools | length > 0 or vars.sphinx_enabled),
+    ) -%}
+    {%- set vars = dict(vars,
+      include_distribution=python_inputs.include_distribution if python_inputs.include_distribution is defined
+        else vars.include_package and vars.distribution_name | length > 0,
+    ) -%}
+    {%- set vars = dict(vars,
+      include_setup=python_inputs.include_setup if python_inputs.include_setup is defined
+        else vars.include_distribution or vars.include_devgroup,
+    ) -%}
+    vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if python_inputs.enabled %}
+      {%- if vars.enabled %}
       - path: pyproject.toml
         template: files/pyproject.toml.jinja
-      {%- if python_package_name %}
-      - path: src/{{ python_package_name }}/__init__.py
+      {%- if vars.include_package %}
+      - path: src/{{ vars.package_name }}/__init__.py
         template: files/package/__init__.py.jinja
       {%- endif %}
-      {%- if 'pytest' in python_tools %}
-      - path: src/{{ python_testpackage_name }}/__init__.py
+      {%- if 'pytest' in vars.tools %}
+      - path: src/{{ vars.testpackage_name }}/__init__.py
         template: files/testpackage/__init__.py.jinja
-      - path: src/{{ python_testpackage_name }}/test_self.py
+      - path: src/{{ vars.testpackage_name }}/test_self.py
         template: files/testpackage/test_self.py.jinja
-      {%- if python_package_name %}
-      - path: src/{{ python_testpackage_name }}/test_import.py
+      {%- if vars.include_package %}
+      - path: src/{{ vars.testpackage_name }}/test_import.py
         template: files/testpackage/test_import.py.jinja
       {%- endif %}
       {%- endif %}
@@ -104,10 +131,10 @@ python:
       {%- endfilter %}
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if python_inputs.enabled %}
+      {%- if vars.enabled %}
       - id: core.gitignore
         template: fragments/gitignore.jinja
-      {%- if include_distribution or include_devgroup %}
+      {%- if vars.include_setup %}
       - id: codex.setup
         template: fragments/setup.sh.jinja
       - id: codex.maintenance

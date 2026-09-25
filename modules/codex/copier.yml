@@ -1,40 +1,46 @@
+# Module Defaults
+codex_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    cloud: true
+    devcontainer: false
+
 # Module Inputs
-codex_inputs:  # These defaults can be overridden by the including template
+codex_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
   when: false
-  default: |
-    enabled: true
-    devcontainer: false
+  default: {}
 
 # Module Questions
 codex_cloud:
   type: bool
   help: Set up Codex Cloud integration?
-  default: "{{ codex_inputs.cloud | default(codex_inputs.enabled) }}"
-  when: "{{ codex_inputs.enabled }}"
+  default: "{{ codex_inputs.cloud | default((codex_inputs.enabled | default(codex_defaults.enabled)) and codex_defaults.cloud) }}"
+  when: "{{ codex_inputs.enabled | default(codex_defaults.enabled) }}"
 
 codex_devcontainer:
   type: bool
   help: Add Codex integration to the Dev Container?
-  default: "{{ codex_inputs.enabled and codex_inputs.devcontainer | default(false) }}"
-  when: "{{ codex_inputs.enabled and codex_inputs.devcontainer | default(false) }}"
+  default: "{{ codex_inputs.devcontainer | default(codex_defaults.devcontainer) }}"
+  when: "{{ (codex_inputs.enabled | default(codex_defaults.enabled)) and (codex_inputs.devcontainer | default(codex_defaults.devcontainer)) }}"
 
 # Module Outputs
 codex:
   type: yaml
   when: false
   default: |
-    vars:
-      enabled: {{ codex_inputs.enabled }}  # TODO: Decide later if "enabled" shall be treated as a special variable
-      cloud: {{ codex_cloud }}
-      devcontainer: {{ codex_devcontainer }}
+    {%- set vars = dict(codex_defaults, **codex_inputs) -%}
+    {%- set vars = dict(vars, cloud=codex_cloud, devcontainer=codex_devcontainer) -%}
+    vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if codex_inputs.enabled %}
+      {%- if vars.enabled %}
       - path: AGENTS.md
         template: files/AGENTS.md.jinja
-      {%- if codex_cloud %}
+      {%- if vars.cloud %}
       - path: .codex/setup.sh
         template: files/setup.sh.jinja
       - path: .codex/maintenance.sh
@@ -44,7 +50,7 @@ codex:
       {%- endfilter %}
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if codex_devcontainer %}
+      {%- if vars.enabled and vars.devcontainer %}
       - id: devcontainer.features
         template: fragments/devcontainer.features.json.jinja
       - id: devcontainer.mounts

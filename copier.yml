@@ -128,13 +128,14 @@ devcontainer_inputs:
   help: Which inputs should be used for the module?
   when: false
   default: |
-    {%- set python_vars = python.vars if python is defined else {} -%}
     enabled: {{ 'devcontainer' in features }}
-    python_enabled: {{ python_vars.enabled | default(false) }}
-    python_version: {{ python_vars.version | default('3.12') | to_json }}
-    python_include_setup: {{ python_vars.include_setup | default(false) }}
-    python_include_distribution: {{ python_vars.include_distribution | default(false) }}
-    python_include_devgroup: {{ python_vars.include_devgroup | default(false) }}
+    {% if python is defined %}
+    python_enabled: {{ python.vars.enabled }}
+    python_version: {{ python.vars.version | to_json }}
+    python_include_setup: {{ python.vars.include_setup }}
+    python_include_distribution: {{ python.vars.include_distribution }}
+    python_include_devgroup: {{ python.vars.include_devgroup }}
+    {% endif %}
 
 # Output Aggregation
 # Each selected module exposes its output through exports.jinja.
