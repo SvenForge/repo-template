@@ -21,6 +21,7 @@ python_defaults:
     sphinx_enabled: false
 
 # Module Inputs
+# To be overwritten by template, otherwise defaults will be used
 python_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
@@ -94,18 +95,14 @@ python:
       testpackage_name=python_testpackage_name,
     ) -%}
     {%- set vars = dict(vars,
-      include_package=python_inputs.include_package if python_inputs.include_package is defined
-        else vars.enabled and vars.package_name | length > 0,
-      include_devgroup=python_inputs.include_devgroup if python_inputs.include_devgroup is defined
-        else vars.enabled and (vars.tools | length > 0 or vars.sphinx_enabled),
+      include_package=python_inputs.include_package if python_inputs.include_package is defined else vars.enabled and vars.package_name | length > 0,
+      include_devgroup=python_inputs.include_devgroup if python_inputs.include_devgroup is defined else vars.enabled and (vars.tools | length > 0 or vars.sphinx_enabled),
     ) -%}
     {%- set vars = dict(vars,
-      include_distribution=python_inputs.include_distribution if python_inputs.include_distribution is defined
-        else vars.include_package and vars.distribution_name | length > 0,
+      include_distribution=python_inputs.include_distribution if python_inputs.include_distribution is defined else vars.include_package and vars.distribution_name | length > 0,
     ) -%}
     {%- set vars = dict(vars,
-      include_setup=python_inputs.include_setup if python_inputs.include_setup is defined
-        else vars.include_distribution or vars.include_devgroup,
+      include_setup=python_inputs.include_setup if python_inputs.include_setup is defined else vars.include_distribution or vars.include_devgroup,
     ) -%}
     vars: {{ vars | to_json }}
     files:

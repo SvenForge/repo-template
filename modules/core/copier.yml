@@ -16,6 +16,7 @@ core_defaults:
     include_gitignore: true
 
 # Module Inputs
+# To be overwritten by template, otherwise defaults will be used
 core_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
@@ -28,11 +29,13 @@ core_repository_name:
   help: What is the name of the repository?
   default: "{{ core_inputs.repository_name | default(core_defaults.repository_name) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
+
 core_repository_url:
   type: str
   help: At which URL is the repository hosted? (optional)
   default: "{{ core_inputs.repository_url | default(core_defaults.repository_url) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
+
 core_repository_host:
   type: str
   help: At which host is the repository hosted?
@@ -47,6 +50,7 @@ core_repository_host:
     {{ core_defaults.repository_host }}
     {%- endif -%}
   when: false
+
 core_repository_path:
   type: str
   help: At which path is the repository hosted?
@@ -61,31 +65,37 @@ core_repository_path:
     {{ core_defaults.repository_path }}
     {%- endif -%}
   when: false
+
 core_owner_name:
   type: str
   help: Who is the repository owner? (optional)
   default: "{{ core_inputs.owner_name | default(core_defaults.owner_name) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
+
 core_owner_email:
   type: str
   help: What is the owner's email address? (optional)
   default: "{{ core_inputs.owner_email | default(core_defaults.owner_email) }}"
   when: "{{ (core_inputs.enabled | default(core_defaults.enabled)) and core_owner_name }}"
+
 core_owner_user:
   type: str
   help: What is the owner's username? (optional)
   default: "{{ core_inputs.owner_user | default(core_defaults.owner_user) }}"
   when: "{{ (core_inputs.enabled | default(core_defaults.enabled)) and core_owner_name }}"
+
 core_year:
   type: int
   help: What is the current year?
   default: "{{ core_inputs.year if core_inputs.year is defined else '%Y' | strftime }}"
   when: false
+
 core_include_readme:
   type: bool
   help: Create README.md file?
   default: "{{ core_inputs.include_readme | default((core_inputs.enabled | default(core_defaults.enabled)) and core_defaults.include_readme) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
+
 core_license:
   type: str
   help: Under which license shall this repository provided?
@@ -95,6 +105,7 @@ core_license:
     No license defined: NOASSERTION
   default: "{{ core_inputs.license | default(core_defaults.license) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
+
 core_include_gitignore:
   type: bool
   help: Create .gitignore file?
@@ -121,8 +132,7 @@ core:
       include_gitignore=core_include_gitignore,
     ) -%}
     {%- set vars = dict(vars,
-      include_license=core_inputs.include_license if core_inputs.include_license is defined
-        else vars.enabled and vars.license != 'NOASSERTION',
+      include_license=core_inputs.include_license if core_inputs.include_license is defined else vars.enabled and vars.license != 'NOASSERTION',
     ) -%}
     vars: {{ vars | to_json }}
     files:

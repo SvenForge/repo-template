@@ -11,6 +11,7 @@ devcontainer_defaults:
     python_include_devgroup: false
 
 # Module Inputs
+# To be overwritten by template, otherwise defaults will be used
 devcontainer_inputs:
   type: yaml
   help: Which inputs shall be used for the module?

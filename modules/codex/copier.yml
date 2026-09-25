@@ -8,6 +8,7 @@ codex_defaults:
     devcontainer: false
 
 # Module Inputs
+# To be overwritten by template, otherwise defaults will be used
 codex_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
@@ -33,7 +34,10 @@ codex:
   when: false
   default: |
     {%- set vars = dict(codex_defaults, **codex_inputs) -%}
-    {%- set vars = dict(vars, cloud=codex_cloud, devcontainer=codex_devcontainer) -%}
+    {%- set vars = dict(vars,
+      cloud=codex_cloud,
+      devcontainer=codex_devcontainer,
+    ) -%}
     vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}

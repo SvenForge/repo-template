@@ -19,6 +19,7 @@ gitlab_defaults:
     sphinx_enabled: false
 
 # Module Inputs
+# To be overwritten by template, otherwise defaults will be used
 gitlab_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
@@ -78,7 +79,10 @@ gitlab:
   when: false
   default: |
     {%- set vars = dict(gitlab_defaults, **gitlab_inputs) -%}
-    {%- set vars = dict(vars, pipeline=gitlab_pipeline, pages_url=gitlab_pages_url) -%}
+    {%- set vars = dict(vars,
+      pipeline=gitlab_pipeline,
+      pages_url=gitlab_pages_url,
+    ) -%}
     vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}

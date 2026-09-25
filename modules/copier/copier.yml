@@ -7,6 +7,7 @@ copier_defaults:
     version: 9.17.2
 
 # Module Inputs
+# To be overwritten by template, otherwise defaults will be used
 copier_inputs:
   type: yaml
   help: Which inputs shall be used for the module?
