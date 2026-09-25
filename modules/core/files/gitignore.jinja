@@ -1,4 +1,4 @@
-{% for contribution in contributions | selectattr('id', 'equalto', 'core.gitignore') -%}
+{% for contribution in contributions | selectattr('target', 'equalto', 'core.gitignore') -%}
 {% include contribution.template -%}
 {% endfor -%}
 

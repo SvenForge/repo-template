@@ -129,12 +129,12 @@ python:
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
-      - id: core.gitignore
+      - target: core.gitignore
         template: fragments/gitignore.jinja
       {%- if vars.include_setup %}
-      - id: codex.setup
+      - target: codex.setup
         template: fragments/setup.sh.jinja
-      - id: codex.maintenance
+      - target: codex.maintenance
         template: fragments/maintenance.sh.jinja
       {%- endif %}
       {%- endif %}

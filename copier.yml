@@ -168,7 +168,7 @@ contributions:
       {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for contribution in output.contributions -%}
         {%- set result.contributions = result.contributions + [{
-          'id': contribution.id,
+          'target': contribution.target,
           'template': module_path ~ '/' ~ contribution.template,
         }] -%}
       {%- endfor -%}

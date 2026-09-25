@@ -18,7 +18,7 @@ _TODO: Add development instructions._
 
 ## Documentation
 
-{% for contribution in contributions | selectattr('id', 'equalto', 'core.readme.documentation') -%}
+{% for contribution in contributions | selectattr('target', 'equalto', 'core.readme.documentation') -%}
 {% include contribution.template -%}
 {% else -%}
 _TODO: Link or add documentation._

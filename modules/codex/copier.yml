@@ -55,13 +55,13 @@ codex:
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled and vars.devcontainer %}
-      - id: devcontainer.features
+      - target: devcontainer.features
         template: fragments/devcontainer.features.json.jinja
-      - id: devcontainer.mounts
+      - target: devcontainer.mounts
         template: fragments/devcontainer.mounts.json.jinja
-      - id: devcontainer.extensions
+      - target: devcontainer.extensions
         template: fragments/devcontainer.extensions.json.jinja
-      - id: devcontainer.postCreateCommand
+      - target: devcontainer.postCreateCommand
         template: fragments/devcontainer.postCreateCommand.json.jinja
       {%- endif %}
       {%- endfilter %}

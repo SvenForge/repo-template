@@ -155,7 +155,7 @@ core:
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled and vars.include_gitignore %}
-      - id: core.gitignore
+      - target: core.gitignore
         template: fragments/gitignore.jinja
       {%- endif %}
       {%- endfilter %}

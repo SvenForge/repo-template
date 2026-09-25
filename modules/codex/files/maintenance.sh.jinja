@@ -3,6 +3,6 @@
 # Add the following maintenance command to the Codex Cloud Environment configuration:
 #   bash .codex/maintenance.sh
 set -euo pipefail
-{% for contribution in contributions | selectattr('id', 'equalto', 'codex.maintenance') %}
+{% for contribution in contributions | selectattr('target', 'equalto', 'codex.maintenance') %}
 {% include contribution.template -%}
 {% endfor -%}

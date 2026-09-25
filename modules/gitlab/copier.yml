@@ -104,14 +104,14 @@ gitlab:
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
-      - id: codex.agents
+      - target: codex.agents
         template: fragments/AGENTS.md.jinja
-      - id: codex.setup
+      - target: codex.setup
         template: fragments/setup.sh.jinja
-      - id: codex.maintenance
+      - target: codex.maintenance
         template: fragments/maintenance.sh.jinja
       {%- if 'sphinx' in vars.pipeline and vars.pages_url %}
-      - id: core.readme.documentation
+      - target: core.readme.documentation
         template: fragments/readme.documentation.md.jinja
       {%- endif %}
       {%- endif %}

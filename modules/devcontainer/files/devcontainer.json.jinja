@@ -1,6 +1,6 @@
 {# Fragments contain JSON members or items, without enclosing containers or trailing commas. #}
 {%- macro render_contributions(extensionpoint, indentation=8) -%}
-{%- for contribution in contributions | selectattr('id', 'equalto', extensionpoint) %}
+{%- for contribution in contributions | selectattr('target', 'equalto', extensionpoint) %}
 {% filter trim | indent(indentation, true) %}{% include contribution.template %}{% endfilter %}{% if not loop.last %},{% endif %}
 {%- endfor %}
 {%- endmacro -%}

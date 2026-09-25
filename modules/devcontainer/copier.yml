@@ -37,7 +37,7 @@ devcontainer:
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
-      - id: devcontainer.extensions
+      - target: devcontainer.extensions
         template: fragments/devcontainer.extensions.json.jinja
       {%- endif %}
       {%- endfilter %}

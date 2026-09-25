@@ -83,11 +83,11 @@ sphinx:
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
-      - id: core.gitignore
+      - target: core.gitignore
         template: fragments/gitignore.jinja
-      - id: python.dependency_groups
+      - target: python.dependency_groups
         template: fragments/dependency_groups.toml.jinja
-      - id: python.dev_dependencies
+      - target: python.dev_dependencies
         template: fragments/dev_dependencies.toml.jinja
       {%- endif %}
       {%- endfilter %}

@@ -43,7 +43,7 @@ lint = [
 {% endif -%}
 ]
 {% endif -%}
-{% for contribution in contributions | selectattr('id', 'equalto', 'python.dependency_groups') -%}
+{% for contribution in contributions | selectattr('target', 'equalto', 'python.dependency_groups') -%}
 {% include contribution.template -%}
 {% endfor -%}
 dev = [
@@ -53,7 +53,7 @@ dev = [
 {% if 'ruff' in python.vars.tools or 'mypy' in python.vars.tools -%}
     { include-group = "lint" },
 {% endif -%}
-{% for contribution in contributions | selectattr('id', 'equalto', 'python.dev_dependencies') -%}
+{% for contribution in contributions | selectattr('target', 'equalto', 'python.dev_dependencies') -%}
 {% include contribution.template -%}
 {% endfor -%}
 ]

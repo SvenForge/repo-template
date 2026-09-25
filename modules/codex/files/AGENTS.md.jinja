@@ -6,7 +6,7 @@
 * Keep changes focused and minimal.
 * Preserve existing style and conventions.
 * Use American English in all files in this repository, unless a specific topic requires another language, such as German.
-{% for contribution in contributions | selectattr('id', 'equalto', 'codex.agents') %}
+{% for contribution in contributions | selectattr('target', 'equalto', 'codex.agents') %}
 {% include contribution.template -%}
 {% endfor %}
 ## Safety and boundaries
