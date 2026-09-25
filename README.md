@@ -6,28 +6,30 @@ Common [copier](https://copier.readthedocs.io/en/stable/) template to setup new 
 
 ### Installation
 
-Install the supported Copier release:
+Install the Copier CLI to use this template:
 
 ```shell
-python -m pip install "copier==9.17.2"
+python -m pip install "copier>=9.17.2"
 ```
 
-### Usage
+### Use this template
 
-To create a repository from a checkout of this template:
+To create a new repository from this template:
 
 ```shell
-copier copy . path/to/new-project
+copier copy https://gitlab.com/sventerprise/repo-template.git path/to/new-project
 ```
 
-From the generated repository root, where `.copier-answers.yml` was saved, check for an available template update and then apply it:
+During the creation process, Copier prompts you to answer questions that customize the new repository.
+
+To check for a template update and then apply it to a generated repository, run these commands from the repository root (where `.copier-answers.yml` was saved):
 
 ```shell
 copier check-update
 copier update
 ```
 
-### Advanced use
+### Reuse this template in your own template
 
 To reuse modules in your own Copier template, add this repository as a Git submodule inside your host template:
 
@@ -39,17 +41,20 @@ After cloning that host, initialize its submodules with `git submodule update --
 
 ### Development
 
-Develop this repository in its [development container](./.devcontainer/devcontainer.json) (VS Code Dev Containers and a Docker-compatible CLI) or the preconfigured [Codex Cloud](https://chatgpt.com/codex/cloud) environment. For a local Python environment, install the `dev` dependency group:
+It is recommended to develop this repository in the provided [development container](./.devcontainer/devcontainer.json) (VS Code Dev Containers and a Docker-compatible CLI) or in the preconfigured [Codex Cloud](https://chatgpt.com/codex/cloud) environment. For a local Python environment, install the `dev` dependency group:
 
 ```shell
 python -m pip install --group dev
 ```
 
-The group includes Copier, pytest, Ruff, mypy, and Sphinx. Run the relevant checks for your changes; for example:
+The group includes all relevant development dependencies. Run the relevant checks for your changes; for example:
 
 ```shell
 python -m pytest
+ruff check
+mypy
 make -C doc/sphinx html SPHINXOPTS='-W --keep-going'
+copier check-update
 ```
 
 ## Documentation
@@ -57,7 +62,7 @@ make -C doc/sphinx html SPHINXOPTS='-W --keep-going'
 <!-- toctree-start -->
 The documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
 
-For basic use, see Getting started above. For module reuse and template development, see [Template structure](./doc/template-structure.md) and [Module guide](./doc/module-guide.md).
+For module reuse and template development, see [Template structure](./doc/template-structure.md) and [Module guide](./doc/module-guide.md). For Copier commands and concepts, see the [Copier documentation](https://copier.readthedocs.io/en/stable/).
 <!-- toctree-end -->
 
 ## Contributing
