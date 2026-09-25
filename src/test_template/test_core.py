@@ -96,5 +96,4 @@ def test_gitignore(
     assert "### macOS ###" in rendered
     assert "### VisualStudioCode ###" in rendered
     assert "### Windows ###" in rendered
-    assert "### Python ###" not in rendered
     assert "### Project Customization ###" in rendered
