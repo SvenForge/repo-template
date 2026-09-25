@@ -22,12 +22,8 @@ copier:
       {%- if copier_inputs.enabled %}
       - path: copier.yml
         template: files/copier.yml.jinja
-      - path: modules/core/copier.yml
+      - path: template/_modules/core/copier.yml
         template: files/core.yml.jinja
-      - path: modules/core/exports.jinja
-        template: files/exports.jinja
-      - path: {{ 'template/{% yield file from files %}{{ file.path }}{% endyield %}.jinja' | to_json }}
-        template: files/file.jinja
       {%- endif %}
       {%- endfilter %}
     contributions: []

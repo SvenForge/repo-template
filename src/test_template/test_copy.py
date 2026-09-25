@@ -94,11 +94,10 @@ COPY_CASES = {
             Path(".copier-answers.yml"): [],
             Path("copier.yml"): [
                 "_subdirectory: template",
-                "!include modules/core/copier.yml",
+                "  - /_modules",
+                "!include template/_modules/core/copier.yml",
             ],
-            Path("modules/core/copier.yml"): ["core_inputs:", "files: []", "contributions: []"],
-            Path("modules/core/exports.jinja"): ["{% set output = core %}"],
-            Path("template/{% yield file from files %}{{ file.path }}{% endyield %}.jinja"): ["{% include file.template %}"],
+            Path("template/_modules/core/copier.yml"): [],
         },
     ),
     "codex": CopyCase(
