@@ -6,37 +6,63 @@ Common [copier](https://copier.readthedocs.io/en/stable/) template to setup new 
 
 ### Installation
 
-Install the supported Copier release:
+Install the Copier CLI to use this template:
 
 ```shell
-python -m pip install "copier==9.17.2"
+python -m pip install "copier>=9.17.2"
 ```
 
-### Usage
+### Use this template
 
-Render the template interactively from this repository:
+To create a new repository from this template:
 
 ```shell
-copier copy . path/to/new-project
+copier copy https://gitlab.com/sventerprise/repo-template.git path/to/new-project
 ```
+
+During the creation process, Copier prompts you to answer questions that customize the new repository.
+
+To check for a template update and then apply it to a generated repository, run these commands from the repository root (where `.copier-answers.yml` was saved):
+
+```shell
+copier check-update
+copier update
+```
+
+### Reuse this template in your own template
+
+To reuse modules in your own Copier template, add this repository as a Git submodule inside your host template:
+
+```shell
+git submodule add https://gitlab.com/sventerprise/repo-template.git vendor/repo-template
+```
+
+After cloning that host, initialize its submodules with `git submodule update --init --recursive`. See [Template structure](./doc/template-structure.md) for the repository layout and [Module guide](./doc/module-guide.md) for registration, input overrides, extension points, and a working consumer example.
 
 ### Development
 
-Use one of the supported development environments:
-
-* Open this repository in its included [development container](./.devcontainer/devcontainer.json). VS Code with the Dev Containers extension is recommended for creating and accessing the container. Please note that a Docker-compliant CLI must be installed on your machine to start the Dev Container.
-* Start an AI task in [Codex Cloud](https://chatgpt.com/codex/cloud) using the preconfigured environment for this repository.
-
-To update this repository from its own template simply run the following command:
+It is recommended to develop this repository in the provided [development container](./.devcontainer/devcontainer.json) (VS Code Dev Containers and a Docker-compatible CLI) or in the preconfigured [Codex Cloud](https://chatgpt.com/codex/cloud) environment. For a local Python environment, install the `dev` dependency group:
 
 ```shell
-copier update
+python -m pip install --group dev
+```
+
+The group includes all relevant development dependencies. Run the relevant checks for your changes; for example:
+
+```shell
+python -m pytest
+ruff check
+mypy
+make -C doc/sphinx html SPHINXOPTS='-W --keep-going'
+copier check-update
 ```
 
 ## Documentation
 
 <!-- toctree-start -->
-The documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
+The template documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
+
+For Copier commands and concepts, see the [Copier documentation](https://copier.readthedocs.io/en/stable/).
 <!-- toctree-end -->
 
 ## Contributing

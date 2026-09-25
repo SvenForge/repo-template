@@ -7,6 +7,11 @@
 * Preserve existing style and conventions.
 * Use American English in all files in this repository, unless a specific topic requires another language, such as German.
 
+## Repository structure
+
+* Consult [Template structure](doc/template-structure.md) for the repository layout.
+* Consult [Module guide](doc/module-guide.md) when adding, changing or reusing modules.
+
 ## GitLab development workflow
 
 * Follow these workflow stages in order: **plan**, **create**, **verify**, and **deploy**.
