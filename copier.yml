@@ -39,24 +39,66 @@ features:
     - codex
     - devcontainer
 
-# Include Modules
 ---
+# Module Includes and Inputs
+# Keep each !include beside its host override, in provider-before-consumer order.
 !include modules/core/copier.yml
+---
+core_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'core' in features }}
+
 ---
 !include modules/copier/copier.yml
 ---
+copier_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'copier' in features }}
+    version: {{ copier_version | to_json }}
+
+---
 !include modules/python/copier.yml
+---
+python_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'python' in features }}
+    repository_name: {{ core.vars.repository_name | to_json }}
+    has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
+    has_license: {{ 'LICENSE.md' in core.files | map(attribute='path') }}
+    license: {{ core.vars.license | to_json }}
+    owner_name: {{ core.vars.owner_name | to_json }}
+    owner_email: {{ core.vars.owner_email | to_json }}
+    {# The host declares which selected modules provide development dependencies. #}
+    has_extra_dev_dependencies: {{ 'sphinx' in features }}
+
 ---
 !include modules/sphinx/copier.yml
 ---
+sphinx_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'sphinx' in features }}
+    repository_name: {{ core.vars.repository_name | to_json }}
+    owner_name: {{ core.vars.owner_name | to_json }}
+    year: {{ core.vars.year }}
+    has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
+    has_license: {{ 'LICENSE.md' in core.files | map(attribute='path') }}
+    has_python_package: {{ ('src/' ~ python.vars.package_name ~ '/__init__.py') in python.files | map(attribute='path') }}
+
+---
 !include modules/gitlab/copier.yml
 ---
-!include modules/codex/copier.yml
----
-!include modules/devcontainer/copier.yml
----
-
-# Module Inputs
 gitlab_inputs:
   type: yaml
   help: Which inputs should be used for the module?
@@ -73,49 +115,9 @@ gitlab_inputs:
     has_python_distribution: {{ python.vars.has_distribution }}
     sphinx_enabled: {{ sphinx.vars.enabled }}
 
-sphinx_inputs:
-  type: yaml
-  help: Which inputs should be used for the module?
-  when: false
-  default: |
-    enabled: {{ 'sphinx' in features }}
-    repository_name: {{ core.vars.repository_name | to_json }}
-    owner_name: {{ core.vars.owner_name | to_json }}
-    year: {{ core.vars.year }}
-    has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
-    has_license: {{ 'LICENSE.md' in core.files | map(attribute='path') }}
-    has_python_package: {{ ('src/' ~ python.vars.package_name ~ '/__init__.py') in python.files | map(attribute='path') }}
-
-python_inputs:
-  type: yaml
-  help: Which inputs should be used for the module?
-  when: false
-  default: |
-    enabled: {{ 'python' in features }}
-    repository_name: {{ core.vars.repository_name | to_json }}
-    has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
-    has_license: {{ 'LICENSE.md' in core.files | map(attribute='path') }}
-    license: {{ core.vars.license | to_json }}
-    owner_name: {{ core.vars.owner_name | to_json }}
-    owner_email: {{ core.vars.owner_email | to_json }}
-    {# The host declares which selected modules provide development dependencies. #}
-    has_extra_dev_dependencies: {{ 'sphinx' in features }}
-
-copier_inputs:
-  type: yaml
-  help: Which inputs should be used for the module?
-  when: false
-  default: |
-    enabled: {{ 'copier' in features }}
-    version: {{ copier_version | to_json }}
-
-core_inputs:
-  type: yaml
-  help: Which inputs should be used for the module?
-  when: false
-  default: |
-    enabled: {{ 'core' in features }}
-
+---
+!include modules/codex/copier.yml
+---
 codex_inputs:
   type: yaml
   help: Which inputs should be used for the module?
@@ -124,6 +126,9 @@ codex_inputs:
     enabled: {{ 'codex' in features }}
     devcontainer_available: {{ 'devcontainer' in features }}
 
+---
+!include modules/devcontainer/copier.yml
+---
 devcontainer_inputs:
   type: yaml
   help: Which inputs should be used for the module?
@@ -134,40 +139,6 @@ devcontainer_inputs:
     image: {{ ('mcr.microsoft.com/devcontainers/python:3-' ~ python.vars.version ~ '-bookworm') | to_json }}
     {% endif %}
 
-# Output Aggregation
-# Each selected module exposes its output through exports.jinja.
-files:
-  type: yaml
-  help: Which files shall be generated?
-  when: false
-  default: |
-    {%- set result = namespace(files=[]) -%}
-    {%- for feature in features -%}
-      {%- set module_path = module_paths[feature] -%}
-      {%- from module_path ~ '/exports.jinja' import output with context -%}
-      {%- for file in output.files -%}
-        {%- set result.files = result.files + [{
-          'path': file.path,
-          'template': module_path ~ '/' ~ file.template,
-        }] -%}
-      {%- endfor -%}
-    {%- endfor -%}
-    {{ result.files | to_json }}
-
-contributions:
-  type: yaml
-  help: Which contributions shall be made to other files?
-  when: false
-  default: |
-    {%- set result = namespace(contributions=[]) -%}
-    {%- for feature in features -%}
-      {%- set module_path = module_paths[feature] -%}
-      {%- from module_path ~ '/exports.jinja' import output with context -%}
-      {%- for contribution in output.contributions -%}
-        {%- set result.contributions = result.contributions + [{
-          'target': contribution.target,
-          'template': module_path ~ '/' ~ contribution.template,
-        }] -%}
-      {%- endfor -%}
-    {%- endfor -%}
-    {{ result.contributions | to_json }}
+---
+# Generic aggregation of module exports; contains no module-specific wiring.
+!include modules/aggregation/copier.yml
