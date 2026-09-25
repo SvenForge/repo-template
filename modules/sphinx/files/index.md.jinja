@@ -1,18 +1,16 @@
 {% if sphinx.vars.has_readme -%}
+<!-- Reuse modified README.md as index page -->
 ```{include} ../../README.md
 :relative-docs: ./
+:end-before: <!-- sphinx-toctree-start -->
 ```
 {% else -%}
 # {{ sphinx.vars.repository_name }}
 
 Documentation for {{ sphinx.vars.repository_name }}.
-
-{% endif -%}
-
-## Table of Contents
-
+{% endif %}
 ```{toctree}
-:maxdepth: 1
+:maxdepth: 2
 :glob:
 
 ../*
@@ -20,3 +18,9 @@ Documentation for {{ sphinx.vars.repository_name }}.
 License <../../LICENSE>
 {% endif -%}
 ```
+{% if sphinx.vars.has_readme %}
+```{include} ../../README.md
+:relative-docs: ./
+:start-after: <!-- sphinx-toctree-end -->
+```
+{% endif -%}

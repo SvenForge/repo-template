@@ -18,11 +18,13 @@ _TODO: Add development instructions._
 
 ## Documentation
 
+<!-- sphinx-toctree-start -->
 {% for contribution in contributions | selectattr('target', 'equalto', 'core.readme.documentation') -%}
 {% include contribution.template -%}
 {% else -%}
 _TODO: Link or add documentation._
-{% endfor %}
+{% endfor -%}
+<!-- sphinx-toctree-end -->
 
 ## Contributing
 

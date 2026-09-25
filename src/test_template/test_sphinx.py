@@ -159,12 +159,17 @@ def test_sphinx_integrations(
         "test",
     }
 
-    assert "{include} ../../README.md" in index
+    assert index.count("{include} ../../README.md") == 2
+    assert ":end-before: <!-- sphinx-toctree-start -->" in index
+    assert ":start-after: <!-- sphinx-toctree-end -->" in index
+    assert index.index(":end-before:") < index.index("{toctree}") < index.index(":start-after:")
     assert "{toctree}" in index
-    assert ":maxdepth: 1" in index
+    assert ":maxdepth: 2" in index
     assert ":glob:" in index
     assert "../*" in index
     assert f"[GitLab Pages]({pages_url})" in readme
+    assert "<!-- sphinx-toctree-start -->" in readme
+    assert "<!-- sphinx-toctree-end -->" in readme
     assert "{toctree}" not in readme
     assert "License <../../LICENSE>" in index
     assert license_text.startswith("# License & Copyright Information\n")
