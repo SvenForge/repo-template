@@ -1,3 +1,3 @@
+{% from module_paths['python'] ~ '/helpers/install.jinja' import install_commands with context -%}
 # Refresh the Python project and/or its development dependency group.
-python -m pip install --upgrade pip
-python -m pip install{% if python.vars.include_distribution %} --editable .{% endif %}{% if python.vars.include_devgroup %} --group dev{% endif %}
+{{ install_commands() }}

@@ -18,7 +18,7 @@ python_defaults:
     license: NOASSERTION
     owner_name: ''
     owner_email: ''
-    sphinx_enabled: false
+    has_extra_dev_dependencies: false
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
@@ -96,7 +96,7 @@ python:
     ) -%}
     {%- set vars = dict(vars,
       include_package=python_inputs.include_package if python_inputs.include_package is defined else vars.enabled and vars.package_name | length > 0,
-      include_devgroup=python_inputs.include_devgroup if python_inputs.include_devgroup is defined else vars.enabled and (vars.tools | length > 0 or vars.sphinx_enabled),
+      include_devgroup=python_inputs.include_devgroup if python_inputs.include_devgroup is defined else vars.enabled and (vars.tools | length > 0 or vars.has_extra_dev_dependencies),
     ) -%}
     {%- set vars = dict(vars,
       include_distribution=python_inputs.include_distribution if python_inputs.include_distribution is defined else vars.include_package and vars.distribution_name | length > 0,
@@ -136,6 +136,8 @@ python:
         template: fragments/setup.sh.jinja
       - target: codex.maintenance
         template: fragments/maintenance.sh.jinja
+      - target: devcontainer.postCreateCommand
+        template: fragments/devcontainer.postCreateCommand.json.jinja
       {%- endif %}
       {%- endif %}
       {%- endfilter %}

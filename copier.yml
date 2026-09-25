@@ -98,7 +98,8 @@ python_inputs:
     license: {{ core.vars.license | to_json }}
     owner_name: {{ core.vars.owner_name | to_json }}
     owner_email: {{ core.vars.owner_email | to_json }}
-    sphinx_enabled: {{ 'sphinx' in features }}
+    {# The host declares which selected modules provide development dependencies. #}
+    has_extra_dev_dependencies: {{ 'sphinx' in features }}
 
 copier_inputs:
   type: yaml
@@ -129,12 +130,8 @@ devcontainer_inputs:
   when: false
   default: |
     enabled: {{ 'devcontainer' in features }}
-    {% if python is defined %}
-    python_enabled: {{ python.vars.enabled }}
-    python_version: {{ python.vars.version | to_json }}
-    python_include_setup: {{ python.vars.include_setup }}
-    python_include_distribution: {{ python.vars.include_distribution }}
-    python_include_devgroup: {{ python.vars.include_devgroup }}
+    {% if python is defined and python.vars.enabled %}
+    image: {{ ('mcr.microsoft.com/devcontainers/python:3-' ~ python.vars.version ~ '-bookworm') | to_json }}
     {% endif %}
 
 # Output Aggregation

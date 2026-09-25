@@ -1,0 +1,2 @@
+{% from module_paths['python'] ~ '/helpers/install.jinja' import install_commands with context -%}
+"setupPython": {{ ('set -eu; ' ~ install_commands('; ')) | to_json }}

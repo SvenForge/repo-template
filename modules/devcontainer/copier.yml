@@ -4,11 +4,7 @@ devcontainer_defaults:
   when: false
   default:
     enabled: true
-    python_enabled: false
-    python_version: '3.12'
-    python_include_setup: false
-    python_include_distribution: false
-    python_include_devgroup: false
+    image: mcr.microsoft.com/devcontainers/base:2-bookworm
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
