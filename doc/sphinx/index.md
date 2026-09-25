@@ -1,12 +1,18 @@
+<!-- Reuse modified README.md as index page -->
 ```{include} ../../README.md
 :relative-docs: ./
+:end-before: <!-- sphinx-toctree-start -->
 ```
-## Table of Contents
 
 ```{toctree}
-:maxdepth: 1
+:maxdepth: 2
 :glob:
 
 ../*
 License <../../LICENSE>
+```
+
+```{include} ../../README.md
+:relative-docs: ./
+:start-after: <!-- sphinx-toctree-end -->
 ```
