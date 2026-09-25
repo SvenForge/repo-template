@@ -1,6 +1,6 @@
 """Sphinx configuration."""
 
-{% if sphinx_include_api -%}
+{% if sphinx.vars.python_include_package -%}
 import sys
 from pathlib import Path
 
@@ -9,21 +9,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
 {% endif -%}
 # -- Project information -----------------------------------------------------
 
-project = {{ core_repository_name | tojson }}
-author = {{ core_owner_name | tojson }}
-copyright = {{ core_year | string | tojson }}
+project = {{ sphinx.vars.repository_name | tojson }}
+author = {{ sphinx.vars.owner_name | tojson }}
+copyright = {{ sphinx.vars.year | string | tojson }}
 
 # -- General configuration ---------------------------------------------------
 
 extensions = [
     'myst_parser',
     'sphinx.ext.intersphinx',
-{% if sphinx_include_api -%}
+{% if sphinx.vars.python_include_package -%}
     'sphinx.ext.apidoc',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
 {% endif -%}
-{% if sphinx_needs -%}
+{% if sphinx.vars.needs -%}
     'sphinx_needs',
 {% endif -%}
 ]
@@ -61,7 +61,7 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org/stable/', None),
 }
 
-{% if sphinx_include_api -%}
+{% if sphinx.vars.python_include_package -%}
 # -- Options for apidoc / autodoc extensions ---------------------------------
 
 apidoc_modules = [
@@ -82,7 +82,7 @@ napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 
 {% endif -%}
-{% if sphinx_needs -%}
+{% if sphinx.vars.needs -%}
 # -- Options for sphinx-needs extension --------------------------------------
 
 needs_types = [

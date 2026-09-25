@@ -1,8 +1,17 @@
+# Module Inputs
+sphinx_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: |
+    enabled: true
+
+# Module Questions
 sphinx_needs:
   type: bool
   help: Include Sphinx-Needs support?
-  default: false
-  when: "{{ 'sphinx' in features }}"
+  default: "{{ sphinx_inputs.needs | default(false) }}"
+  when: "{{ sphinx_inputs.enabled }}"
 
 sphinx_needs_pages:
   type: str
@@ -13,69 +22,57 @@ sphinx_needs_pages:
     Architecture: architecture
     Implementation: implementation
     Verification: verification
-  default:
-    - requirements
-    - architecture
-    - implementation
-    - verification
-  when: "{{ 'sphinx' in features and sphinx_needs }}"
+  default: "{{ sphinx_inputs.needs_pages | default(['requirements', 'architecture', 'implementation', 'verification']) | to_json }}"
+  when: "{{ sphinx_inputs.enabled and sphinx_needs }}"
 
-sphinx_include_config:
-  type: bool
-  help: Create conf.py?
-  default: "{{ 'sphinx' in features }}"
+# Module Outputs
+sphinx:
+  type: yaml
   when: false
-
-sphinx_include_index:
-  type: bool
-  help: Create index.md?
-  default: "{{ 'sphinx' in features }}"
-  when: false
-
-sphinx_include_notes:
-  type: bool
-  help: Create notes.md?
-  default: "{{ 'sphinx' in features }}"
-  when: false
-
-sphinx_include_makefile:
-  type: bool
-  help: Create the Sphinx Makefile?
-  default: "{{ 'sphinx' in features }}"
-  when: false
-
-sphinx_include_makebat:
-  type: bool
-  help: Create the Sphinx Windows build script?
-  default: "{{ 'sphinx' in features }}"
-  when: false
-
-sphinx_include_api:
-  type: bool
-  help: Create the Python API page?
-  default: "{{ 'sphinx' in features and python_include_package }}"
-  when: false
-
-sphinx_include_requirements:
-  type: bool
-  help: Create the requirements page?
-  default: "{{ 'sphinx' in features and sphinx_needs and 'requirements' in sphinx_needs_pages }}"
-  when: false
-
-sphinx_include_architecture:
-  type: bool
-  help: Create the architecture page?
-  default: "{{ 'sphinx' in features and sphinx_needs and 'architecture' in sphinx_needs_pages }}"
-  when: false
-
-sphinx_include_implementation:
-  type: bool
-  help: Create the implementation page?
-  default: "{{ 'sphinx' in features and sphinx_needs and 'implementation' in sphinx_needs_pages }}"
-  when: false
-
-sphinx_include_verification:
-  type: bool
-  help: Create the verification page?
-  default: "{{ 'sphinx' in features and sphinx_needs and 'verification' in sphinx_needs_pages }}"
-  when: false
+  default: |
+    vars:
+      enabled: {{ sphinx_inputs.enabled }}
+      needs: {{ sphinx_needs }}
+      needs_pages: {{ sphinx_needs_pages | to_json }}
+      repository_name: {{ sphinx_inputs.repository_name | default('My Repository') | to_json }}
+      owner_name: {{ sphinx_inputs.owner_name | default('') | to_json }}
+      year: {{ sphinx_inputs.year | default('%Y' | strftime) }}
+      include_readme: {{ sphinx_inputs.include_readme | default(false) }}
+      include_license: {{ sphinx_inputs.include_license | default(false) }}
+      python_include_package: {{ sphinx_inputs.python_include_package | default(false) }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if sphinx_inputs.enabled %}
+      - path: doc/sphinx/conf.py
+        template: files/conf.py.jinja
+      - path: doc/sphinx/index.md
+        template: files/index.md.jinja
+      - path: doc/notes.md
+        template: files/notes.md.jinja
+      - path: doc/sphinx/Makefile
+        template: files/Makefile.jinja
+      - path: doc/sphinx/make.bat
+        template: files/make.bat.jinja
+      {%- if sphinx_inputs.python_include_package | default(false) %}
+      - path: doc/api.md
+        template: files/api.md.jinja
+      {%- endif %}
+      {%- if sphinx_needs %}
+      {%- for page in sphinx_needs_pages %}
+      - path: doc/{{ page }}.md
+        template: files/{{ page }}.md.jinja
+      {%- endfor %}
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if sphinx_inputs.enabled %}
+      - id: core.gitignore
+        template: fragments/gitignore.jinja
+      - id: python.dependency_groups
+        template: fragments/dependency_groups.toml.jinja
+      - id: python.dev_dependencies
+        template: fragments/dev_dependencies.toml.jinja
+      {%- endif %}
+      {%- endfilter %}
