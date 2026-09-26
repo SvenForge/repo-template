@@ -87,7 +87,7 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
                 expected={
                     'project': {'name': 'acme-widget', 'requires-python': '>=3.13', 'readme': 'README.md'},
                     'build-system': {'build-backend': 'setuptools.build_meta'},
-                    'dependency-groups': {'test': ['pytest'], 'dev': [{'include-group': 'test'}, {'include-group': 'lint'}]},
+                    'dependency-groups': {'dev': ['pytest', 'pytest-cov', 'ruff', 'mypy', 'mypy-gitlab-code-quality']},
                 },
             ),
             id='distribution',
@@ -98,7 +98,7 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
                 parse=tomllib.loads,
                 expected={
                     'tool': {'pytest': {'ini_options': {'testpaths': ['src/test_*']}}},
-                    'dependency-groups': {'test': ['pytest'], 'lint': ['ruff', 'mypy']},
+                    'dependency-groups': {'dev': ['pytest', 'pytest-cov', 'ruff', 'mypy', 'mypy-gitlab-code-quality']},
                 },
             ),
             id='development-only',

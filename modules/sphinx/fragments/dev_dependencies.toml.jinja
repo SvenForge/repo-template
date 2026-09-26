@@ -1,1 +1,6 @@
-{ include-group = "doc" },
+    "furo",
+    "myst-parser",
+    "sphinx>=8.2",
+{% if sphinx.vars.needs -%}
+    "sphinx-needs",
+{% endif -%}

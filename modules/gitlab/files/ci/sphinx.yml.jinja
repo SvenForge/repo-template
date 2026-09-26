@@ -4,7 +4,7 @@
   image: python:{{ gitlab.vars.python_version }}-bookworm
   before_script:
     - python -m pip install --upgrade pip
-    - python -m pip install{% if gitlab.vars.has_python_distribution %} --editable .{% endif %} --group doc
+    - python -m pip install{% if gitlab.vars.has_python_distribution %} --editable .{% endif %} --group dev
 
 sphinx:build:
   extends: .sphinx:base

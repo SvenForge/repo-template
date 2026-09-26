@@ -15,7 +15,6 @@ sphinx_defaults:
     has_readme: false
     has_license: false
     python_packages: []
-    package_dependency_groups: {}
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
@@ -64,15 +63,6 @@ sphinx:
       needs_pages=sphinx_needs_pages,
       year=sphinx_inputs.year if sphinx_inputs.year is defined else '%Y' | strftime | int,
     ) -%}
-    {%- set dependencies = namespace(groups=[]) -%}
-    {%- for package in vars.api_packages -%}
-    {%- for group in vars.package_dependency_groups.get(package, []) -%}
-    {%- if group not in dependencies.groups -%}
-    {%- set dependencies.groups = dependencies.groups + [group] -%}
-    {%- endif -%}
-    {%- endfor -%}
-    {%- endfor -%}
-    {%- set vars = dict(vars, api_dependency_groups=dependencies.groups) -%}
     vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
@@ -104,8 +94,6 @@ sphinx:
       {%- if vars.enabled %}
       - target: core.gitignore
         template: fragments/gitignore.jinja
-      - target: python.dependency_groups
-        template: fragments/dependency_groups.toml.jinja
       - target: python.dev_dependencies
         template: fragments/dev_dependencies.toml.jinja
       {%- endif %}

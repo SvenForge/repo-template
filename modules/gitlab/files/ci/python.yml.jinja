@@ -4,7 +4,7 @@
   image: python:{{ gitlab.vars.python_version }}-bookworm
   before_script:
     - python -m pip install --upgrade pip
-    - python -m pip install{% if gitlab.vars.has_python_distribution %} --editable .{% endif %} --group "$PYTHON_DEPENDENCY_GROUP"
+    - python -m pip install{% if gitlab.vars.has_python_distribution %} --editable .{% endif %} --group dev
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -22,8 +22,6 @@
 python:pytest:
   extends: .python:base
   needs: []
-  variables:
-    PYTHON_DEPENDENCY_GROUP: test
   script:
     - pytest
   artifacts:
@@ -39,8 +37,6 @@ python:pytest:
 python:ruff:
   extends: .python:base
   needs: []
-  variables:
-    PYTHON_DEPENDENCY_GROUP: lint
   script:
     - ruff check --output-format=gitlab --output-file=ruff-code-quality.json
   allow_failure: true
@@ -54,10 +50,8 @@ python:ruff:
 python:mypy:
   extends: .python:base
   needs: []
-  variables:
-    PYTHON_DEPENDENCY_GROUP: lint
   script:
-    - mypy --output=json > mypy.json || mypy_status=$?
+    - python -m mypy --output=json > mypy.json || mypy_status=$?
     - mypy-gitlab-code-quality < mypy.json > mypy-code-quality.json || exit $?
     - exit "${mypy_status:-0}"
   allow_failure: true

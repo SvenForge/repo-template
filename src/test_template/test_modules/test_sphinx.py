@@ -1,7 +1,6 @@
 """Smoke checks for Sphinx output and each of its templates."""
 
 import pytest
-import tomllib
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module_context, python_assignments, toml_items
 
@@ -12,11 +11,10 @@ SPHINX_VARIABLES = {
     'has_readme': True,
     'has_license': True,
     'api_packages': ['widget', 'test_widget'],
-    'api_dependency_groups': ['test'],
     'needs': True,
 }
 SPHINX_CONTEXT = module_context('sphinx', **SPHINX_VARIABLES)
-MINIMAL_CONTEXT = module_context('sphinx', **{**SPHINX_VARIABLES, 'has_readme': False, 'has_license': False, 'api_packages': [], 'api_dependency_groups': [], 'needs': False})
+MINIMAL_CONTEXT = module_context('sphinx', **{**SPHINX_VARIABLES, 'has_readme': False, 'has_license': False, 'api_packages': [], 'needs': False})
 
 
 @pytest.mark.parametrize(
@@ -32,7 +30,6 @@ MINIMAL_CONTEXT = module_context('sphinx', **{**SPHINX_VARIABLES, 'has_readme': 
                         {'path': 'doc/notes.md', 'template': 'files/notes.md.jinja'},
                     ],
                     'contributions': [
-                        {'target': 'python.dependency_groups', 'template': 'fragments/dependency_groups.toml.jinja'},
                         {'target': 'python.dev_dependencies', 'template': 'fragments/dev_dependencies.toml.jinja'},
                         {'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'},
                     ],
@@ -42,10 +39,10 @@ MINIMAL_CONTEXT = module_context('sphinx', **{**SPHINX_VARIABLES, 'has_readme': 
         ),
         pytest.param(
             ModuleCase(
-                inputs={'python_packages': ['widget', 'test_widget'], 'package_dependency_groups': {'test_widget': ['test']}, 'year': 2026},
+                inputs={'python_packages': ['widget', 'test_widget'], 'year': 2026},
                 answers={'sphinx_api_packages': ['test_widget'], 'sphinx_needs': True},
                 expected={
-                    'vars': {'api_packages': ['test_widget'], 'api_dependency_groups': ['test'], 'needs': True},
+                    'vars': {'api_packages': ['test_widget'], 'needs': True},
                     'files': [
                         {'path': 'doc/api.md', 'template': 'files/api.md.jinja'},
                         {'path': 'doc/requirements.md', 'template': 'files/requirements.md.jinja'},
@@ -183,18 +180,8 @@ def test_verification(check_template: TemplateCheck, case: RenderCase) -> None:
 @pytest.mark.parametrize(
     'case',
     [
-        pytest.param(RenderCase(context=SPHINX_CONTEXT, parse=tomllib.loads, expected={'doc': ['sphinx-needs', {'include-group': 'test'}]}), id='api-dependencies-and-needs'),
-        pytest.param(RenderCase(context=MINIMAL_CONTEXT, parse=tomllib.loads, expected={'doc': ['furo', 'myst-parser', 'sphinx>=8.2']}), id='minimal'),
-    ],
-)
-def test_dependency_groups(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/sphinx/fragments/dependency_groups.toml.jinja', case)
-
-
-@pytest.mark.parametrize(
-    'case',
-    [
-        pytest.param(RenderCase(parse=toml_items, expected=[{'include-group': 'doc'}]), id='development-documentation'),
+        pytest.param(RenderCase(context=SPHINX_CONTEXT, parse=toml_items, expected=['furo', 'myst-parser', 'sphinx>=8.2', 'sphinx-needs']), id='api-dependencies-and-needs'),
+        pytest.param(RenderCase(context=MINIMAL_CONTEXT, parse=toml_items, expected=['furo', 'myst-parser', 'sphinx>=8.2']), id='minimal'),
     ],
 )
 def test_dev_dependencies(check_template: TemplateCheck, case: RenderCase) -> None:
