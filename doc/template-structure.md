@@ -1,6 +1,6 @@
 # Template structure
 
-Start with the repository README if you want to create or update a repository. This page maps the template's source for people who customize or maintain it. The [module guide](./module-guide.md) covers the module interface and reuse.
+Start with the repository README if you want to create or update a repository. This page maps the template's source for people who customize or maintain it. The [module guide](./module-guide.md) covers the module interface and reuse. See [Testing](./testing.md) for the smoke-test strategy and shared test setup.
 
 ## Repository layout
 
