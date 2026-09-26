@@ -22,7 +22,7 @@ python:pytest:
   extends: .python:base
   needs: []
   variables:
-    PYTHON_DEPENDENCY_GROUP: test
+    PYTHON_DEPENDENCY_GROUP: dev
   script:
     - pytest
   artifacts:
@@ -37,7 +37,7 @@ python:ruff:
   extends: .python:base
   needs: []
   variables:
-    PYTHON_DEPENDENCY_GROUP: lint
+    PYTHON_DEPENDENCY_GROUP: dev
   script:
     - ruff check --output-format=gitlab --output-file=ruff-code-quality.json
   allow_failure: true
@@ -50,7 +50,7 @@ python:mypy:
   extends: .python:base
   needs: []
   variables:
-    PYTHON_DEPENDENCY_GROUP: lint
+    PYTHON_DEPENDENCY_GROUP: dev
   script:
     - mypy --output=json > mypy.json || mypy_status=$?
     - mypy-gitlab-code-quality < mypy.json > mypy-code-quality.json || exit $?
