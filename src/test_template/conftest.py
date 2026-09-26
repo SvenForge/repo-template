@@ -1,8 +1,9 @@
 """Read-only Copier evaluation and Jinja rendering shared by the smoke tests."""
 
+from collections.abc import Generator, Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator, Generator
+from typing import Any
 
 import pytest
 from copier._main import Worker
