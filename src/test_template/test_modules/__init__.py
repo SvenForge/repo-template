@@ -1,0 +1,1 @@
+"""Isolated module smoke tests."""

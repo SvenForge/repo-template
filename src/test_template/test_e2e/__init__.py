@@ -1,0 +1,1 @@
+"""Copier CLI smoke tests."""
