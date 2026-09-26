@@ -34,6 +34,12 @@ class RenderCase:
     macro: str | None = None
 
 
+@dataclass(frozen=True)
+class TemplateCase:
+    answers: dict[str, str]
+    expected: dict[str, tuple[str, ...]]
+
+
 ModuleCheck = Callable[[str, ModuleCase], None]
 VariablesCheck = Callable[[VariableCase], None]
 TemplateCheck = Callable[[str, RenderCase], None]

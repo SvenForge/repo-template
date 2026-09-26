@@ -11,6 +11,7 @@
 
 * Consult [Template structure](doc/template-structure.md) for the repository layout.
 * Consult [Module guide](doc/module-guide.md) when adding, changing or reusing modules.
+* Consult [Testing](doc/testing.md) for the test strategy and shared test setup.
 
 ## GitLab development workflow
 
