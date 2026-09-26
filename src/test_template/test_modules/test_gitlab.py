@@ -103,10 +103,16 @@ def test_demo_pipeline(check_template: TemplateCheck, case: RenderCase) -> None:
                 context=GITLAB_CONTEXT,
                 parse=yaml.safe_load,
                 expected={
-                    '.python:base': {'image': 'python:3.13-bookworm'},
-                    'python:pytest': {'script': ['pytest'], 'variables': {'PYTHON_DEPENDENCY_GROUP': 'test'}},
-                    'python:ruff': {'variables': {'PYTHON_DEPENDENCY_GROUP': 'lint'}},
-                    'python:mypy': {'variables': {'PYTHON_DEPENDENCY_GROUP': 'lint'}},
+                    '.python:base': {'image': 'python:3.13-bookworm', 'before_script': ['python -m pip install --upgrade pip', 'python -m pip install --editable . --group dev']},
+                    'python:pytest': {'script': ['pytest']},
+                    'python:ruff': {'script': ['ruff check --output-format=gitlab --output-file=ruff-code-quality.json']},
+                    'python:mypy': {
+                        'script': [
+                            'python -m mypy --output=json > mypy.json || mypy_status=$?',
+                            'mypy-gitlab-code-quality < mypy.json > mypy-code-quality.json || exit $?',
+                            'exit "${mypy_status:-0}"',
+                        ],
+                    },
                 },
             ),
             id='python-tools',
@@ -125,6 +131,7 @@ def test_python_pipeline(check_template: TemplateCheck, case: RenderCase) -> Non
                 context=GITLAB_CONTEXT,
                 parse=yaml.safe_load,
                 expected={
+                    '.sphinx:base': {'before_script': ['python -m pip install --upgrade pip', 'python -m pip install --editable . --group dev']},
                     'sphinx:build': {'script': ["make -C doc/sphinx html SPHINXOPTS='-W --keep-going'"]},
                     'sphinx:pages': {'pages': {'publish': 'doc/sphinx/_build/html'}, 'needs': [{'job': 'sphinx:build', 'artifacts': True}]},
                 },

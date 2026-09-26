@@ -26,32 +26,20 @@ authors = [
 {% endif -%}
 {% if python.vars.has_dev_dependencies -%}
 [dependency-groups]
+{% for contribution in contributions | selectattr('target', 'equalto', 'python.dependency_groups') -%}
+{% include contribution.template -%}
+{% endfor -%}
+dev = [
 {% if 'pytest' in python.vars.tools -%}
-test = [
     "pytest",
     "pytest-cov",
-]
 {% endif -%}
-{% if 'ruff' in python.vars.tools or 'mypy' in python.vars.tools -%}
-lint = [
 {% if 'mypy' in python.vars.tools -%}
     "mypy",
     "mypy-gitlab-code-quality",
 {% endif -%}
 {% if 'ruff' in python.vars.tools -%}
     "ruff",
-{% endif -%}
-]
-{% endif -%}
-{% for contribution in contributions | selectattr('target', 'equalto', 'python.dependency_groups') -%}
-{% include contribution.template -%}
-{% endfor -%}
-dev = [
-{% if 'pytest' in python.vars.tools -%}
-    { include-group = "test" },
-{% endif -%}
-{% if 'ruff' in python.vars.tools or 'mypy' in python.vars.tools -%}
-    { include-group = "lint" },
 {% endif -%}
 {% for contribution in contributions | selectattr('target', 'equalto', 'python.dev_dependencies') -%}
 {% include contribution.template -%}

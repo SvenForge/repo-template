@@ -111,8 +111,6 @@ sphinx_inputs:
     {% endif %}
     {% endfor %}
     python_packages: {{ packages.names | unique | list | to_json }}
-    package_dependency_groups: {{ ({python.vars.testpackage_name: ['test']}
-      if python.vars.has_dev_dependencies and python.vars.testpackage_name in packages.names else {}) | to_json }}
 
 ---
 !include modules/gitlab/copier.yml

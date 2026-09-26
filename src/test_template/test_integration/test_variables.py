@@ -19,11 +19,11 @@ from ..support import VariableCase, VariablesCheck
                     ],
                     'contributions': [
                         {'target': 'core.gitignore', 'template': 'modules/python/fragments/gitignore.jinja'},
-                        {'target': 'python.dependency_groups', 'template': 'modules/sphinx/fragments/dependency_groups.toml.jinja'},
+                        {'target': 'python.dev_dependencies', 'template': 'modules/sphinx/fragments/dev_dependencies.toml.jinja'},
                         {'target': 'devcontainer.postCreateCommand', 'template': 'modules/python/fragments/devcontainer.postCreateCommand.json.jinja'},
                     ],
                     'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.12-bookworm'}},
-                    'sphinx': {'vars': {'api_packages': ['test_my_repository'], 'api_dependency_groups': ['test']}},
+                    'sphinx': {'vars': {'api_packages': ['test_my_repository']}},
                     'gitlab': {'vars': {'pipeline': ['python', 'sphinx']}},
                 },
             ),
