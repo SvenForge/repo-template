@@ -35,6 +35,14 @@ features:
   choices: {}
   default: []
 {% endif %}
+{% raw %}
+  validator: >-
+    {%- for feature in features -%}
+    {%- if feature not in module_paths.keys() -%}
+    Path to template module "{{ feature }}" not found.
+    {%- endif -%}
+    {%- endfor -%}
+{% endraw %}
 
 # Module Includes and Inputs
 # Keep each input definition after the corresponding !include.
@@ -51,7 +59,7 @@ features:
 {% endif %}
 
 ---
-{%- raw -%}
+{% raw -%}
 # Output Aggregation
 # Module outputs are automatically recognized and aggregated through their exports.jinja.
 files:

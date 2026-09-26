@@ -51,6 +51,16 @@ def test_starter(tmp_path: Path, template_source: Path, case: TemplateCase) -> N
     if not module_name:
         return
 
+    # A valid feature choice must also have a registered module path.
+    invalid = subprocess.run(
+        ['copier', 'copy', '--defaults', '--quiet', '--data', 'module_paths={}', str(starter), str(tmp_path / 'invalid')],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert invalid.returncode != 0
+    assert f'Path to template module "{module_name}" not found.' in invalid.stderr
+
     # Extend the generated module in the temporary source, exercising both manifests.
     module = starter / 'modules' / module_name
     config = module / 'copier.yml'
