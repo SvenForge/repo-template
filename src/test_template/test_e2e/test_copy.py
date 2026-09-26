@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from ..support import TemplateCase
+from ..support import TemplateCase, copier_starter_files
 
 
 @pytest.mark.parametrize(
@@ -57,6 +57,7 @@ from ..support import TemplateCase
                     'sphinx_needs': 'true',
                 },
                 expected={
+                    **copier_starter_files(),
                     '.codex/maintenance.sh': ('glab auth status',),
                     '.codex/setup.sh': ('glab auth login', 'python -m pip install --editable . --group dev'),
                     '.copier-answers.yml': ('python_package_name: acme_widget',),
@@ -72,7 +73,6 @@ from ..support import TemplateCase
                     'AGENTS.md': ('## GitLab development workflow',),
                     'LICENSE.md': (),
                     'README.md': ('# [Widget](https://gitlab.com/example/widget.git)', '[GitLab Pages](https://example.gitlab.io/widget/)'),
-                    'copier.yml': ('!include template/_modules/core/copier.yml',),
                     'doc/api.md': ('sphinx/_apidoc/acme_widget/modules',),
                     'doc/architecture.md': (),
                     'doc/implementation.md': (),
@@ -88,7 +88,6 @@ from ..support import TemplateCase
                     'src/test_acme_widget/__init__.py': (),
                     'src/test_acme_widget/test_import.py': ('import acme_widget',),
                     'src/test_acme_widget/test_self.py': (),
-                    'template/_modules/core/copier.yml': (),
                 },
             ),
             id='all-modules',
