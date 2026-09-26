@@ -50,7 +50,7 @@ python_distribution_name:
     {% if python_distribution_name and not (python_distribution_name | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
     Use lowercase letters and numbers separated by single hyphens.
     {% endif %}
-  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) and python_package_name }}"
+  when: false
 
 python_tools:
   type: str
@@ -61,16 +61,6 @@ python_tools:
     Ruff: ruff
     mypy: mypy
   default: "{{ python_inputs.tools | default(python_defaults.tools) | to_json }}"
-  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) }}"
-
-python_version:
-  type: str
-  help: What is the minimum supported Python version?
-  default: "{{ python_inputs.version | default(python_defaults.version) }}"
-  validator: >-
-    {% if not (python_version | regex_search('^[0-9]+[.][0-9]+$')) %}
-    Use a numeric Python major and minor version, such as 3.12.
-    {% endif %}
   when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) }}"
 
 python_testpackage_name:
@@ -84,16 +74,23 @@ python_testpackage_name:
         ('test_' ~ repository if repository else python_defaults.testpackage_name)) }}
   validator: >-
     {% if (python_inputs.enabled | default(python_defaults.enabled)) and 'pytest' in python_tools %}
-    {% if not (python_testpackage_name | regex_search('^[a-z_][a-z0-9_]*$')) or python_testpackage_name in
-      ['and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except',
-       'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass',
-       'raise', 'return', 'try', 'while', 'with', 'yield'] %}
+    {% if not (python_testpackage_name | regex_search('^[a-z_][a-z0-9_]*$')) %}
     Use a nonempty lowercase Python identifier that is not a keyword.
     {% elif python_testpackage_name == python_package_name %}
     Use a test package name different from the production package name.
     {% endif %}
     {% endif %}
   when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) and 'pytest' in python_tools }}"
+
+python_version:
+  type: str
+  help: What is the minimum supported Python version?
+  default: "{{ python_inputs.version | default(python_defaults.version) }}"
+  validator: >-
+    {% if not (python_version | regex_search('^[0-9]+[.][0-9]+$')) %}
+    Use a numeric Python major and minor version, such as 3.12.
+    {% endif %}
+  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) }}"
 
 # Module Outputs
 python:
