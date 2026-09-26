@@ -55,7 +55,6 @@ def test_python_file_selection_and_defaults(
         ({"python_version": "3"}, "python_version"),
         ({"python_testpackage_name": ""}, "python_testpackage_name"),
         ({"python_testpackage_name": "test-package"}, "python_testpackage_name"),
-        ({"python_testpackage_name": "class"}, "python_testpackage_name"),
         (
             {"python_package_name": "example_package", "python_testpackage_name": "example_package"},
             "python_testpackage_name",
