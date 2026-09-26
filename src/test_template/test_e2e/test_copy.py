@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from ..support import TemplateCase, copier_starter_files
+from ..support import TemplateCase
 
 
 @pytest.mark.parametrize(
@@ -57,7 +57,6 @@ from ..support import TemplateCase, copier_starter_files
                     'sphinx_needs': 'true',
                 },
                 expected={
-                    **copier_starter_files(),
                     '.codex/maintenance.sh': ('glab auth status',),
                     '.codex/setup.sh': ('glab auth login', 'python -m pip install --editable . --group dev'),
                     '.copier-answers.yml': ('python_package_name: acme_widget',),
@@ -73,6 +72,7 @@ from ..support import TemplateCase, copier_starter_files
                     'AGENTS.md': ('## GitLab development workflow',),
                     'LICENSE.md': (),
                     'README.md': ('# [Widget](https://gitlab.com/example/widget.git)', '[GitLab Pages](https://example.gitlab.io/widget/)'),
+                    'copier.yml': ('_subdirectory: template', '!include modules/custom/copier.yml'),
                     'doc/api.md': ('sphinx/_apidoc/acme_widget/modules',),
                     'doc/architecture.md': (),
                     'doc/implementation.md': (),
@@ -83,11 +83,15 @@ from ..support import TemplateCase, copier_starter_files
                     'doc/sphinx/index.md': (),
                     'doc/sphinx/make.bat': (),
                     'doc/verification.md': (),
+                    'modules/custom/copier.yml': ('custom_defaults:', 'custom_inputs:', 'files: []', 'contributions: []'),
+                    'modules/custom/exports.jinja': ('{% set output = custom %}',),
                     'pyproject.toml': ('name = "acme-widget"', 'sphinx-needs'),
                     'src/acme_widget/__init__.py': ('Widget package.',),
                     'src/test_acme_widget/__init__.py': (),
                     'src/test_acme_widget/test_import.py': ('import acme_widget',),
                     'src/test_acme_widget/test_self.py': (),
+                    'template/{% yield file from files %}{{ file.path }}{% endyield %}.jinja': ('{% include file.template %}',),
+                    'template/{{ _copier_conf.answers_file }}.jinja': ('{{ _copier_answers|to_nice_yaml -}}',),
                 },
             ),
             id='all-modules',

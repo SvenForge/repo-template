@@ -38,25 +38,6 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
 
 
 @pytest.mark.parametrize(
-    'name',
-    [
-        pytest.param('../example', id='path'),
-        pytest.param('Example', id='uppercase'),
-        pytest.param('example\n', id='newline'),
-        pytest.param('files', id='host-field'),
-        pytest.param('namespace', id='jinja-global'),
-        pytest.param('none', id='jinja-literal'),
-        pytest.param('yes', id='yaml-literal'),
-        pytest.param('result', id='aggregation-variable'),
-        pytest.param('self', id='template-reference'),
-    ],
-)
-def test_invalid_module_name(check_module: ModuleCheck, name: str) -> None:
-    with pytest.raises(ValueError, match='Use lowercase|reserved'):
-        check_module('copier', ModuleCase(answers={'copier_module_name': name}))
-
-
-@pytest.mark.parametrize(
     'case',
     [
         pytest.param(

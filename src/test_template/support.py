@@ -97,18 +97,3 @@ def python_assignments(source: str) -> dict[str, Any]:
                 if isinstance(target, ast.Name):
                     result[target.id] = value
     return result
-
-
-def copier_starter_files(module_name: str = 'custom') -> dict[str, tuple[str, ...]]:
-    """List the complete starter artifacts for CLI file-set checks."""
-    files = {
-        '.copier-answers.yml': (),
-        'copier.yml': ('_subdirectory: template', '{{ result.files | to_json }}', '{{ result.contributions | to_json }}'),
-        'template/{% yield file from files %}{{ file.path }}{% endyield %}.jinja': ('{% include file.template %}',),
-        'template/{{ _copier_conf.answers_file }}.jinja': ('{{ _copier_answers|to_nice_yaml -}}',),
-    }
-    if module_name:
-        files['copier.yml'] += (f'!include modules/{module_name}/copier.yml',)
-        files[f'modules/{module_name}/copier.yml'] = (f'{module_name}_defaults:', f'{module_name}_inputs:', 'files: []', 'contributions: []')
-        files[f'modules/{module_name}/exports.jinja'] = ('{% set output = ' + module_name + ' %}',)
-    return files
