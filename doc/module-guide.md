@@ -25,7 +25,7 @@ copier copy --defaults --data 'features=[copier]' https://gitlab.com/sventerpris
 copier copy --defaults my-template my-project
 ```
 
-The `copier_module_name` answer defaults to `custom`; pass `--data copier_module_name=example` to rename it or `--data copier_module_name=` to skip it. The starter initially renders only its answers file. Add files and contributions through its module manifest. Older starters used `template/_modules/core`; customized content must follow the current `modules/<name>` interface.
+The `copier_module_name` answer defaults to `custom`; pass `--data copier_module_name=example` to rename it or `--data copier_module_name=` to skip it. The starter initially renders only its answers file. Add files and contributions through its module manifest.
 
 ## Module interface
 
