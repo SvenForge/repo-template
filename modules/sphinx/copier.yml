@@ -14,7 +14,8 @@ sphinx_defaults:
     owner_name: ''
     has_readme: false
     has_license: false
-    has_python_package: false
+    python_packages: []
+    package_dependency_groups: {}
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
@@ -25,6 +26,14 @@ sphinx_inputs:
   default: {}
 
 # Module Questions
+sphinx_api_packages:
+  type: str
+  help: Which Python packages shall have API documentation?
+  multiselect: true
+  choices: "{{ sphinx_inputs.python_packages | default(sphinx_defaults.python_packages) | to_json }}"
+  default: "{{ sphinx_inputs.api_packages | default(sphinx_inputs.python_packages | default(sphinx_defaults.python_packages)) | to_json }}"
+  when: "{{ (sphinx_inputs.enabled | default(sphinx_defaults.enabled)) and (sphinx_inputs.python_packages | default(sphinx_defaults.python_packages) | length > 0) }}"
+
 sphinx_needs:
   type: bool
   help: Include Sphinx-Needs support?
@@ -50,10 +59,20 @@ sphinx:
   default: |
     {%- set vars = dict(sphinx_defaults, **sphinx_inputs) -%}
     {%- set vars = dict(vars,
+      api_packages=sphinx_api_packages,
       needs=sphinx_needs,
       needs_pages=sphinx_needs_pages,
       year=sphinx_inputs.year if sphinx_inputs.year is defined else '%Y' | strftime | int,
     ) -%}
+    {%- set dependencies = namespace(groups=[]) -%}
+    {%- for package in vars.api_packages -%}
+    {%- for group in vars.package_dependency_groups.get(package, []) -%}
+    {%- if group not in dependencies.groups -%}
+    {%- set dependencies.groups = dependencies.groups + [group] -%}
+    {%- endif -%}
+    {%- endfor -%}
+    {%- endfor -%}
+    {%- set vars = dict(vars, api_dependency_groups=dependencies.groups) -%}
     vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
@@ -68,7 +87,7 @@ sphinx:
         template: files/Makefile.jinja
       - path: doc/sphinx/make.bat
         template: files/make.bat.jinja
-      {%- if vars.has_python_package %}
+      {%- if vars.api_packages %}
       - path: doc/api.md
         template: files/api.md.jinja
       {%- endif %}

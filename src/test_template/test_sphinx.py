@@ -5,6 +5,8 @@ from collections.abc import Callable
 from contextlib import AbstractContextManager
 from typing import Any
 
+import pytest
+import tomllib
 import yaml
 
 from .conftest import CopierCase
@@ -55,6 +57,7 @@ def test_sphinx_without_readme(
         core_repository_name="Example Repository",
         core_include_readme=False,
         sphinx_needs=False,
+        sphinx_api_packages=[],
     ) as case:
         features = case.context["features"]
         included = {file["path"] for file in case.context["sphinx"]["files"]}
@@ -136,9 +139,10 @@ def test_sphinx_integrations(
     assert assignments["needs_sphinx"] == "8.2"
     assert assignments["apidoc_modules"] == [
         {
-            "path": "../../src",
-            "destination": "doc/sphinx/_apidoc",
-        },
+            "path": f"../../src/{package}",
+            "destination": f"doc/sphinx/_apidoc/{package}",
+        }
+        for package in ["example_library", "test_example_library"]
     ]
     assert assignments["html_theme"] == "furo"
     assert {
@@ -169,7 +173,8 @@ def test_sphinx_integrations(
     assert "License <../../LICENSE>" in index
     assert license_text.startswith("# License & Copyright Information\n")
     assert "{toctree}" in api
-    assert "sphinx/_apidoc/modules" in api
+    assert "sphinx/_apidoc/example_library/modules" in api
+    assert "sphinx/_apidoc/test_example_library/modules" in api
 
     needs_contracts = {
         "requirements": ("req", "REQ_001"),
@@ -217,3 +222,43 @@ def test_sphinx_integrations(
     )
     assert pages["pages"]["publish"].rstrip("/") == "doc/sphinx/_build/html"
     assert root_pipeline["stages"] == ["test"]
+
+
+@pytest.mark.parametrize("packages", [["example_library"], ["test_contracts"], []])
+def test_sphinx_api_selection(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+    packages: list[str],
+) -> None:
+    with copier_case(
+        features=["core", "python", "sphinx"],
+        python_package_name="example_library",
+        python_testpackage_name="test_contracts",
+        sphinx_api_packages=packages,
+    ) as case:
+        context = case.context
+        config = _literal_assignments(case.render(PATH_CONFIG), {"extensions", "apidoc_modules"})
+        project = tomllib.loads(case.render("modules/python/files/pyproject.toml.jinja"))
+
+    assert context["_copier_answers"]["sphinx_api_packages"] == packages
+    assert context["sphinx"]["vars"]["api_packages"] == packages
+    assert ("doc/api.md" in {file["path"] for file in context["sphinx"]["files"]}) is bool(packages)
+    assert ("sphinx.ext.apidoc" in config["extensions"]) is bool(packages)
+    assert ({"include-group": "test"} in project["dependency-groups"]["doc"]) is ("test_contracts" in packages)
+    if packages:
+        assert [entry["path"] for entry in config["apidoc_modules"]] == [f"../../src/{package}" for package in packages]
+
+
+def test_sphinx_host_packages(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+) -> None:
+    with copier_case(
+        features=["sphinx"],
+        sphinx_inputs={
+            "python_packages": ["alpha", "beta", "gamma"],
+            "package_dependency_groups": {"beta": ["test"], "gamma": ["test"]},
+        },
+    ) as case:
+        config = _literal_assignments(case.render(PATH_CONFIG), {"apidoc_modules"})
+        assert case.context["sphinx"]["vars"]["api_packages"] == ["alpha", "beta", "gamma"]
+        assert case.context["sphinx"]["vars"]["api_dependency_groups"] == ["test"]
+        assert len({entry["destination"] for entry in config["apidoc_modules"]}) == 3

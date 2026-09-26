@@ -104,7 +104,15 @@ sphinx_inputs:
     year: {{ core.vars.year }}
     has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
     has_license: {{ 'LICENSE.md' in core.files | map(attribute='path') }}
-    has_python_package: {{ ('src/' ~ python.vars.package_name ~ '/__init__.py') in python.files | map(attribute='path') }}
+    {% set packages = namespace(names=[]) %}
+    {% for file in python.files %}
+    {% if file.path.startswith('src/') and file.path.endswith('/__init__.py') %}
+    {% set packages.names = packages.names + [file.path.split('/')[1]] %}
+    {% endif %}
+    {% endfor %}
+    python_packages: {{ packages.names | unique | list | to_json }}
+    package_dependency_groups: {{ ({python.vars.testpackage_name: ['test']}
+      if python.vars.has_dev_dependencies and python.vars.testpackage_name in packages.names else {}) | to_json }}
 
 ---
 !include modules/gitlab/copier.yml

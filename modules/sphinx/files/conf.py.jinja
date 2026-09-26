@@ -1,24 +1,26 @@
 """Sphinx configuration."""
 
-{% if sphinx.vars.has_python_package -%}
+{% if sphinx.vars.api_packages -%}
 import sys
+{% endif -%}
 from pathlib import Path
 
+{% if sphinx.vars.api_packages -%}
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
 
 {% endif -%}
 # -- Project information -----------------------------------------------------
 
-project = {{ sphinx.vars.repository_name | tojson }}
-author = {{ sphinx.vars.owner_name | tojson }}
-copyright = {{ sphinx.vars.year | string | tojson }}
+project = {{ sphinx.vars.repository_name | pprint }}
+author = {{ sphinx.vars.owner_name | pprint }}
+copyright = {{ sphinx.vars.year | string | pprint }}
 
 # -- General configuration ---------------------------------------------------
 
 extensions = [
     'myst_parser',
     'sphinx.ext.intersphinx',
-{% if sphinx.vars.has_python_package -%}
+{% if sphinx.vars.api_packages -%}
     'sphinx.ext.apidoc',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
@@ -38,6 +40,11 @@ exclude_patterns = [
     'doc/sphinx/_build',
     'template',
 ]
+exclude_patterns.extend(
+    f'doc/sphinx/_apidoc/{path.name}'
+    for path in (Path(__file__).parent / '_apidoc').glob('*')
+    if path.name not in {{ sphinx.vars.api_packages | pprint }}
+)
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -61,14 +68,16 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org/stable/', None),
 }
 
-{% if sphinx.vars.has_python_package -%}
+{% if sphinx.vars.api_packages -%}
 # -- Options for apidoc / autodoc extensions ---------------------------------
 
 apidoc_modules = [
+{% for package in sphinx.vars.api_packages %}
     {
-        'path': '../../src',
-        'destination': 'doc/sphinx/_apidoc',
+        'path': {{ ('../../src/' ~ package) | pprint }},
+        'destination': {{ ('doc/sphinx/_apidoc/' ~ package) | pprint }},
     },
+{% endfor -%}
 ]
 autodoc_default_options = {
     'members': True,
