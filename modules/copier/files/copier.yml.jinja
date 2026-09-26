@@ -36,7 +36,6 @@ features:
   default: []
 {% endif %}
 {% raw %}
-  when: "{{ module_paths | length > 0 }}"
   validator: >-
     {%- for feature in features -%}
     {%- if feature not in module_paths.keys() -%}
