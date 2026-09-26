@@ -1,0 +1,28 @@
+{% set name = copier.vars.module_name -%}
+# Module Defaults
+{{ name }}_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+{{ name }}_inputs:
+  type: yaml
+  when: false
+  default: {}
+
+# Module Questions
+# TODO: Add namespaced questions here when the module needs user answers.
+
+# Module Outputs
+{{ name }}:
+  type: yaml
+  when: false
+  default: |
+    {{ '{%- set vars = dict(' ~ name ~ '_defaults, **' ~ name ~ '_inputs) -%}' }}
+    vars: {% raw %}{{ vars | to_json }}{% endraw %}
+    # Add module-relative file and fragment templates when enabled.
+    files: []
+    contributions: []

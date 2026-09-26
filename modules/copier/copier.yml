@@ -5,6 +5,7 @@ copier_defaults:
   default:
     enabled: true
     version: 9.17.2
+    module_name: custom
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
@@ -15,6 +16,21 @@ copier_inputs:
   default: {}
 
 # Module Questions
+copier_module_name:
+  type: str
+  help: What should the starter module be named? (leave empty to skip module generation)
+  default: "{{ copier_inputs.module_name | default(copier_defaults.module_name) }}"
+  when: "{{ copier_inputs.enabled | default(copier_defaults.enabled) }}"
+  validator: >-
+    {% if copier_module_name and not (copier_module_name | regex_search('^[a-z][a-z0-9_]*\\Z')) %}
+    Use lowercase letters, digits, and underscores, starting with a letter, or leave empty.
+    {% elif copier_module_name in ['features', 'module_paths', 'copier_version', 'files', 'contributions',
+      'feature', 'module_path', 'result', 'output', 'file', 'contribution',
+      'true', 'false', 'none', 'null', 'yes', 'no', 'on', 'off',
+      'and', 'or', 'not', 'in', 'is', 'if', 'else', 'self', 'super',
+      'range', 'dict', 'lipsum', 'cycler', 'joiner', 'namespace'] %}
+    This name is reserved by the generated host or Jinja. Choose another module name.
+    {% endif %}
 
 # Module Outputs
 copier:
@@ -22,14 +38,23 @@ copier:
   when: false
   default: |
     {%- set vars = dict(copier_defaults, **copier_inputs) -%}
+    {%- set vars = dict(vars, module_name=copier_module_name) -%}
     vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
       - path: copier.yml
         template: files/copier.yml.jinja
-      - path: template/_modules/core/copier.yml
-        template: files/core.yml.jinja
+      - path: "{% raw %}template/{% yield file from files %}{{ file.path }}{% endyield %}.jinja{% endraw %}"
+        template: files/yield.jinja
+      - path: "{% raw %}template/{{ _copier_conf.answers_file }}.jinja{% endraw %}"
+        template: files/answers.jinja
+      {%- if vars.module_name %}
+      - path: modules/{{ vars.module_name }}/copier.yml
+        template: files/module.yml.jinja
+      - path: modules/{{ vars.module_name }}/exports.jinja
+        template: files/exports.jinja
+      {%- endif %}
       {%- endif %}
       {%- endfilter %}
     contributions: []

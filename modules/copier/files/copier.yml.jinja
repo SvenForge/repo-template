@@ -1,17 +1,7 @@
 ---
+# General Configuration
 _min_copier_version: &min_copier_version "{{ copier.vars.version }}"
 _subdirectory: template
-_exclude:
-  - /_modules
-
-features:
-  type: str
-  help: Which template features shall be used?
-  multiselect: true
-  choices:
-    Core: core
-  default:
-    - core
 
 copier_version:
   type: str
@@ -19,5 +9,90 @@ copier_version:
   default: *min_copier_version
   when: false
 
+# Module Paths
+# When moving a module, update also the corresponding !include below.
+module_paths:
+  type: yaml
+  when: false
+{% if copier.vars.module_name %}
+  default:
+    {{ copier.vars.module_name }}: modules/{{ copier.vars.module_name }}
+{% else %}
+  default: {}
+{% endif %}
+
+# Module Selector
+features:
+  type: str
+  help: Which template features shall be used?
+  multiselect: true
+{% if copier.vars.module_name %}
+  choices:
+    {{ copier.vars.module_name }}: {{ copier.vars.module_name }}
+  default:
+    - {{ copier.vars.module_name }}
+{% else %}
+  choices: {}
+  default: []
+{% endif %}
+{% raw %}
+  validator: >-
+    {%- for feature in features -%}
+    {%- if feature not in module_paths.keys() -%}
+    Path to template module "{{ feature }}" not found.
+    {%- endif -%}
+    {%- endfor -%}
+{% endraw %}
+
+# Module Includes and Inputs
+# Keep each input definition after the corresponding !include.
+# Keep modules in provider-before-consumer order.
+{% if copier.vars.module_name %}
 ---
-!include template/_modules/core/copier.yml
+!include modules/{{ copier.vars.module_name }}/copier.yml
+---
+{{ copier.vars.module_name }}_inputs:
+  type: yaml
+  when: false
+  default: |
+    enabled: {{ "{{ '" ~ copier.vars.module_name ~ "' in features }}" }}
+{% endif %}
+
+---
+{% raw -%}
+# Output Aggregation
+# Module outputs are automatically recognized and aggregated through their exports.jinja.
+files:
+  type: yaml
+  when: false
+  default: |
+    {%- set result = namespace(files=[]) -%}
+    {%- for feature in features -%}
+      {%- set module_path = module_paths[feature] -%}
+      {%- from module_path ~ '/exports.jinja' import output with context -%}
+      {%- for file in output.files -%}
+        {%- set result.files = result.files + [{
+          'path': file.path,
+          'template': module_path ~ '/' ~ file.template,
+        }] -%}
+      {%- endfor -%}
+    {%- endfor -%}
+    {{ result.files | to_json }}
+
+contributions:
+  type: yaml
+  when: false
+  default: |
+    {%- set result = namespace(contributions=[]) -%}
+    {%- for feature in features -%}
+      {%- set module_path = module_paths[feature] -%}
+      {%- from module_path ~ '/exports.jinja' import output with context -%}
+      {%- for contribution in output.contributions -%}
+        {%- set result.contributions = result.contributions + [{
+          'target': contribution.target,
+          'template': module_path ~ '/' ~ contribution.template,
+        }] -%}
+      {%- endfor -%}
+    {%- endfor -%}
+    {{ result.contributions | to_json }}
+{% endraw %}

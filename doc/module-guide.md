@@ -16,6 +16,17 @@ modules/<name>/
 
 `files/` and `fragments/` contain only the templates a module needs. `exports.jinja` names the module output, for example `{% set output = codex %}`. The host imports that export with context; modules do not need their own rendering extension.
 
+### Generate a template starter
+
+Select the Copier feature to scaffold another template:
+
+```shell
+copier copy --defaults --data 'features=[copier]' https://gitlab.com/sventerprise/repo-template.git my-template
+copier copy --defaults my-template my-project
+```
+
+The `copier_module_name` answer defaults to `custom`; pass `--data copier_module_name=example` to rename it or `--data copier_module_name=` to skip it. The starter initially renders only its answers file. Add files and contributions through its module manifest.
+
 ## Module interface
 
 ### Defaults, inputs, and questions
