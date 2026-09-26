@@ -4,37 +4,45 @@ import pytest
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, json_items, json_members, module_context
 
-OUTPUT_CASES = {
-    'cloud': ModuleCase(
-        expected={
-            'vars': {'cloud_integration': True},
-            'files': [
-                {'path': 'AGENTS.md', 'template': 'files/AGENTS.md.jinja'},
-                {'path': '.codex/setup.sh', 'template': 'files/setup.sh.jinja'},
-                {'path': '.codex/maintenance.sh', 'template': 'files/maintenance.sh.jinja'},
-            ],
-            'contributions': [],
-        },
-    ),
-    'devcontainer': ModuleCase(
-        inputs={'devcontainer_available': True},
-        answers={'codex_cloud': False},
-        expected={
-            'vars': {'cloud_integration': False, 'devcontainer_integration': True},
-            'files': [{'path': 'AGENTS.md', 'template': 'files/AGENTS.md.jinja'}],
-            'contributions': [
-                {'target': 'devcontainer.features', 'template': 'fragments/devcontainer.features.json.jinja'},
-                {'target': 'devcontainer.mounts', 'template': 'fragments/devcontainer.mounts.json.jinja'},
-                {'target': 'devcontainer.extensions', 'template': 'fragments/devcontainer.extensions.json.jinja'},
-                {'target': 'devcontainer.postCreateCommand', 'template': 'fragments/devcontainer.postCreateCommand.json.jinja'},
-            ],
-        },
-    ),
-}
 CODEX_CONTEXT = module_context('codex')
 
 
-@pytest.mark.parametrize('case', OUTPUT_CASES.values(), ids=OUTPUT_CASES.keys())
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(
+            ModuleCase(
+                expected={
+                    'vars': {'cloud_integration': True},
+                    'files': [
+                        {'path': 'AGENTS.md', 'template': 'files/AGENTS.md.jinja'},
+                        {'path': '.codex/setup.sh', 'template': 'files/setup.sh.jinja'},
+                        {'path': '.codex/maintenance.sh', 'template': 'files/maintenance.sh.jinja'},
+                    ],
+                    'contributions': [],
+                },
+            ),
+            id='cloud',
+        ),
+        pytest.param(
+            ModuleCase(
+                inputs={'devcontainer_available': True},
+                answers={'codex_cloud': False},
+                expected={
+                    'vars': {'cloud_integration': False, 'devcontainer_integration': True},
+                    'files': [{'path': 'AGENTS.md', 'template': 'files/AGENTS.md.jinja'}],
+                    'contributions': [
+                        {'target': 'devcontainer.features', 'template': 'fragments/devcontainer.features.json.jinja'},
+                        {'target': 'devcontainer.mounts', 'template': 'fragments/devcontainer.mounts.json.jinja'},
+                        {'target': 'devcontainer.extensions', 'template': 'fragments/devcontainer.extensions.json.jinja'},
+                        {'target': 'devcontainer.postCreateCommand', 'template': 'fragments/devcontainer.postCreateCommand.json.jinja'},
+                    ],
+                },
+            ),
+            id='devcontainer',
+        ),
+    ],
+)
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     check_module('codex', case)
 

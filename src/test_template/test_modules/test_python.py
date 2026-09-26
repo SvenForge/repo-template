@@ -7,41 +7,6 @@ import tomllib
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, json_members, module_context
 
-OUTPUT_CASES = {
-    'development-tools': ModuleCase(
-        expected={
-            'vars': {'has_dev_dependencies': True, 'testpackage_name': 'test_my_repository'},
-            'files': [
-                {'path': 'pyproject.toml', 'template': 'files/pyproject.toml.jinja'},
-                {'path': 'src/test_my_repository/test_self.py', 'template': 'files/testpackage/test_self.py.jinja'},
-            ],
-            'contributions': [
-                {'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'},
-                {'target': 'devcontainer.postCreateCommand', 'template': 'fragments/devcontainer.postCreateCommand.json.jinja'},
-            ],
-        },
-    ),
-    'distribution': ModuleCase(
-        inputs={'repository_name': 'Widget'},
-        answers={'python_package_name': 'acme_widget', 'python_version': '3.13'},
-        expected={
-            'vars': {'distribution_name': 'acme-widget', 'has_distribution': True, 'version': '3.13', 'testpackage_name': 'test_acme_widget'},
-            'files': [
-                {'path': 'src/acme_widget/__init__.py', 'template': 'files/package/__init__.py.jinja'},
-                {'path': 'src/test_acme_widget/test_import.py', 'template': 'files/testpackage/test_import.py.jinja'},
-            ],
-            'contributions': [{'target': 'codex.setup', 'template': 'fragments/setup.sh.jinja'}],
-        },
-    ),
-    'custom-test-package': ModuleCase(
-        inputs={'testpackage_name': 'qa_default'},
-        answers={'python_testpackage_name': 'qa_widget', 'python_tools': ['pytest']},
-        expected={
-            'vars': {'testpackage_name': 'qa_widget', 'tools': ['pytest']},
-            'files': [{'path': 'src/qa_widget/test_self.py', 'template': 'files/testpackage/test_self.py.jinja'}],
-        },
-    ),
-}
 PYTHON_VARIABLES = {
     'repository_name': 'Widget',
     'package_name': 'acme_widget',
@@ -61,7 +26,53 @@ PYTHON_CONTEXT = module_context('python', **PYTHON_VARIABLES)
 DEVELOPMENT_CONTEXT = module_context('python', **{**PYTHON_VARIABLES, 'has_distribution': False, 'package_name': ''})
 
 
-@pytest.mark.parametrize('case', OUTPUT_CASES.values(), ids=OUTPUT_CASES.keys())
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(
+            ModuleCase(
+                expected={
+                    'vars': {'has_dev_dependencies': True, 'testpackage_name': 'test_my_repository'},
+                    'files': [
+                        {'path': 'pyproject.toml', 'template': 'files/pyproject.toml.jinja'},
+                        {'path': 'src/test_my_repository/test_self.py', 'template': 'files/testpackage/test_self.py.jinja'},
+                    ],
+                    'contributions': [
+                        {'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'},
+                        {'target': 'devcontainer.postCreateCommand', 'template': 'fragments/devcontainer.postCreateCommand.json.jinja'},
+                    ],
+                },
+            ),
+            id='development-tools',
+        ),
+        pytest.param(
+            ModuleCase(
+                inputs={'repository_name': 'Widget'},
+                answers={'python_package_name': 'acme_widget', 'python_version': '3.13'},
+                expected={
+                    'vars': {'distribution_name': 'acme-widget', 'has_distribution': True, 'version': '3.13', 'testpackage_name': 'test_acme_widget'},
+                    'files': [
+                        {'path': 'src/acme_widget/__init__.py', 'template': 'files/package/__init__.py.jinja'},
+                        {'path': 'src/test_acme_widget/test_import.py', 'template': 'files/testpackage/test_import.py.jinja'},
+                    ],
+                    'contributions': [{'target': 'codex.setup', 'template': 'fragments/setup.sh.jinja'}],
+                },
+            ),
+            id='distribution',
+        ),
+        pytest.param(
+            ModuleCase(
+                inputs={'testpackage_name': 'qa_default'},
+                answers={'python_testpackage_name': 'qa_widget', 'python_tools': ['pytest']},
+                expected={
+                    'vars': {'testpackage_name': 'qa_widget', 'tools': ['pytest']},
+                    'files': [{'path': 'src/qa_widget/test_self.py', 'template': 'files/testpackage/test_self.py.jinja'}],
+                },
+            ),
+            id='custom-test-package',
+        ),
+    ],
+)
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     check_module('python', case)
 

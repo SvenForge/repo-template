@@ -5,32 +5,6 @@ import yaml  # type: ignore[import-untyped]
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module_context
 
-OUTPUT_CASES = {
-    'defaults': ModuleCase(
-        expected={
-            'vars': {'pipeline': ['copier', 'demo']},
-            'files': [
-                {'path': '.gitlab/issue_templates/default.md', 'template': 'files/issue.md.jinja'},
-                {'path': '.gitlab/merge_request_templates/default.md', 'template': 'files/merge_request.md.jinja'},
-                {'path': '.gitlab-ci.yml', 'template': 'files/gitlab-ci.yml.jinja'},
-                {'path': '.gitlab/ci/copier.yml', 'template': 'files/ci/copier.yml.jinja'},
-            ],
-            'contributions': [{'target': 'codex.agents', 'template': 'fragments/AGENTS.md.jinja'}],
-        },
-    ),
-    'python-and-documentation': ModuleCase(
-        inputs={'python_enabled': True, 'python_tools': ['pytest'], 'sphinx_enabled': True, 'has_readme': True, 'repository_path': 'group/widget'},
-        answers={'gitlab_pipeline': ['python', 'sphinx']},
-        expected={
-            'vars': {'pipeline': ['python', 'sphinx'], 'pages_url': 'https://group.gitlab.io/widget/'},
-            'files': [
-                {'path': '.gitlab/ci/python.yml', 'template': 'files/ci/python.yml.jinja'},
-                {'path': '.gitlab/ci/sphinx.yml', 'template': 'files/ci/sphinx.yml.jinja'},
-            ],
-            'contributions': [{'target': 'core.readme.documentation', 'template': 'fragments/readme.documentation.md.jinja'}],
-        },
-    ),
-}
 GITLAB_CONTEXT = module_context(
     'gitlab',
     repository_host='gitlab.example.com',
@@ -42,7 +16,41 @@ GITLAB_CONTEXT = module_context(
 )
 
 
-@pytest.mark.parametrize('case', OUTPUT_CASES.values(), ids=OUTPUT_CASES.keys())
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(
+            ModuleCase(
+                expected={
+                    'vars': {'pipeline': ['copier', 'demo']},
+                    'files': [
+                        {'path': '.gitlab/issue_templates/default.md', 'template': 'files/issue.md.jinja'},
+                        {'path': '.gitlab/merge_request_templates/default.md', 'template': 'files/merge_request.md.jinja'},
+                        {'path': '.gitlab-ci.yml', 'template': 'files/gitlab-ci.yml.jinja'},
+                        {'path': '.gitlab/ci/copier.yml', 'template': 'files/ci/copier.yml.jinja'},
+                    ],
+                    'contributions': [{'target': 'codex.agents', 'template': 'fragments/AGENTS.md.jinja'}],
+                },
+            ),
+            id='defaults',
+        ),
+        pytest.param(
+            ModuleCase(
+                inputs={'python_enabled': True, 'python_tools': ['pytest'], 'sphinx_enabled': True, 'has_readme': True, 'repository_path': 'group/widget'},
+                answers={'gitlab_pipeline': ['python', 'sphinx']},
+                expected={
+                    'vars': {'pipeline': ['python', 'sphinx'], 'pages_url': 'https://group.gitlab.io/widget/'},
+                    'files': [
+                        {'path': '.gitlab/ci/python.yml', 'template': 'files/ci/python.yml.jinja'},
+                        {'path': '.gitlab/ci/sphinx.yml', 'template': 'files/ci/sphinx.yml.jinja'},
+                    ],
+                    'contributions': [{'target': 'core.readme.documentation', 'template': 'fragments/readme.documentation.md.jinja'}],
+                },
+            ),
+            id='python-and-documentation',
+        ),
+    ],
+)
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     check_module('gitlab', case)
 

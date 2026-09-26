@@ -4,22 +4,26 @@ import pytest
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module_context
 
-OUTPUT_CASES = {
-    'defaults': ModuleCase(
-        expected={
-            'vars': {'enabled': True, 'version': '9.17.2'},
-            'files': [
-                {'path': 'copier.yml', 'template': 'files/copier.yml.jinja'},
-                {'path': 'template/_modules/core/copier.yml', 'template': 'files/core.yml.jinja'},
-            ],
-            'contributions': [],
-        },
-    ),
-    'custom-version': ModuleCase(inputs={'version': '9.18.0'}, expected={'vars': {'version': '9.18.0'}}),
-}
 
-
-@pytest.mark.parametrize('case', OUTPUT_CASES.values(), ids=OUTPUT_CASES.keys())
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(
+            ModuleCase(
+                expected={
+                    'vars': {'enabled': True, 'version': '9.17.2'},
+                    'files': [
+                        {'path': 'copier.yml', 'template': 'files/copier.yml.jinja'},
+                        {'path': 'template/_modules/core/copier.yml', 'template': 'files/core.yml.jinja'},
+                    ],
+                    'contributions': [],
+                },
+            ),
+            id='defaults',
+        ),
+        pytest.param(ModuleCase(inputs={'version': '9.18.0'}, expected={'vars': {'version': '9.18.0'}}), id='custom-version'),
+    ],
+)
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     check_module('copier', case)
 

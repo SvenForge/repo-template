@@ -6,21 +6,26 @@ import pytest
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, json_items, module_context
 
-OUTPUT_CASES = {
-    'defaults': ModuleCase(
-        expected={
-            'vars': {'image': 'mcr.microsoft.com/devcontainers/base:2-bookworm'},
-            'files': [{'path': '.devcontainer/devcontainer.json', 'template': 'files/devcontainer.json.jinja'}],
-            'contributions': [{'target': 'devcontainer.extensions', 'template': 'fragments/devcontainer.extensions.json.jinja'}],
-        },
-    ),
-    'custom-image': ModuleCase(inputs={'image': 'example.com/development:1'}, expected={'vars': {'image': 'example.com/development:1'}}),
-}
 CONTAINER_CONTEXT = module_context('devcontainer', image='example.com/development:1')
 CONTAINER_CONTEXT['contributions'] = [{'target': 'devcontainer.extensions', 'template': 'modules/devcontainer/fragments/devcontainer.extensions.json.jinja'}]
 
 
-@pytest.mark.parametrize('case', OUTPUT_CASES.values(), ids=OUTPUT_CASES.keys())
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(
+            ModuleCase(
+                expected={
+                    'vars': {'image': 'mcr.microsoft.com/devcontainers/base:2-bookworm'},
+                    'files': [{'path': '.devcontainer/devcontainer.json', 'template': 'files/devcontainer.json.jinja'}],
+                    'contributions': [{'target': 'devcontainer.extensions', 'template': 'fragments/devcontainer.extensions.json.jinja'}],
+                },
+            ),
+            id='defaults',
+        ),
+        pytest.param(ModuleCase(inputs={'image': 'example.com/development:1'}, expected={'vars': {'image': 'example.com/development:1'}}), id='custom-image'),
+    ],
+)
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     check_module('devcontainer', case)
 

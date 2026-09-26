@@ -4,28 +4,6 @@ import pytest
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module_context
 
-OUTPUT_CASES = {
-    'defaults': ModuleCase(
-        expected={
-            'vars': {'repository_name': 'My Repository', 'license': 'NONE'},
-            'files': [
-                {'path': 'README.md', 'template': 'files/README.md.jinja'},
-                {'path': 'LICENSE.md', 'template': 'files/LICENSE_NONE.md.jinja'},
-                {'path': '.gitignore', 'template': 'files/gitignore.jinja'},
-            ],
-            'contributions': [{'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'}],
-        },
-    ),
-    'hosted-repository': ModuleCase(
-        inputs={'repository_name': 'Input Name', 'repository_url': 'git@gitlab.example.com:group/widget.git', 'year': 2026},
-        answers={'core_repository_name': 'Widget', 'core_owner_name': 'Example Owner', 'core_license': 'MIT'},
-        expected={
-            'vars': {'repository_name': 'Widget', 'repository_host': 'gitlab.example.com', 'repository_path': 'group/widget', 'owner_name': 'Example Owner', 'year': 2026},
-            'files': [{'path': 'LICENSE.md', 'template': 'files/LICENSE_MIT.md.jinja'}],
-            'contributions': [{'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'}],
-        },
-    ),
-}
 README_CONTEXT = module_context(
     'core',
     repository_name='Widget',
@@ -40,7 +18,37 @@ GITIGNORE_CONTEXT = module_context('core')
 GITIGNORE_CONTEXT['contributions'] = [{'target': 'core.gitignore', 'template': 'modules/core/fragments/gitignore.jinja'}]
 
 
-@pytest.mark.parametrize('case', OUTPUT_CASES.values(), ids=OUTPUT_CASES.keys())
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(
+            ModuleCase(
+                expected={
+                    'vars': {'repository_name': 'My Repository', 'license': 'NONE'},
+                    'files': [
+                        {'path': 'README.md', 'template': 'files/README.md.jinja'},
+                        {'path': 'LICENSE.md', 'template': 'files/LICENSE_NONE.md.jinja'},
+                        {'path': '.gitignore', 'template': 'files/gitignore.jinja'},
+                    ],
+                    'contributions': [{'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'}],
+                },
+            ),
+            id='defaults',
+        ),
+        pytest.param(
+            ModuleCase(
+                inputs={'repository_name': 'Input Name', 'repository_url': 'git@gitlab.example.com:group/widget.git', 'year': 2026},
+                answers={'core_repository_name': 'Widget', 'core_owner_name': 'Example Owner', 'core_license': 'MIT'},
+                expected={
+                    'vars': {'repository_name': 'Widget', 'repository_host': 'gitlab.example.com', 'repository_path': 'group/widget', 'owner_name': 'Example Owner', 'year': 2026},
+                    'files': [{'path': 'LICENSE.md', 'template': 'files/LICENSE_MIT.md.jinja'}],
+                    'contributions': [{'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'}],
+                },
+            ),
+            id='hosted-repository',
+        ),
+    ],
+)
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     check_module('core', case)
 

@@ -5,37 +5,6 @@ import tomllib
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module_context, python_assignments, toml_items
 
-OUTPUT_CASES = {
-    'defaults': ModuleCase(
-        expected={
-            'vars': {'repository_name': 'My Repository', 'needs': False},
-            'files': [
-                {'path': 'doc/sphinx/conf.py', 'template': 'files/conf.py.jinja'},
-                {'path': 'doc/sphinx/index.md', 'template': 'files/index.md.jinja'},
-                {'path': 'doc/notes.md', 'template': 'files/notes.md.jinja'},
-            ],
-            'contributions': [
-                {'target': 'python.dependency_groups', 'template': 'fragments/dependency_groups.toml.jinja'},
-                {'target': 'python.dev_dependencies', 'template': 'fragments/dev_dependencies.toml.jinja'},
-                {'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'},
-            ],
-        },
-    ),
-    'test-api-and-needs': ModuleCase(
-        inputs={'python_packages': ['widget', 'test_widget'], 'package_dependency_groups': {'test_widget': ['test']}, 'year': 2026},
-        answers={'sphinx_api_packages': ['test_widget'], 'sphinx_needs': True},
-        expected={
-            'vars': {'api_packages': ['test_widget'], 'api_dependency_groups': ['test'], 'needs': True},
-            'files': [
-                {'path': 'doc/api.md', 'template': 'files/api.md.jinja'},
-                {'path': 'doc/requirements.md', 'template': 'files/requirements.md.jinja'},
-                {'path': 'doc/architecture.md', 'template': 'files/architecture.md.jinja'},
-                {'path': 'doc/implementation.md', 'template': 'files/implementation.md.jinja'},
-                {'path': 'doc/verification.md', 'template': 'files/verification.md.jinja'},
-            ],
-        },
-    ),
-}
 SPHINX_VARIABLES = {
     'repository_name': 'Widget',
     'owner_name': 'Example Owner',
@@ -50,7 +19,46 @@ SPHINX_CONTEXT = module_context('sphinx', **SPHINX_VARIABLES)
 MINIMAL_CONTEXT = module_context('sphinx', **{**SPHINX_VARIABLES, 'has_readme': False, 'has_license': False, 'api_packages': [], 'api_dependency_groups': [], 'needs': False})
 
 
-@pytest.mark.parametrize('case', OUTPUT_CASES.values(), ids=OUTPUT_CASES.keys())
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(
+            ModuleCase(
+                expected={
+                    'vars': {'repository_name': 'My Repository', 'needs': False},
+                    'files': [
+                        {'path': 'doc/sphinx/conf.py', 'template': 'files/conf.py.jinja'},
+                        {'path': 'doc/sphinx/index.md', 'template': 'files/index.md.jinja'},
+                        {'path': 'doc/notes.md', 'template': 'files/notes.md.jinja'},
+                    ],
+                    'contributions': [
+                        {'target': 'python.dependency_groups', 'template': 'fragments/dependency_groups.toml.jinja'},
+                        {'target': 'python.dev_dependencies', 'template': 'fragments/dev_dependencies.toml.jinja'},
+                        {'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'},
+                    ],
+                },
+            ),
+            id='defaults',
+        ),
+        pytest.param(
+            ModuleCase(
+                inputs={'python_packages': ['widget', 'test_widget'], 'package_dependency_groups': {'test_widget': ['test']}, 'year': 2026},
+                answers={'sphinx_api_packages': ['test_widget'], 'sphinx_needs': True},
+                expected={
+                    'vars': {'api_packages': ['test_widget'], 'api_dependency_groups': ['test'], 'needs': True},
+                    'files': [
+                        {'path': 'doc/api.md', 'template': 'files/api.md.jinja'},
+                        {'path': 'doc/requirements.md', 'template': 'files/requirements.md.jinja'},
+                        {'path': 'doc/architecture.md', 'template': 'files/architecture.md.jinja'},
+                        {'path': 'doc/implementation.md', 'template': 'files/implementation.md.jinja'},
+                        {'path': 'doc/verification.md', 'template': 'files/verification.md.jinja'},
+                    ],
+                },
+            ),
+            id='test-api-and-needs',
+        ),
+    ],
+)
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     check_module('sphinx', case)
 
