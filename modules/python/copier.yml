@@ -50,7 +50,7 @@ python_distribution_name:
     {% if python_distribution_name and not (python_distribution_name | regex_search('^[a-z0-9]+(?:-[a-z0-9]+)*$')) %}
     Use lowercase letters and numbers separated by single hyphens.
     {% endif %}
-  when: false
+  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) and python_package_name }}"
 
 python_tools:
   type: str
