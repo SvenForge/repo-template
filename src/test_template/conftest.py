@@ -1,54 +1,71 @@
-"""Fixtures for testing module templates without Git side effects."""
+"""Read-only Copier evaluation and Jinja rendering shared by the smoke tests."""
 
-import shutil
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import pytest
 from copier._main import Worker
+from jinja2 import Environment, StrictUndefined
 
-TEMPLATE_ROOT = Path(__file__).parents[2]
-
-
-@dataclass
-class CopierCase:
-    worker: Worker
-
-    @property
-    def context(self) -> dict[str, Any]:
-        return self.worker._render_context()
-
-    def render(self, template_name: str) -> str:
-        template = self.worker.jinja_env.get_template(template_name)
-        return template.render(**self.context)
+from .support import TEMPLATE_ROOT, ModuleCase, ModuleCheck, RenderCase, TemplateCheck, VariableCase, VariablesCheck, assert_expected
 
 
-@pytest.fixture
-def template_source(tmp_path: Path) -> Path:
-    source = tmp_path / 'template-source'
-    source.mkdir()
-    shutil.copy2(TEMPLATE_ROOT / 'copier.yml', source / 'copier.yml')
-    for name in ('modules', 'template'):
-        shutil.copytree(TEMPLATE_ROOT / name, source / name)
-    return source
+@contextmanager
+def _worker(source: Path, answers: dict[str, Any]) -> Generator[Worker, None, None]:
+    """Use pinned Copier internals without cloning, copying, or writing answers."""
+    with Worker(src_path=str(source), dst_path=TEMPLATE_ROOT, data=answers, defaults=True, skip_tasks=True, quiet=True) as worker:
+        # Cached properties let the questionnaire read this checkout directly.
+        # Never call run_copy/run_update here; only CLI tests exercise VCS and disk output.
+        worker.template.__dict__['vcs'] = None
+        worker.subproject.__dict__['last_answers'] = {}
+        yield worker
 
 
 @pytest.fixture
-def copier_case(tmp_path: Path, template_source: Path):
-    @contextmanager
-    def create(**answers: Any) -> Iterator[CopierCase]:
-        with Worker(
-            src_path=str(template_source),
-            dst_path=tmp_path / "unused",
-            data=answers,
-            defaults=True,
-            skip_tasks=True,
-            quiet=True,
-        ) as worker:
+def check_module() -> ModuleCheck:
+    def check(module: str, case: ModuleCase) -> None:
+        answers = {f'{module}_inputs': case.inputs, **case.answers}
+        with _worker(TEMPLATE_ROOT / 'modules' / module, answers) as worker:
             worker._ask()
-            yield CopierCase(worker)
+            output = worker._render_context()[module]
+        assert_expected(output, case.expected)
 
-    return create
+    return check
+
+
+@pytest.fixture
+def check_variables() -> VariablesCheck:
+    def check(case: VariableCase) -> None:
+        with _worker(TEMPLATE_ROOT, case.answers) as worker:
+            worker._ask()
+            context = worker._render_context()
+        assert_expected(context, case.expected)
+
+    return check
+
+
+@pytest.fixture(scope='session')
+def render_environment() -> Iterator[Environment]:
+    with _worker(TEMPLATE_ROOT, {}) as worker:
+        environment = worker.jinja_env
+        environment.undefined = StrictUndefined
+        yield environment
+
+
+@pytest.fixture
+def check_template(render_environment: Environment) -> TemplateCheck:
+    def check(template_name: str, case: RenderCase) -> None:
+        template = render_environment.get_template(template_name)
+        if case.macro:
+            rendered = str(getattr(template.make_module(case.context), case.macro)())
+        else:
+            rendered = template.render(**case.context)
+        for text in case.contains:
+            assert text in rendered
+        parsed = case.parse(rendered) if case.parse else rendered
+        if case.expected is not None:
+            assert_expected(parsed, case.expected)
+
+    return check
