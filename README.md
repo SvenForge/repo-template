@@ -1,61 +1,66 @@
 # [Repo Template](https://gitlab.com/sventerprise/repo-template.git)
 
-Common [copier](https://copier.readthedocs.io/en/stable/) template to setup new or update existing Git repositories. Batteries included.
+[![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-orange.json)](https://github.com/copier-org/copier)
+
+Set up a Git repository without repeating the same documentation and tool configuration. [Copier](https://copier.readthedocs.io/en/stable/) asks questions and generates editable project files, which you can update as this template evolves.
+
+Select the parts you need:
+
+* README and license files; Sphinx documentation.
+* Python testing and code checks; GitLab CI/CD.
+* Dev Containers, Codex support, or a starter for another Copier template.
+
+The default selection includes Core, Python, Sphinx, GitLab, and Dev Container. This template is in early development; feedback on setup and documentation is welcome.
 
 ## Getting started
 
 ### Installation
 
-Install the Copier CLI to use this template:
+You need Git and Python 3.10 or newer. Install Copier 9.17.2 or newer:
 
 ```shell
 python -m pip install "copier>=9.17.2"
 ```
 
-### Use this template
+### Usage
 
-To create a new repository from this template:
+Generate a project and answer Copier's questions:
 
 ```shell
 copier copy https://gitlab.com/sventerprise/repo-template.git path/to/new-project
+cd path/to/new-project
 ```
 
-During the creation process, Copier prompts you to answer questions that customize the new repository.
+With default choices, you get `README.md`, `LICENSE.md`, `pyproject.toml`, documentation under `doc/`, Dev Container and GitLab configuration, and saved answers in `.copier-answers.yml`.
 
-To check for a template update and then apply it to a generated repository, run these commands from the repository root (where `.copier-answers.yml` was saved):
+Review and customize the generated README, license, and configuration, then initialize Git and commit:
+
+```shell
+git init
+git add .
+git commit -m "Initialize repository"
+```
+
+To update a repository generated from this template, keep `.copier-answers.yml` and start from a clean, committed Git working tree:
 
 ```shell
 copier check-update
 copier update
 ```
 
-### Reuse this template in your own template
+Review any conflicts before committing. Copier normally uses the latest tagged template release; see its [update guide](https://copier.readthedocs.io/en/stable/updating/) for details and version selection.
 
-To reuse modules in your own Copier template, add this repository as a Git submodule inside your host template:
-
-```shell
-git submodule add https://gitlab.com/sventerprise/repo-template.git vendor/repo-template
-```
-
-After cloning that host, initialize its submodules with `git submodule update --init --recursive`. See [Template structure](./doc/template-structure.md) for the repository layout and [Module guide](./doc/module-guide.md) for registration, input overrides, extension points, and a working consumer example.
+To build your own template or reuse modules, see [Template structure](./doc/template-structure.md) and the [Module guide](./doc/module-guide.md).
 
 ### Development
 
-It is recommended to develop this repository in the provided [development container](./.devcontainer/devcontainer.json) (VS Code Dev Containers and a Docker-compatible CLI) or in the preconfigured [Codex Cloud](https://chatgpt.com/codex/cloud) environment. For a local Python environment, install the `dev` dependency group:
+Use the provided [development container](./.devcontainer/devcontainer.json) or preconfigured [Codex Cloud](https://chatgpt.com/codex/cloud) environment. For local development of this template, install the `dev` dependency group:
 
 ```shell
 python -m pip install --group dev
 ```
 
-The group includes all relevant development dependencies. Run the relevant checks for your changes; for example:
-
-```shell
-python -m pytest
-ruff check
-mypy
-make -C doc/sphinx html SPHINXOPTS='-W --keep-going'
-copier check-update
-```
+See [Testing](./doc/testing.md) for the checks to run.
 
 ## Documentation
 
@@ -66,6 +71,8 @@ For Copier commands and concepts, see the [Copier documentation](https://copier.
 <!-- toctree-end -->
 
 ## Contributing
+
+Questions, setup problems, documentation gaps, and proposed improvements are welcome in the [issue tracker](https://gitlab.com/sventerprise/repo-template/-/issues). For contributions, follow the workflow in [AGENTS.md](https://gitlab.com/sventerprise/repo-template/-/blob/main/AGENTS.md).
 
 ### Maintainer
 
