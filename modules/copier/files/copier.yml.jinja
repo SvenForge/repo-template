@@ -1,8 +1,16 @@
 ---
+# General Configuration
 _min_copier_version: &min_copier_version "{{ copier.vars.version }}"
 _subdirectory: template
 
-# When moving a module, update its path and the corresponding !include.
+copier_version:
+  type: str
+  help: Which Copier version does this template require?
+  default: *min_copier_version
+  when: false
+
+# Module Paths
+# When moving a module, update also the corresponding !include below.
 module_paths:
   type: yaml
   when: false
@@ -13,6 +21,7 @@ module_paths:
   default: {}
 {% endif %}
 
+# Module Selector
 features:
   type: str
   help: Which template features shall be used?
@@ -25,15 +34,11 @@ features:
 {% else %}
   choices: {}
   default: []
-  when: false
 {% endif %}
 
-copier_version:
-  type: str
-  help: Which Copier version does this template require?
-  default: *min_copier_version
-  when: false
-
+# Module Includes and Inputs
+# Keep each input definition after the corresponding !include.
+# Keep modules in provider-before-consumer order.
 {% if copier.vars.module_name %}
 ---
 !include modules/{{ copier.vars.module_name }}/copier.yml
@@ -46,7 +51,9 @@ copier_version:
 {% endif %}
 
 ---
-{% raw %}# Module outputs are aggregated through their exports.jinja.
+{%- raw -%}
+# Output Aggregation
+# Module outputs are automatically recognized and aggregated through their exports.jinja.
 files:
   type: yaml
   when: false
