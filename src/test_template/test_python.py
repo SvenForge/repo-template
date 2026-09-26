@@ -29,14 +29,14 @@ def test_python_file_selection_and_defaults(
         context = case.context
 
     assert {file["path"] for file in context["python"]["files"]} == {
-        "pyproject.toml", "src/test_project/__init__.py", "src/test_project/test_self.py",
+        "pyproject.toml", "src/test_my_repository/__init__.py", "src/test_my_repository/test_self.py",
     }
     assert context["python"]["vars"]["has_distribution"] is False
     assert context["python"]["vars"]["has_dev_dependencies"] is True
     assert any(item["target"] == "codex.setup" for item in context["python"]["contributions"])
     assert context["python"]["vars"]["package_name"] == ""
     assert context["python"]["vars"]["distribution_name"] == ""
-    assert context["python"]["vars"]["testpackage_name"] == "test_project"
+    assert context["python"]["vars"]["testpackage_name"] == "test_my_repository"
     assert context["python"]["vars"]["tools"] == ["pytest", "ruff", "mypy"]
     assert context["python"]["vars"]["version"] == "3.12"
 
@@ -53,6 +53,12 @@ def test_python_file_selection_and_defaults(
         ),
         ({"python_package_name": "example-package"}, "python_package_name"),
         ({"python_version": "3"}, "python_version"),
+        ({"python_testpackage_name": ""}, "python_testpackage_name"),
+        ({"python_testpackage_name": "test-package"}, "python_testpackage_name"),
+        (
+            {"python_package_name": "example_package", "python_testpackage_name": "example_package"},
+            "python_testpackage_name",
+        ),
     ],
 )
 def test_python_answer_validation(
@@ -155,6 +161,42 @@ def test_python_tool_selection(
 
     assert set(project.get("dependency-groups", {})) == dependency_groups
     assert set(project.get("tool", {})) == tool_sections
-    assert ("src/test_project/test_self.py" in {file["path"] for file in context["python"]["files"]}) is ("pytest" in python_tools)
+    assert ("src/test_my_repository/test_self.py" in {file["path"] for file in context["python"]["files"]}) is ("pytest" in python_tools)
     assert context["python"]["vars"]["has_dev_dependencies"] is bool(python_tools)
     assert any(item["target"] == "codex.setup" for item in context["python"]["contributions"]) is bool(python_tools)
+
+
+@pytest.mark.parametrize(
+    ("repository_name", "testpackage_name"),
+    [("Repo Template", "test_repo_template"), ("?!", "test_project")],
+)
+def test_python_testpackage_default(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+    repository_name: str,
+    testpackage_name: str,
+) -> None:
+    with copier_case(features=["core", "python"], core_repository_name=repository_name) as case:
+        assert case.context["python"]["vars"]["testpackage_name"] == testpackage_name
+
+
+@pytest.mark.parametrize("testpackage_name", ["test_contracts", "qa_suite"])
+def test_python_custom_testpackage(
+    copier_case: Callable[..., AbstractContextManager[CopierCase]],
+    testpackage_name: str,
+) -> None:
+    with copier_case(
+        features=["core", "python"],
+        python_package_name="example_library",
+        python_testpackage_name=testpackage_name,
+    ) as case:
+        context = case.context
+        project = tomllib.loads(case.render(PATH_PROJECT))
+
+    assert context["_copier_answers"]["python_testpackage_name"] == testpackage_name
+    assert f"src/{testpackage_name}/test_import.py" in {file["path"] for file in context["python"]["files"]}
+    options = project["tool"]["pytest"]["ini_options"]
+    assert "src/test_*" in options["testpaths"]
+    if testpackage_name == "qa_suite":
+        assert "src/qa_suite" in options["testpaths"]
+        assert {"qa_suite", "qa_suite.*"}.issubset(project["tool"]["setuptools"]["packages"]["find"]["exclude"])
+        assert "src/qa_suite/*" in project["tool"]["coverage"]["run"]["omit"]

@@ -3,5 +3,7 @@
 ```{toctree}
 :maxdepth: 2
 
-sphinx/_apidoc/modules
+{% for package in sphinx.vars.api_packages -%}
+sphinx/_apidoc/{{ package }}/modules
+{% endfor -%}
 ```

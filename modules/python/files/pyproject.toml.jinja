@@ -65,7 +65,7 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
-exclude = ["test_*"]
+exclude = ["test_*"{% if 'pytest' in python.vars.tools and not python.vars.testpackage_name.startswith('test_') %}, {{ python.vars.testpackage_name | tojson }}, {{ (python.vars.testpackage_name ~ '.*') | tojson }}{% endif %}]
 namespaces = false
 
 [tool.setuptools_scm]
@@ -80,14 +80,14 @@ addopts = [
     "--cov-report=xml:coverage.xml",
     "--junitxml=pytest.xml",
 ]
-testpaths = ["src/test_*"]
+testpaths = ["src/test_*"{% if not python.vars.testpackage_name.startswith('test_') %}, {{ ('src/' ~ python.vars.testpackage_name) | tojson }}{% endif %}]
 {% if python.vars.package_name and not python.vars.has_distribution -%}
 pythonpath = ["src"]
 {% endif %}
 
 [tool.coverage.run]
 branch = true
-omit = ["test_*"]
+omit = ["test_*"{% if not python.vars.testpackage_name.startswith('test_') %}, {{ ('src/' ~ python.vars.testpackage_name ~ '/*') | tojson }}{% endif %}]
 
 [tool.coverage.report]
 show_missing = true

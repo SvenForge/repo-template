@@ -48,7 +48,7 @@ COPY_CASES = {
                 "_TODO: Add contact information._",
             ],
             Path("doc/sphinx/conf.py"): [
-                'project = "My Repository"',
+                "project = 'My Repository'",
                 "sphinx.ext.intersphinx",
             ],
             Path("doc/sphinx/Makefile"): [
@@ -66,12 +66,13 @@ COPY_CASES = {
                 "../*",
             ],
             Path("doc/notes.md"): ["# Notes"],
+            Path("doc/api.md"): ["sphinx/_apidoc/test_my_repository/modules"],
             Path("pyproject.toml"): [
                 "[dependency-groups]",
                 "[tool.pytest.ini_options]",
             ],
-            Path("src/test_project/__init__.py"): [],
-            Path("src/test_project/test_self.py"): [],
+            Path("src/test_my_repository/__init__.py"): [],
+            Path("src/test_my_repository/test_self.py"): [],
         },
     ),
     "empty-repository": CopyCase(
