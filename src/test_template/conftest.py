@@ -1,9 +1,8 @@
 """Read-only Copier evaluation and Jinja rendering shared by the smoke tests."""
 
-from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator, Generator
 
 import pytest
 from copier._main import Worker
@@ -13,7 +12,7 @@ from .support import TEMPLATE_ROOT, ModuleCase, ModuleCheck, RenderCase, Templat
 
 
 @contextmanager
-def _worker(source: Path, answers: dict[str, Any]) -> Iterator[Worker]:
+def _worker(source: Path, answers: dict[str, Any]) -> Generator[Worker, None, None]:
     """Use pinned Copier internals without cloning, copying, or writing answers."""
     with Worker(src_path=str(source), dst_path=TEMPLATE_ROOT, data=answers, defaults=True, skip_tasks=True, quiet=True) as worker:
         # Cached properties let the questionnaire read this checkout directly.
