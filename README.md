@@ -1,4 +1,4 @@
-# [Repo Template](https://gitlab.com/sventerprise/repo-template.git)
+# [Repo Template](https://gitlab.com/svenforge/repo-template.git)
 
 [![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-orange.json)](https://github.com/copier-org/copier)
 [![Documentation](https://img.shields.io/badge/docs-GitLab%20Pages-007EC6?logo=gitlab&logoColor=white)](https://sventerprise.gitlab.io/repo-template/)
@@ -67,7 +67,7 @@ See [Testing](./doc/testing.md) for the checks to run.
 ## Documentation
 
 <!-- toctree-start -->
-The template documentation is available on [GitLab Pages](https://sventerprise.gitlab.io/repo-template/).
+The documentation is available on [GitLab Pages](https://svenforge.gitlab.io/repo-template/).
 
 For Copier commands and concepts, see the [Copier documentation](https://copier.readthedocs.io/en/stable/).
 <!-- toctree-end -->
