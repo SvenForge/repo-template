@@ -4,5 +4,5 @@
 #   bash .codex/maintenance.sh
 set -euo pipefail
 {% for contribution in contributions | selectattr('target', 'equalto', 'codex.maintenance') %}
-{% include contribution.template -%}
+{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
 {% endfor -%}

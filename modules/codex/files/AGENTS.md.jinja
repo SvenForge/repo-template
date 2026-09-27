@@ -7,7 +7,7 @@
 * Preserve existing style and conventions.
 * Use American English in all files in this repository, unless a specific topic requires another language, such as German.
 {% for contribution in contributions | selectattr('target', 'equalto', 'codex.agents') %}
-{% include contribution.template -%}
+{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
 {% endfor %}
 ## Safety and boundaries
 

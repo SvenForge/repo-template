@@ -1,3 +1,4 @@
+{% filter trim -%}
 """Sphinx configuration."""
 
 {% if sphinx.vars.api_packages -%}
@@ -20,14 +21,14 @@ copyright = {{ sphinx.vars.year | string | pprint }}
 extensions = [
     'myst_parser',
     'sphinx.ext.intersphinx',
-{% if sphinx.vars.api_packages -%}
+{%- if sphinx.vars.api_packages %}
     'sphinx.ext.apidoc',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-{% endif -%}
-{% if sphinx.vars.needs -%}
+{%- endif %}
+{%- if sphinx.vars.needs %}
     'sphinx_needs',
-{% endif -%}
+{%- endif %}
 ]
 
 root_doc = 'doc/sphinx/index'
@@ -68,16 +69,17 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org/stable/', None),
 }
 
-{% if sphinx.vars.api_packages -%}
+{%- if sphinx.vars.api_packages %}
+
 # -- Options for apidoc / autodoc extensions ---------------------------------
 
 apidoc_modules = [
-{% for package in sphinx.vars.api_packages %}
+{%- for package in sphinx.vars.api_packages %}
     {
         'path': {{ ('../../src/' ~ package) | pprint }},
         'destination': {{ ('doc/sphinx/_apidoc/' ~ package) | pprint }},
     },
-{% endfor -%}
+{%- endfor %}
 ]
 autodoc_default_options = {
     'members': True,
@@ -90,8 +92,9 @@ autodoc_typehints = 'description'
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 
-{% endif -%}
-{% if sphinx.vars.needs -%}
+{%- endif %}
+{%- if sphinx.vars.needs %}
+
 # -- Options for sphinx-needs extension --------------------------------------
 
 needs_types = [
@@ -142,4 +145,5 @@ needs_links = {
         'outgoing': 'verifies',
     },
 }
-{% endif -%}
+{%- endif %}
+{% endfilter %}
