@@ -13,12 +13,12 @@ _message_before_update: |
   For optional text answers, clear the value to skip.
 
 _message_after_copy: |
-  Project created in {{ _copier_conf.dst_path }}.
+  Project created in "{{ _copier_conf.dst_path }}".
   Review and customize the generated files before committing.
   Keep .copier-answers.yml to update this project with Copier.
 
 _message_after_update: |
-  Template update finished in {{ _copier_conf.dst_path }}.
+  Template update finished.
   Review the changes and resolve any conflicts before committing.
 
 copier_version:
