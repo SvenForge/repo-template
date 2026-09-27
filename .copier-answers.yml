@@ -1,11 +1,12 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 0.1.5
+_commit: 0.2.0a3
 _src_path: https://gitlab.com/sventerprise/repo-template.git
 codex_cloud: true
 codex_devcontainer: true
+copier_module_name: core
 core_include_gitignore: true
 core_include_readme: true
-core_license: NONE
+core_license: MIT
 core_owner_email: sven@nichtgerade.de
 core_owner_name: Sven Krummen
 core_owner_user: krum_sv
@@ -13,12 +14,12 @@ core_repository_name: Repo Template
 core_repository_url: https://gitlab.com/sventerprise/repo-template.git
 features:
 - core
-- codex
 - copier
-- devcontainer
-- gitlab
 - python
 - sphinx
+- gitlab
+- codex
+- devcontainer
 gitlab_pages_url: https://sventerprise.gitlab.io/repo-template/
 gitlab_pipeline:
 - copier
@@ -26,9 +27,12 @@ gitlab_pipeline:
 - python
 - sphinx
 python_package_name: ''
+python_testpackage_name: test_template
 python_tools:
 - pytest
 - ruff
 - mypy
 python_version: '3.12'
+sphinx_api_packages:
+- test_template
 sphinx_needs: false

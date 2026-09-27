@@ -1,3 +1,4 @@
+---
 # General Configuration
 _min_copier_version: &min_copier_version "9.17.2"
 _subdirectory: template
@@ -194,7 +195,6 @@ devcontainer_inputs:
 # Module outputs are automatically recognized and aggregated through their exports.jinja.
 files:
   type: yaml
-  help: Which files shall be generated?
   when: false
   default: |
     {%- set result = namespace(files=[]) -%}
@@ -212,7 +212,6 @@ files:
 
 contributions:
   type: yaml
-  help: Which contributions shall be made to other files?
   when: false
   default: |
     {%- set result = namespace(contributions=[]) -%}

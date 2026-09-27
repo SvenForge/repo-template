@@ -1,16 +1,24 @@
 """Sphinx configuration."""
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
+
 # -- Project information -----------------------------------------------------
 
-project = "Repo Template"
-author = "Sven Krummen"
-copyright = "2026"
+project = 'Repo Template'
+author = 'Sven Krummen'
+copyright = '2026'
 
 # -- General configuration ---------------------------------------------------
 
 extensions = [
     'myst_parser',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.apidoc',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
 ]
 
 root_doc = 'doc/sphinx/index'
@@ -23,6 +31,11 @@ exclude_patterns = [
     'doc/sphinx/_build',
     'template',
 ]
+exclude_patterns.extend(
+    f'doc/sphinx/_apidoc/{path.name}'
+    for path in (Path(__file__).parent / '_apidoc').glob('*')
+    if path.name not in ['test_template']
+)
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -46,3 +59,21 @@ intersphinx_mapping = {
     'matplotlib': ('https://matplotlib.org/stable/', None),
 }
 
+# -- Options for apidoc / autodoc extensions ---------------------------------
+
+apidoc_modules = [
+    {
+        'path': '../../src/test_template',
+        'destination': 'doc/sphinx/_apidoc/test_template',
+    },
+]
+autodoc_default_options = {
+    'members': True,
+    'show-inheritance': True,
+}
+autodoc_typehints = 'description'
+
+# -- Options for napoleon extension ------------------------------------------
+
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False

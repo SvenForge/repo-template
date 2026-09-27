@@ -1,28 +1,16 @@
 [dependency-groups]
-test = [
+dev = [
     "copier==9.17.2",
     "PyYAML",
     "pytest",
     "pytest-cov",
-]
-lint = [
-"mypy",
+    "mypy",
     "mypy-gitlab-code-quality",
-"ruff",
-]
-doc = [
+    "ruff",
     "furo",
     "myst-parser",
     "sphinx>=8.2",
 ]
-dev = [
-{ include-group = "test" },
-{ include-group = "lint" },
-{ include-group = "doc" },
-]
-
-
-
 
 [tool.pytest.ini_options]
 addopts = [
@@ -33,14 +21,12 @@ addopts = [
 ]
 testpaths = ["src/test_*"]
 
-
 [tool.coverage.run]
 branch = true
 omit = ["test_*"]
 
 [tool.coverage.report]
 show_missing = true
-
 
 [tool.ruff]
 src = ["src"]
@@ -82,8 +68,6 @@ convention = "google"
 [tool.ruff.format]
 quote-style = "single"
 
-
 [tool.mypy]
 files = ["src"]
 strict = true
-

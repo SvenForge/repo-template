@@ -276,5 +276,6 @@ pyrightconfig.json
 ### Sphinx ###
 doc/sphinx/_apidoc/
 doc/sphinx/_build/
+
 ### Project Customization ###
 pytest.xml

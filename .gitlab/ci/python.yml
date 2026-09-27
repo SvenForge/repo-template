@@ -4,7 +4,7 @@
   image: python:3.12-bookworm
   before_script:
     - python -m pip install --upgrade pip
-    - python -m pip install --group "$PYTHON_DEPENDENCY_GROUP"
+    - python -m pip install --group dev
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -21,8 +21,6 @@
 python:pytest:
   extends: .python:base
   needs: []
-  variables:
-    PYTHON_DEPENDENCY_GROUP: dev
   script:
     - pytest
   artifacts:
@@ -36,8 +34,6 @@ python:pytest:
 python:ruff:
   extends: .python:base
   needs: []
-  variables:
-    PYTHON_DEPENDENCY_GROUP: dev
   script:
     - ruff check --output-format=gitlab --output-file=ruff-code-quality.json
   allow_failure: true
@@ -49,10 +45,8 @@ python:ruff:
 python:mypy:
   extends: .python:base
   needs: []
-  variables:
-    PYTHON_DEPENDENCY_GROUP: dev
   script:
-    - mypy --output=json > mypy.json || mypy_status=$?
+    - python -m mypy --output=json > mypy.json || mypy_status=$?
     - mypy-gitlab-code-quality < mypy.json > mypy-code-quality.json || exit $?
     - exit "${mypy_status:-0}"
   allow_failure: true
