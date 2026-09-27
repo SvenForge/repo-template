@@ -6,7 +6,7 @@ codex_devcontainer: true
 copier_module_name: core
 core_include_gitignore: true
 core_include_readme: true
-core_license: NONE
+core_license: MIT
 core_owner_email: sven@nichtgerade.de
 core_owner_name: Sven Krummen
 core_owner_user: krum_sv
