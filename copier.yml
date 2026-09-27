@@ -3,23 +3,54 @@ _min_copier_version: &min_copier_version "9.17.2"
 _subdirectory: template
 
 _message_before_copy: |
-  Select the modules to include, then configure each selected module.
-  Use Space to select options and Enter to confirm.
+  Thank you for using our template!
+
+  Choose the parts you need, then answer a few questions about your project.
+  Copier will use your answers to create editable project files.
+  Use Space to select options in checklists and Enter to confirm your answers.
   For optional text answers, clear the value to skip.
 
 _message_before_update: |
-  Review your saved answers and any new module questions for this update.
-  Use Space to select options and Enter to confirm.
+  Thank you for using our template!
+
+  Copier will bring this repository's generated files up to date with the template.
+  Your saved answers are the suggested values; review them and any new questions.
+  Use Space to select options in checklists and Enter to confirm your answers.
   For optional text answers, clear the value to skip.
 
 _message_after_copy: |
-  Project created in "{{ _copier_conf.dst_path }}".
-  Review and customize the generated files before committing.
-  Keep .copier-answers.yml to update this project with Copier.
+  Project files created in "{{ _copier_conf.dst_path }}".
+
+  Open the project directory and review the generated files.
+  TODO notes mark places to customize for your project, such as its description or setup instructions.
+  If this directory is not a Git repository yet, run git init.
+  {% if '.devcontainer/devcontainer.json' in files | map(attribute='path') -%}
+  To use the Dev Container, reopen the project in a container with your editor.
+  {% endif -%}
+  {% if python.vars.enabled and (python.vars.has_distribution or python.vars.has_dev_dependencies) -%}
+  For local Python development, create and activate a virtual environment, then run:
+  {% from module_paths['python'] ~ '/fragments/install.jinja' import install_commands with context -%}
+  {{ install_commands() | indent(2, true) }}
+  {% endif -%}
+  After customizing the files, run your project's checks.
+  Review your changes, then stage and commit them with git add . and git commit.
+  Keep .copier-answers.yml; it saves your choices for later updates with copier update.
 
 _message_after_update: |
   Template update finished.
-  Review the changes and resolve any conflicts before committing.
+
+  Review the changed files and resolve any conflicts.
+  TODO notes in added or updated files mark places to customize for your project.
+  {% if '.devcontainer/devcontainer.json' in files | map(attribute='path') -%}
+  If you use the Dev Container, rebuild it when its configuration or dependencies change.
+  {% endif -%}
+  {% if python.vars.enabled and (python.vars.has_distribution or python.vars.has_dev_dependencies) -%}
+  To refresh your local Python environment, activate your virtual environment and run:
+  {% from module_paths['python'] ~ '/fragments/install.jinja' import install_commands with context -%}
+  {{ install_commands() | indent(2, true) }}
+  {% endif -%}
+  Run your project's checks, then review and commit the changes, including .copier-answers.yml.
+  Keep .copier-answers.yml for future updates.
 
 copier_version:
   type: str
