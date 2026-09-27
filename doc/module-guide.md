@@ -78,6 +78,10 @@ Create the module skeleton and one output with all three keys. Add a stable name
 
 Deselecting a name from `features` stops its files and contributions, but its static configuration remains loaded. To remove the module from a host, delete its choice, path registration, static include, input block, and module directory or submodule reference. Also remove or replace **consumer adapters that still read its output**; otherwise rendering can fail with an undefined module value. Review contributions and receiving targets, then render the remaining feature combinations.
 
+### Whitespace conventions
+
+Use local Jinja controls with Copier's default settings. Preserve content indentation and meaningful internal whitespace; receivers supply fragment spacing and base indentation. End nonempty text files with one LF newline, and keep generic yield templates newline-free.
+
 ## Reuse in another template
 
 ### Git submodule setup

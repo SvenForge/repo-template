@@ -18,7 +18,8 @@
     - when: manual
       allow_failure: true
 
-{% if 'pytest' in gitlab.vars.python_tools -%}
+{%- if 'pytest' in gitlab.vars.python_tools %}
+
 python:pytest:
   extends: .python:base
   needs: []
@@ -32,8 +33,9 @@ python:pytest:
         coverage_format: cobertura
         path: coverage.xml
 
-{% endif -%}
-{% if 'ruff' in gitlab.vars.python_tools -%}
+{%- endif %}
+{%- if 'ruff' in gitlab.vars.python_tools %}
+
 python:ruff:
   extends: .python:base
   needs: []
@@ -45,8 +47,9 @@ python:ruff:
     reports:
       codequality: ruff-code-quality.json
 
-{% endif -%}
-{% if 'mypy' in gitlab.vars.python_tools -%}
+{%- endif %}
+{%- if 'mypy' in gitlab.vars.python_tools %}
+
 python:mypy:
   extends: .python:base
   needs: []
@@ -59,4 +62,4 @@ python:mypy:
     when: always
     reports:
       codequality: mypy-code-quality.json
-{% endif -%}
+{%- endif %}
