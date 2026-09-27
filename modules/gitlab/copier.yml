@@ -29,7 +29,8 @@ gitlab_inputs:
 # Module Questions
 gitlab_pipeline:
   type: str
-  help: Which jobs shall be included in the GitLab pipeline?
+  help: "[GitLab] Which jobs do you want in the CI/CD pipeline?"
+  qmark: "🦊"
   multiselect: true
   choices: |
     {%- set vars = dict(gitlab_defaults, **gitlab_inputs) %}
@@ -54,7 +55,8 @@ gitlab_pipeline:
 
 gitlab_pages_url:
   type: str
-  help: At which URL is the Sphinx documentation published by GitLab Pages? (optional)
+  help: "[GitLab] What is the GitLab Pages URL for your documentation? (optional)"
+  qmark: "🦊"
   default: |
     {%- if gitlab_inputs.pages_url is defined -%}
     {{ gitlab_inputs.pages_url }}

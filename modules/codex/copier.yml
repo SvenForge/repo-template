@@ -19,13 +19,15 @@ codex_inputs:
 # Module Questions
 codex_cloud:
   type: bool
-  help: Set up Codex Cloud integration?
+  help: "[Codex] Set up Codex Cloud integration?"
+  qmark: "🤖"
   default: "{{ codex_inputs.cloud_integration | default((codex_inputs.enabled | default(codex_defaults.enabled)) and codex_defaults.cloud_integration) }}"
   when: "{{ codex_inputs.enabled | default(codex_defaults.enabled) }}"
 
 codex_devcontainer:
   type: bool
-  help: Add Codex integration to the Dev Container?
+  help: "[Codex] Add Codex to the Dev Container?"
+  qmark: "🤖"
   default: "{{ codex_inputs.devcontainer_integration | default((codex_inputs.devcontainer_available | default(codex_defaults.devcontainer_available)) and codex_defaults.devcontainer_integration) }}"
   when: "{{ (codex_inputs.enabled | default(codex_defaults.enabled)) and (codex_inputs.devcontainer_available | default(codex_defaults.devcontainer_available)) }}"
 

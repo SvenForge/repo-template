@@ -2,6 +2,25 @@
 _min_copier_version: &min_copier_version "9.17.2"
 _subdirectory: template
 
+_message_before_copy: |
+  Select the modules to include, then configure each selected module.
+  Use Space to select options and Enter to confirm.
+  For optional text answers, clear the value to skip.
+
+_message_before_update: |
+  Review your saved answers and any new module questions for this update.
+  Use Space to select options and Enter to confirm.
+  For optional text answers, clear the value to skip.
+
+_message_after_copy: |
+  Project created in {{ _copier_conf.dst_path }}.
+  Review and customize the generated files before committing.
+  Keep .copier-answers.yml to update this project with Copier.
+
+_message_after_update: |
+  Template update finished in {{ _copier_conf.dst_path }}.
+  Review the changes and resolve any conflicts before committing.
+
 copier_version:
   type: str
   help: Which Copier version does this template require?
@@ -25,16 +44,17 @@ module_paths:
 # Module Selector
 features:
   type: str
-  help: Which template features shall be used?
+  help: "[Template] Which modules do you want to include?"
+  qmark: "📦"
   multiselect: true
   choices:
-    Core: core
-    Copier: copier
-    Python: python
-    Sphinx: sphinx
-    GitLab: gitlab
-    Codex: codex
-    DevContainer: devcontainer
+    Core (README, license, .gitignore): core
+    Copier (build another template): copier
+    Python (packages, tests, code checks): python
+    Sphinx (documentation): sphinx
+    GitLab (CI/CD, issue and merge request templates): gitlab
+    Codex (agent guidance and integrations): codex
+    Dev Container (development environment): devcontainer
   default:
     - core
     - devcontainer

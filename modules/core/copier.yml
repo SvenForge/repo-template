@@ -26,13 +26,15 @@ core_inputs:
 # Module Questions
 core_repository_name:
   type: str
-  help: What is the name of the repository?
+  help: "[Core] What is the repository name?"
+  qmark: "📁"
   default: "{{ core_inputs.repository_name | default(core_defaults.repository_name) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 
 core_repository_url:
   type: str
-  help: At which URL is the repository hosted? (optional)
+  help: "[Core] What is the repository URL? (optional)"
+  qmark: "📁"
   default: "{{ core_inputs.repository_url | default(core_defaults.repository_url) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 
@@ -68,19 +70,22 @@ core_repository_path:
 
 core_owner_name:
   type: str
-  help: Who is the repository owner? (optional)
+  help: "[Core] Who is the repository owner? (optional)"
+  qmark: "📁"
   default: "{{ core_inputs.owner_name | default(core_defaults.owner_name) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 
 core_owner_email:
   type: str
-  help: What is the owner's email address? (optional)
+  help: "[Core] What is the owner's email address? (optional)"
+  qmark: "📁"
   default: "{{ core_inputs.owner_email | default(core_defaults.owner_email) }}"
   when: "{{ (core_inputs.enabled | default(core_defaults.enabled)) and core_owner_name }}"
 
 core_owner_user:
   type: str
-  help: What is the owner's username? (optional)
+  help: "[Core] What is the owner's username on the repository host? (optional)"
+  qmark: "📁"
   default: "{{ core_inputs.owner_user | default(core_defaults.owner_user) }}"
   when: "{{ (core_inputs.enabled | default(core_defaults.enabled)) and core_owner_name }}"
 
@@ -92,13 +97,15 @@ core_year:
 
 core_include_readme:
   type: bool
-  help: Create README.md file?
+  help: "[Core] Create README.md?"
+  qmark: "📁"
   default: "{{ core_inputs.readme | default((core_inputs.enabled | default(core_defaults.enabled)) and core_defaults.readme) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 
 core_license:
   type: str
-  help: Under which license shall this repository provided?
+  help: "[Core] Which license should the repository use?"
+  qmark: "📁"
   choices:
     All rights reserved: NONE
     MIT License: MIT
@@ -108,7 +115,8 @@ core_license:
 
 core_include_gitignore:
   type: bool
-  help: Create .gitignore file?
+  help: "[Core] Create .gitignore?"
+  qmark: "📁"
   default: "{{ core_inputs.gitignore | default((core_inputs.enabled | default(core_defaults.enabled)) and core_defaults.gitignore) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 

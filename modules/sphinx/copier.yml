@@ -27,7 +27,8 @@ sphinx_inputs:
 # Module Questions
 sphinx_api_packages:
   type: str
-  help: Which Python packages shall have API documentation?
+  help: "[Sphinx] Which Python packages need API documentation?"
+  qmark: "📚"
   multiselect: true
   choices: "{{ sphinx_inputs.python_packages | default(sphinx_defaults.python_packages) | to_json }}"
   default: "{{ sphinx_inputs.api_packages | default(sphinx_inputs.python_packages | default(sphinx_defaults.python_packages)) | to_json }}"
@@ -35,13 +36,15 @@ sphinx_api_packages:
 
 sphinx_needs:
   type: bool
-  help: Include Sphinx-Needs support?
+  help: "[Sphinx] Enable Sphinx-Needs for requirements tracking?"
+  qmark: "📚"
   default: "{{ sphinx_inputs.needs | default(sphinx_defaults.needs) }}"
   when: "{{ (sphinx_inputs.enabled | default(sphinx_defaults.enabled)) }}"
 
 sphinx_needs_pages:
   type: str
-  help: Which Sphinx-Needs starter pages shall be created?
+  help: "[Sphinx] Which Sphinx-Needs pages do you want to create?"
+  qmark: "📚"
   multiselect: true
   choices:
     Requirements: requirements
