@@ -19,7 +19,6 @@ core_defaults:
 # To be overwritten by template, otherwise defaults will be used
 core_inputs:
   type: yaml
-  help: Which inputs shall be used for the module?
   when: false
   default: {}
 
