@@ -35,6 +35,8 @@ The `copier_module_name` answer defaults to `custom`; pass `--data copier_module
 
 For an effective field, precedence is **saved or new question answer → supplied input → applicable calculation → module default**. For a question, the lower-priority values determine its prompt default. An explicit `false`, empty string, or zero is a supplied value, not a missing key. Keep input, default, and output field names consistent where they represent the same setting. Renaming a persisted question can affect existing Copier answers.
 
+Prefix visible question help with the module's display name, such as `[Python]`, and use one distinct `qmark` consistently throughout that module. Keep questions brief, explain unfamiliar choices, and mark optional text answers with `(optional)` or an explicit instruction to leave them empty. The host owns the module selector and copy/update messages; modules own their question wording and marks.
+
 ### Output manifest
 
 The module output always has these keys:

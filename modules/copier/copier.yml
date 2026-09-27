@@ -18,7 +18,8 @@ copier_inputs:
 # Module Questions
 copier_module_name:
   type: str
-  help: What should the starter module be named? (leave empty to skip module generation)
+  help: "[Copier] What should the Copier module be named? (leave empty to skip)"
+  qmark: "🧩"
   default: "{{ copier_inputs.module_name | default(copier_defaults.module_name) }}"
   when: "{{ copier_inputs.enabled | default(copier_defaults.enabled) }}"
   validator: >-

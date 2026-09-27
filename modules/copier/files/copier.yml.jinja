@@ -24,7 +24,8 @@ module_paths:
 # Module Selector
 features:
   type: str
-  help: Which template features shall be used?
+  help: "[Template] Which modules do you want to include?"
+  qmark: "📦"
   multiselect: true
 {% if copier.vars.module_name %}
   choices:
