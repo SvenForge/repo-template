@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 0.2.0a2
+_commit: 0.2.0a3
 _src_path: https://gitlab.com/sventerprise/repo-template.git
 codex_cloud: true
 codex_devcontainer: true

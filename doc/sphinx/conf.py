@@ -77,4 +77,3 @@ autodoc_typehints = 'description'
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
-

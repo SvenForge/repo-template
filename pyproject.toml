@@ -12,9 +12,6 @@ dev = [
     "sphinx>=8.2",
 ]
 
-
-
-
 [tool.pytest.ini_options]
 addopts = [
     "--cov",
@@ -24,14 +21,12 @@ addopts = [
 ]
 testpaths = ["src/test_*"]
 
-
 [tool.coverage.run]
 branch = true
 omit = ["test_*"]
 
 [tool.coverage.report]
 show_missing = true
-
 
 [tool.ruff]
 src = ["src"]
@@ -73,8 +68,6 @@ convention = "google"
 [tool.ruff.format]
 quote-style = "single"
 
-
 [tool.mypy]
 files = ["src"]
 strict = true
-

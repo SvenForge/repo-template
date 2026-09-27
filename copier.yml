@@ -62,7 +62,6 @@ features:
   help: "[Template] Which modules do you want to include?"
   qmark: "📦"
   multiselect: true
-
   choices:
     Core (README, license, .gitignore): core
     Copier (build another template): copier
