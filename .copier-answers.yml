@@ -1,6 +1,6 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 0.2.0a3
-_src_path: https://gitlab.com/sventerprise/repo-template.git
+_commit: 0.2.0rc1
+_src_path: .
 codex_cloud: true
 codex_devcontainer: true
 copier_module_name: core
@@ -11,7 +11,7 @@ core_owner_email: sven@nichtgerade.de
 core_owner_name: Sven Krummen
 core_owner_user: krum_sv
 core_repository_name: Repo Template
-core_repository_url: https://gitlab.com/sventerprise/repo-template.git
+core_repository_url: https://gitlab.com/svenforge/repo-template.git
 features:
 - core
 - copier
@@ -20,7 +20,7 @@ features:
 - gitlab
 - codex
 - devcontainer
-gitlab_pages_url: https://sventerprise.gitlab.io/repo-template/
+gitlab_pages_url: https://svenforge.gitlab.io/repo-template/
 gitlab_pipeline:
 - copier
 - demo
