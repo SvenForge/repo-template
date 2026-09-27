@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 0.2.0rc1
+_commit: 0.2.0
 _src_path: .
 codex_cloud: true
 codex_devcontainer: true
