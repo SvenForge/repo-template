@@ -64,40 +64,6 @@ Jinja imports inside a module also resolve from the host loader root. Use the re
 
 The root aggregator preserves selected-feature order and each module's contribution order. A receiving file selects matching `target` records and includes their templates. The receiver owns the surrounding syntax and separators; a listed fragment must render valid, nonempty content for that slot. A contribution to an absent receiver simply has no rendered destination. Keep the target name and fragment format aligned when either changes.
 
-### Whitespace conventions
-
-Keep the default Copier/Jinja environment settings. Use local whitespace controls according to the text a block produces:
-
-- Computation-only blocks can use `{%- ... -%}` when their result is explicitly serialized or delimited.
-- Content blocks usually use `{%- ... %}` to remove the preceding control-only line while retaining the next newline and indentation. Right trimming with `-%}` removes all following whitespace, including indentation; use it only when that whitespace is intentionally disposable.
-- File templates own their beginning, section separators, and final newline. Nonempty text output ends with one LF newline; an intentionally empty file can have zero bytes. For a conditional tail, an outer `trim` filter can remove surplus margin whitespace without changing interior spacing.
-- Receivers own the spacing around contributions. Trim optional newline margins with `trim('\r\n')` for text fragments so first-line indentation survives, then supply the required separators. Markdown sections, shell blocks, and gitignore sections use one blank line between blocks.
-- Structured fragments supply logical members or items without outer containers or base indentation. Keep relative indentation for nested content. The receiver supplies base indentation and separators: the Python dependency array uses four spaces, and Dev Container JSON uses its existing trim/indent/comma macro. Dependency-item fragments include their own TOML item commas; JSON fragments omit trailing commas.
-
-For example, retain indentation in a conditional array item:
-
-```jinja
-items = [
-{%- if enabled %}
-    "optional",
-{%- endif %}
-]
-```
-
-A receiver can normalize fragment margins and supply a blank line after each section:
-
-```jinja
-{% for contribution in contributions | selectattr('target', 'equalto', 'example.sections') -%}
-{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
-
-{% endfor -%}
-Next section
-```
-
-Preserve meaningful interior whitespace, including Makefile recipe tabs, two blank lines before Python top-level functions, command/string spaces, directive-body separators, and imported gitignore layout. Macro return values and JSON fragments may deliberately omit a final newline. The generic yield template and its Copier starter counterpart must remain newline-free includes so they pass file content through unchanged. Raw Jinja emitted by a starter must retain the syntax and indentation needed on its second rendering pass.
-
-Review temporary renders with empty and populated slots, optional branches, and fragments with and without final newlines. Run existing syntax/smoke checks; whitespace changes do not require new assertions or snapshots in the test suite.
-
 ## Working on modules
 
 ### Modify an existing module
@@ -111,6 +77,10 @@ Create the module skeleton and one output with all three keys. Add a stable name
 ### Deselect or remove a module
 
 Deselecting a name from `features` stops its files and contributions, but its static configuration remains loaded. To remove the module from a host, delete its choice, path registration, static include, input block, and module directory or submodule reference. Also remove or replace **consumer adapters that still read its output**; otherwise rendering can fail with an undefined module value. Review contributions and receiving targets, then render the remaining feature combinations.
+
+### Whitespace conventions
+
+Use local Jinja controls with Copier's default settings. Preserve content indentation and meaningful internal whitespace; receivers supply fragment spacing and base indentation. End nonempty text files with one LF newline, and keep generic yield templates newline-free.
 
 ## Reuse in another template
 
