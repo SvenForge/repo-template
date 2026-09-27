@@ -22,35 +22,18 @@ _message_after_copy: |
   Project files created in "{{ _copier_conf.dst_path }}".
 
   Open the project directory and review the generated files.
-  TODO notes mark places to customize for your project, such as its description or setup instructions.
-  If this directory is not a Git repository yet, run git init.
-  {% if '.devcontainer/devcontainer.json' in files | map(attribute='path') -%}
-  To use the Dev Container, reopen the project in a container with your editor.
-  {% endif -%}
-  {% if python.vars.enabled and (python.vars.has_distribution or python.vars.has_dev_dependencies) -%}
-  For local Python development, create and activate a virtual environment, then run:
-  {% from module_paths['python'] ~ '/fragments/install.jinja' import install_commands with context -%}
-  {{ install_commands() | indent(2, true) }}
-  {% endif -%}
-  After customizing the files, run your project's checks.
-  Review your changes, then stage and commit them with git add . and git commit.
-  Keep .copier-answers.yml; it saves your choices for later updates with copier update.
+  "TODO" notes mark places to customize for your project, such as its description or setup instructions.
+  If this directory is not a Git repository yet, run "git init {{ _copier_conf.dst_path }}".
+  After customizing the files, run your project's checks, then review and commit the changes to your repo.
+  Keep ".copier-answers.yml"; it saves your choices for later updates with "copier update".
 
 _message_after_update: |
   Template update finished.
 
   Review the changed files and resolve any conflicts.
-  TODO notes in added or updated files mark places to customize for your project.
-  {% if '.devcontainer/devcontainer.json' in files | map(attribute='path') -%}
-  If you use the Dev Container, rebuild it when its configuration or dependencies change.
-  {% endif -%}
-  {% if python.vars.enabled and (python.vars.has_distribution or python.vars.has_dev_dependencies) -%}
-  To refresh your local Python environment, activate your virtual environment and run:
-  {% from module_paths['python'] ~ '/fragments/install.jinja' import install_commands with context -%}
-  {{ install_commands() | indent(2, true) }}
-  {% endif -%}
-  Run your project's checks, then review and commit the changes, including .copier-answers.yml.
-  Keep .copier-answers.yml for future updates.
+  "TODO" notes in added or updated files mark places to customize for your project.
+  Run your project's checks, then review and commit the changes, including ".copier-answers.yml".
+  Keep ".copier-answers.yml" for future updates.
 
 copier_version:
   type: str
