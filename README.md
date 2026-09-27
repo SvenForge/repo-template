@@ -1,10 +1,8 @@
 # [Repo Template](https://gitlab.com/sventerprise/repo-template.git)
 
 [![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-orange.json)](https://github.com/copier-org/copier)
-[![Version](https://img.shields.io/badge/version-0.2.0a1-007EC6?logo=gitlab&logoColor=white)](https://gitlab.com/sventerprise/repo-template/-/tags)
 [![Documentation](https://img.shields.io/badge/docs-GitLab%20Pages-007EC6?logo=gitlab&logoColor=white)](https://sventerprise.gitlab.io/repo-template/)
-[![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-Support-FF5E5B?logo=kofi&logoColor=white)](https://ko-fi.com/krumsv)
-<!-- Update the version badge when adding a new Git tag. -->
+[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20me-FF5E5B?logo=kofi&logoColor=white)](https://ko-fi.com/krumsv)
 
 Set up a Git repository without repeating the same documentation and tool configuration. [Copier](https://copier.readthedocs.io/en/stable/) asks questions and generates editable project files, which you can update as this template evolves.
 
