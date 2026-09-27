@@ -23,7 +23,7 @@ _message_after_copy: |
 
   Open the project directory and review the generated files.
   "TODO" notes mark places to customize for your project, such as its description or setup instructions.
-  If this directory is not a Git repository yet, run "git init {{ _copier_conf.dst_path }}".
+  If this directory is not a Git repository yet, run "git init" from the project directory.
   After customizing the files, run your project's checks, then review and commit the changes to your repo.
   Keep ".copier-answers.yml"; it saves your choices for later updates with "copier update".
 
