@@ -1,4 +1,6 @@
-{% if python.vars.has_distribution -%}
+{% if python.vars.has_distribution or python.vars.has_dev_dependencies or python.vars.tools -%}
+{% filter trim -%}
+{%- if python.vars.has_distribution %}
 [build-system]
 requires = [
     "setuptools>=84",
@@ -11,43 +13,45 @@ name = {{ python.vars.distribution_name | tojson }}
 dynamic = ["version"]
 requires-python = ">={{ python.vars.version }}"
 dependencies = []
-{% if python.vars.has_readme -%}
+{%- if python.vars.has_readme %}
 readme = "README.md"
-{% endif -%}
-{% if python.vars.has_license -%}
+{%- endif %}
+{%- if python.vars.has_license %}
 license = {% if python.vars.license == 'NONE' %}"LicenseRef-Proprietary"{% else %}{{ python.vars.license | tojson }}{% endif %}
 license-files = ["LICENSE.md"]
-{% endif -%}
-{% if python.vars.owner_name -%}
+{%- endif %}
+{%- if python.vars.owner_name %}
 authors = [
     { name = {{ python.vars.owner_name | tojson }}{% if python.vars.owner_email %}, email = {{ python.vars.owner_email | tojson }}{% endif %} },
 ]
-{% endif %}
-{% endif -%}
-{% if python.vars.has_dev_dependencies -%}
+{%- endif %}
+{%- endif %}
+{%- if python.vars.has_dev_dependencies %}
+
 [dependency-groups]
-{% for contribution in contributions | selectattr('target', 'equalto', 'python.dependency_groups') -%}
-{% include contribution.template -%}
-{% endfor -%}
+{%- for contribution in contributions | selectattr('target', 'equalto', 'python.dependency_groups') %}
+{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
+{%- endfor %}
 dev = [
-{% if 'pytest' in python.vars.tools -%}
+{%- if 'pytest' in python.vars.tools %}
     "pytest",
     "pytest-cov",
-{% endif -%}
-{% if 'mypy' in python.vars.tools -%}
+{%- endif %}
+{%- if 'mypy' in python.vars.tools %}
     "mypy",
     "mypy-gitlab-code-quality",
-{% endif -%}
-{% if 'ruff' in python.vars.tools -%}
+{%- endif %}
+{%- if 'ruff' in python.vars.tools %}
     "ruff",
-{% endif -%}
-{% for contribution in contributions | selectattr('target', 'equalto', 'python.dev_dependencies') -%}
-{% include contribution.template -%}
-{% endfor -%}
+{%- endif %}
+{%- for contribution in contributions | selectattr('target', 'equalto', 'python.dev_dependencies') %}
+{% filter trim('\r\n') | indent(4, true) %}{% include contribution.template %}{% endfilter %}
+{%- endfor %}
 ]
-{% endif %}
+{%- endif %}
 
-{% if python.vars.has_distribution -%}
+{%- if python.vars.has_distribution %}
+
 [tool.setuptools]
 package-dir = { "" = "src" }
 
@@ -58,9 +62,10 @@ namespaces = false
 
 [tool.setuptools_scm]
 fallback_version = "0.0.0"
-{% endif %}
+{%- endif %}
 
-{% if 'pytest' in python.vars.tools -%}
+{%- if 'pytest' in python.vars.tools %}
+
 [tool.pytest.ini_options]
 addopts = [
     "--cov",
@@ -69,9 +74,9 @@ addopts = [
     "--junitxml=pytest.xml",
 ]
 testpaths = ["src/test_*"{% if not python.vars.testpackage_name.startswith('test_') %}, {{ ('src/' ~ python.vars.testpackage_name) | tojson }}{% endif %}]
-{% if python.vars.package_name and not python.vars.has_distribution -%}
+{%- if python.vars.package_name and not python.vars.has_distribution %}
 pythonpath = ["src"]
-{% endif %}
+{%- endif %}
 
 [tool.coverage.run]
 branch = true
@@ -79,9 +84,10 @@ omit = ["test_*"{% if not python.vars.testpackage_name.startswith('test_') %}, {
 
 [tool.coverage.report]
 show_missing = true
-{% endif %}
+{%- endif %}
 
-{% if 'ruff' in python.vars.tools -%}
+{%- if 'ruff' in python.vars.tools %}
+
 [tool.ruff]
 src = ["src"]
 exclude = [
@@ -114,10 +120,13 @@ convention = "google"
 
 [tool.ruff.format]
 quote-style = "single"
-{% endif %}
+{%- endif %}
 
-{% if 'mypy' in python.vars.tools -%}
+{%- if 'mypy' in python.vars.tools %}
+
 [tool.mypy]
 files = ["src"]
 strict = true
-{% endif %}
+{%- endif %}
+{% endfilter %}
+{% endif -%}

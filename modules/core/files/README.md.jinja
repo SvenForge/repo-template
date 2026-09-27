@@ -20,7 +20,8 @@ _TODO: Explain development setup and how to run checks._
 
 <!-- toctree-start -->
 {% for contribution in contributions | selectattr('target', 'equalto', 'core.readme.documentation') -%}
-{% include contribution.template -%}
+{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
+{{ '\n' if not loop.last else '' -}}
 {% else -%}
 _TODO: Link or add documentation._
 {% endfor -%}

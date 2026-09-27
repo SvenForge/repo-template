@@ -35,6 +35,8 @@ The `copier_module_name` answer defaults to `custom`; pass `--data copier_module
 
 For an effective field, precedence is **saved or new question answer → supplied input → applicable calculation → module default**. For a question, the lower-priority values determine its prompt default. An explicit `false`, empty string, or zero is a supplied value, not a missing key. Keep input, default, and output field names consistent where they represent the same setting. Renaming a persisted question can affect existing Copier answers.
 
+Prefix visible question help with the module's display name, such as `[Python]`, and use one distinct `qmark` consistently throughout that module. Keep questions brief, explain unfamiliar choices, and mark optional text answers with `(optional)` or an explicit instruction to leave them empty. The host owns the module selector and copy/update messages; modules own their question wording and marks.
+
 ### Output manifest
 
 The module output always has these keys:
@@ -75,6 +77,10 @@ Create the module skeleton and one output with all three keys. Add a stable name
 ### Deselect or remove a module
 
 Deselecting a name from `features` stops its files and contributions, but its static configuration remains loaded. To remove the module from a host, delete its choice, path registration, static include, input block, and module directory or submodule reference. Also remove or replace **consumer adapters that still read its output**; otherwise rendering can fail with an undefined module value. Review contributions and receiving targets, then render the remaining feature combinations.
+
+### Whitespace conventions
+
+Use local Jinja controls with Copier's default settings. Preserve content indentation and meaningful internal whitespace; receivers supply fragment spacing and base indentation. End nonempty text files with one LF newline, and keep generic yield templates newline-free.
 
 ## Reuse in another template
 

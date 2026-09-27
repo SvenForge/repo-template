@@ -3,6 +3,39 @@
 _min_copier_version: &min_copier_version "9.17.2"
 _subdirectory: template
 
+_message_before_copy: |
+  Thank you for using our template!
+
+  Choose the parts you need, then answer a few questions about your project.
+  Copier will use your answers to create editable project files.
+  Use Space to select options in checklists and Enter to confirm your answers.
+  For optional text answers, clear the value to skip.
+
+_message_before_update: |
+  Thank you for using our template!
+
+  Copier will bring this repository's generated files up to date with the template.
+  Your saved answers are the suggested values; review them and any new questions.
+  Use Space to select options in checklists and Enter to confirm your answers.
+  For optional text answers, clear the value to skip.
+
+_message_after_copy: |
+  Project files created in "{{ _copier_conf.dst_path }}".
+
+  Open the project directory and review the generated files.
+  "TODO" notes mark places to customize for your project, such as its description or setup instructions.
+  If this directory is not a Git repository yet, run "git init" from the project directory.
+  After customizing the files, run your project's checks, then review and commit the changes to your repo.
+  Keep ".copier-answers.yml"; it saves your choices for later updates with "copier update".
+
+_message_after_update: |
+  Template update finished.
+
+  Review the changed files and resolve any conflicts.
+  "TODO" notes in added or updated files mark places to customize for your project.
+  Run your project's checks, then review and commit the changes, including ".copier-answers.yml".
+  Keep ".copier-answers.yml" for future updates.
+
 copier_version:
   type: str
   help: Which Copier version does this template require?
@@ -26,17 +59,18 @@ module_paths:
 # Module Selector
 features:
   type: str
-  help: Which template features shall be used?
+  help: "[Template] Which modules do you want to include?"
+  qmark: "📦"
   multiselect: true
 
   choices:
-    Core: core
-    Copier: copier
-    Python: python
-    Sphinx: sphinx
-    GitLab: gitlab
-    Codex: codex
-    DevContainer: devcontainer
+    Core (README, license, .gitignore): core
+    Copier (build another template): copier
+    Python (packages, tests, code checks): python
+    Sphinx (documentation): sphinx
+    GitLab (CI/CD, issue and merge request templates): gitlab
+    Codex (agent guidance and integrations): codex
+    Dev Container (development environment): devcontainer
   default:
     - core
     - devcontainer

@@ -1,5 +1,5 @@
 {% for contribution in contributions | selectattr('target', 'equalto', 'core.gitignore') -%}
-{% include contribution.template -%}
-{% endfor -%}
+{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
 
+{% endfor -%}
 ### Project Customization ###
