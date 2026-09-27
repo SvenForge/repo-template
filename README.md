@@ -1,7 +1,7 @@
 # [Repo Template](https://gitlab.com/svenforge/repo-template.git)
 
 [![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-orange.json)](https://github.com/copier-org/copier)
-[![Documentation](https://img.shields.io/badge/docs-GitLab%20Pages-007EC6?logo=gitlab&logoColor=white)](https://sventerprise.gitlab.io/repo-template/)
+[![Documentation](https://img.shields.io/badge/docs-GitLab%20Pages-007EC6?logo=gitlab&logoColor=white)](https://svenforge.gitlab.io/repo-template/)
 [![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20me-FF5E5B?logo=kofi&logoColor=white)](https://ko-fi.com/krumsv)
 
 Set up a Git repository without repeating the same documentation and tool configuration. [Copier](https://copier.readthedocs.io/en/stable/) asks questions and generates editable project files, which you can update as this template evolves.
@@ -29,7 +29,7 @@ python -m pip install "copier>=9.17"
 Generate a project and answer Copier's questions:
 
 ```shell
-copier copy https://gitlab.com/sventerprise/repo-template.git path/to/new-project
+copier copy https://gitlab.com/svenforge/repo-template.git path/to/new-project
 cd path/to/new-project
 ```
 
@@ -74,7 +74,7 @@ For Copier commands and concepts, see the [Copier documentation](https://copier.
 
 ## Contributing
 
-Questions, setup problems, documentation gaps, and proposed improvements are welcome in the [issue tracker](https://gitlab.com/sventerprise/repo-template/-/issues). For contributions, follow the workflow in [AGENTS.md](https://gitlab.com/sventerprise/repo-template/-/blob/main/AGENTS.md).
+Questions, setup problems, documentation gaps, and proposed improvements are welcome in the [issue tracker](https://gitlab.com/svenforge/repo-template/-/issues). For contributions, follow the workflow in [AGENTS.md](https://gitlab.com/svenforge/repo-template/-/blob/main/AGENTS.md).
 
 ### Maintainer
 

@@ -21,7 +21,7 @@ modules/<name>/
 Select the Copier feature to scaffold another template:
 
 ```shell
-copier copy --defaults --data 'features=[copier]' https://gitlab.com/sventerprise/repo-template.git my-template
+copier copy --defaults --data 'features=[copier]' https://gitlab.com/svenforge/repo-template.git my-template
 copier copy --defaults my-template my-project
 ```
 
@@ -92,7 +92,7 @@ Today the supported reuse path is to mount this repository as a Git submodule. I
 mkdir consumer-template
 cd consumer-template
 git init
-git submodule add https://gitlab.com/sventerprise/repo-template.git vendor/repo-template
+git submodule add https://gitlab.com/svenforge/repo-template.git vendor/repo-template
 mkdir -p template
 cp vendor/repo-template/template/*.jinja template/
 ```
