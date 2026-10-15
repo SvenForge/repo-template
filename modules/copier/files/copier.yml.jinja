@@ -21,10 +21,10 @@ module_paths:
   default: {}
 {%- endif %}
 
-# Module Selector
+# Feature Selector
 features:
   type: str
-  help: "[Template] Which modules do you want to include?"
+  help: "[Template] Which features do you want to include?"
   qmark: "📦"
   multiselect: true
 {%- if copier.vars.module_name %}
@@ -36,14 +36,6 @@ features:
   choices: {}
   default: []
 {%- endif %}
-{%- raw %}
-  validator: >-
-    {%- for feature in features -%}
-    {%- if feature not in module_paths.keys() -%}
-    Path to template module "{{ feature }}" not found.
-    {%- endif -%}
-    {%- endfor -%}
-{%- endraw %}
 
 # Module Includes and Inputs
 # Keep each input definition after the corresponding !include.
@@ -62,14 +54,13 @@ features:
 ---
 {% raw -%}
 # Output Aggregation
-# Module outputs are automatically recognized and aggregated through their exports.jinja.
+# Aggregate each registered module through its exports.jinja, in registry order.
 files:
   type: yaml
   when: false
   default: |
     {%- set result = namespace(files=[]) -%}
-    {%- for feature in features -%}
-      {%- set module_path = module_paths[feature] -%}
+    {%- for module_path in module_paths.values() -%}
       {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for file in output.files -%}
         {%- set result.files = result.files + [{
@@ -85,8 +76,7 @@ contributions:
   when: false
   default: |
     {%- set result = namespace(contributions=[]) -%}
-    {%- for feature in features -%}
-      {%- set module_path = module_paths[feature] -%}
+    {%- for module_path in module_paths.values() -%}
       {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for contribution in output.contributions -%}
         {%- set result.contributions = result.contributions + [{

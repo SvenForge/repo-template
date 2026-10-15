@@ -2,12 +2,11 @@
 
 import ast
 import json
+import tomllib
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-
-import tomllib
 
 TEMPLATE_ROOT = Path(__file__).parents[2]
 
@@ -54,6 +53,8 @@ def assert_expected(actual: Any, expected: Any) -> None:
             assert_expected(actual[key], value)
     elif isinstance(expected, list):
         assert isinstance(actual, list), f'Expected a list, got {actual!r}'
+        if not expected:
+            assert not actual, f'Expected an empty list, got {actual!r}'
         for value in expected:
             assert value in actual, f'Missing list member: {value!r}'
     else:

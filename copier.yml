@@ -56,10 +56,10 @@ module_paths:
     codex: modules/codex
     devcontainer: modules/devcontainer
 
-# Module Selector
+# Feature Selector
 features:
   type: str
-  help: "[Template] Which modules do you want to include?"
+  help: "[Template] Which features do you want to include?"
   qmark: "📦"
   multiselect: true
   choices:
@@ -76,12 +76,6 @@ features:
     - gitlab
     - python
     - sphinx
-  validator: >-
-    {%- for feature in features -%}
-    {%- if feature not in module_paths.keys() -%}
-    Path to template module "{{ feature }}" not found.
-    {%- endif -%}
-    {%- endfor -%}
 
 # Module Includes and Inputs
 # Keep each input definition after the corresponding !include.
@@ -122,7 +116,7 @@ python_inputs:
     license: {{ core.vars.license | to_json }}
     owner_name: {{ core.vars.owner_name | to_json }}
     owner_email: {{ core.vars.owner_email | to_json }}
-    {# The host declares which selected modules provide development dependencies. #}
+    {# The host declares which features provide development dependencies. #}
     has_extra_dev_dependencies: {{ 'sphinx' in features }}
 
 ---
@@ -192,14 +186,13 @@ devcontainer_inputs:
 
 ---
 # Output Aggregation
-# Module outputs are automatically recognized and aggregated through their exports.jinja.
+# Aggregate each registered module through its exports.jinja, in registry order.
 files:
   type: yaml
   when: false
   default: |
     {%- set result = namespace(files=[]) -%}
-    {%- for feature in features -%}
-      {%- set module_path = module_paths[feature] -%}
+    {%- for module_path in module_paths.values() -%}
       {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for file in output.files -%}
         {%- set result.files = result.files + [{
@@ -215,8 +208,7 @@ contributions:
   when: false
   default: |
     {%- set result = namespace(contributions=[]) -%}
-    {%- for feature in features -%}
-      {%- set module_path = module_paths[feature] -%}
+    {%- for module_path in module_paths.values() -%}
       {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for contribution in output.contributions -%}
         {%- set result.contributions = result.contributions + [{

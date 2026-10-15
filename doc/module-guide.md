@@ -33,6 +33,8 @@ The `copier_module_name` answer defaults to `custom`; pass `--data copier_module
 
 `<name>_defaults` supplies module-owned fallback values. A host defines a sparse `<name>_inputs` mapping after the module's static include; omitted keys retain their defaults. An ordinary question may prompt the user and save its answer, while a hidden question can calculate a value needed by later questions.
 
+Keep activation and other feature-dependent settings together in this host input block. One feature can enable several modules, and a shared module can be enabled by several features. Modules consume their namespaced inputs instead of reading the host's `features`. Explicitly supply `enabled` for optional modules, since standalone defaults may enable them. The consumer example below shows shared activation and feature-dependent integration defaults.
+
 For an effective field, precedence is **saved or new question answer → supplied input → applicable calculation → module default**. For a question, the lower-priority values determine its prompt default. An explicit `false`, empty string, or zero is a supplied value, not a missing key. Keep input, default, and output field names consistent where they represent the same setting. Renaming a persisted question can affect existing Copier answers.
 
 Prefix visible question help with the module's display name, such as `[Python]`, and use one distinct `qmark` consistently throughout that module. Keep questions brief, explain unfamiliar choices, and mark optional text answers with `(optional)` or an explicit instruction to leave them empty. The host owns the module selector and copy/update messages; modules own their question wording and marks.
@@ -47,7 +49,7 @@ The module output always has these keys:
 | `files` | A list of `{path, template}` records for files this module owns. |
 | `contributions` | A list of `{target, template}` records for fragments included by receiving files. |
 
-Both lists exist even when empty. For example, Codex can own `AGENTS.md` with `template: files/AGENTS.md.jinja` and contribute `fragments/devcontainer.extensions.json.jinja` to `devcontainer.extensions`. A consumer that needs to know whether `AGENTS.md` exists should check the provider's `files` paths, not infer it from an input flag.
+Both lists exist even when empty. A disabled module returns `files: []` and `contributions: []`; the host aggregates every registered module without repeating activation logic. For example, Codex can own `AGENTS.md` with `template: files/AGENTS.md.jinja` and contribute `fragments/devcontainer.extensions.json.jinja` to `devcontainer.extensions`. A consumer that needs to know whether `AGENTS.md` exists should check the provider's `files` paths, not infer it from an input flag.
 
 ### Path conventions
 
@@ -62,7 +64,7 @@ Jinja imports inside a module also resolve from the host loader root. Use the re
 
 ### Contributions and extension points
 
-The root aggregator preserves selected-feature order and each module's contribution order. A receiving file selects matching `target` records and includes their templates. The receiver owns the surrounding syntax and separators; a listed fragment must render valid, nonempty content for that slot. A contribution to an absent receiver simply has no rendered destination. Keep the target name and fragment format aligned when either changes.
+The root aggregator preserves `module_paths` registry order and each module's contribution order. Static include order separately controls provider evaluation. A receiving file selects matching `target` records and includes their templates. The receiver owns the surrounding syntax and separators; a listed fragment must render valid, nonempty content for that slot. A contribution to an absent receiver simply has no rendered destination. Keep the target name and fragment format aligned when either changes.
 
 ## Working on modules
 
@@ -72,11 +74,11 @@ Edit content in its owning `files/` template or contributing `fragments/` templa
 
 ### Add a module
 
-Create the module skeleton and one output with all three keys. Add a stable name to the host `features` choices and `module_paths`, then add a matching static `!include` followed by its input override. Put providers before consumers and add only the cross-module adapters the host needs. The generic aggregators need no module-specific edits. Check that the new module owns distinct generated destinations and that every contribution target has the expected receiver and format.
+Create the module skeleton and one output with all three keys. Register it in `module_paths`, then add a matching static `!include` followed by its input override. Add a `features` choice only when exposing a public capability; a support module needs none. Put providers before consumers and define activation and other supplied settings in the input block. The generic aggregators need no module-specific edits. Check that the new module owns distinct generated destinations and that every contribution target has the expected receiver and format.
 
-### Deselect or remove a module
+### Deselect a feature or remove a module
 
-Deselecting a name from `features` stops its files and contributions, but its static configuration remains loaded. To remove the module from a host, delete its choice, path registration, static include, input block, and module directory or submodule reference. Also remove or replace **consumer adapters that still read its output**; otherwise rendering can fail with an undefined module value. Review contributions and receiving targets, then render the remaining feature combinations.
+Deselecting a feature disables a module only when no remaining feature enables it through the host inputs. Its static configuration remains loaded. To remove a module from a host, delete its path registration, static include, input block, and module directory or submodule reference, then adjust affected feature choices and adapters. Also remove or replace **consumer adapters that still read its output**; otherwise rendering can fail with an undefined module value. Review contributions and receiving targets, then render the remaining feature combinations.
 
 ### Whitespace conventions
 
@@ -101,7 +103,7 @@ The two copied files are the generic yield template and Copier answers template.
 
 ### Minimal consumer example
 
-Save the following as the host's `copier.yml`. It selects only Codex and Dev Container. The static includes and path registrations are separate declarations; keep both aligned. The input blocks follow their includes, and the two aggregators are copied from this repository's root configuration.
+Save the following as the host's `copier.yml`. It offers agent guidance or a development workspace using Codex and Dev Container. Both features share Codex; only the workspace enables Dev Container and defaults to Cloud integration. The feature IDs differ from the module IDs. Keep static includes and path registrations aligned. The input blocks follow their includes, and the two aggregators match the root configuration.
 
 ```yaml
 _min_copier_version: "9.17.2"
@@ -118,11 +120,10 @@ features:
   type: str
   multiselect: true
   choices:
-    Codex: codex
-    Dev Container: devcontainer
+    Agent guidance: guidance
+    Development workspace: workspace
   default:
-    - codex
-    - devcontainer
+    - workspace
 
 ---
 !include vendor/repo-template/modules/codex/copier.yml
@@ -131,8 +132,9 @@ codex_inputs:
   type: yaml
   when: false
   default: |
-    enabled: {{ 'codex' in features }}
-    devcontainer_available: {{ 'devcontainer' in features }}
+    enabled: {{ 'guidance' in features or 'workspace' in features }}
+    cloud_integration: {{ 'workspace' in features }}
+    devcontainer_available: {{ 'workspace' in features }}
 
 ---
 !include vendor/repo-template/modules/devcontainer/copier.yml
@@ -141,7 +143,7 @@ devcontainer_inputs:
   type: yaml
   when: false
   default: |
-    enabled: {{ 'devcontainer' in features }}
+    enabled: {{ 'workspace' in features }}
 
 ---
 files:
@@ -149,8 +151,7 @@ files:
   when: false
   default: |
     {%- set result = namespace(files=[]) -%}
-    {%- for feature in features -%}
-      {%- set module_path = module_paths[feature] -%}
+    {%- for module_path in module_paths.values() -%}
       {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for file in output.files -%}
         {%- set result.files = result.files + [{
@@ -166,8 +167,7 @@ contributions:
   when: false
   default: |
     {%- set result = namespace(contributions=[]) -%}
-    {%- for feature in features -%}
-      {%- set module_path = module_paths[feature] -%}
+    {%- for module_path in module_paths.values() -%}
       {%- from module_path ~ '/exports.jinja' import output with context -%}
       {%- for contribution in output.contributions -%}
         {%- set result.contributions = result.contributions + [{
@@ -189,4 +189,4 @@ copier copy --defaults . ../generated-project
 
 ### Verify the render
 
-With Copier 9.17.2 and both default features selected, the generated project contains `AGENTS.md`, `.codex/setup.sh`, `.codex/maintenance.sh`, `.devcontainer/devcontainer.json`, and `.copier-answers.yml`. The Dev Container JSON includes Codex's contributions. This example needs no custom Jinja extension or `--trust`. It uses a fixed Git submodule revision once the host commits the gitlink.
+With Copier 9.17.2 and the default workspace selected, the generated project contains `AGENTS.md`, `.codex/setup.sh`, `.codex/maintenance.sh`, `.devcontainer/devcontainer.json`, and `.copier-answers.yml`. The Dev Container JSON includes Codex's contributions. Guidance alone defaults to only `AGENTS.md` and the answers file. Selecting both still emits each module's output once; selecting neither emits only the answers file. This example needs no custom Jinja extension or `--trust`. It uses a fixed Git submodule revision once the host commits the gitlink.

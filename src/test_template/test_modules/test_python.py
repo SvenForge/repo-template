@@ -1,9 +1,9 @@
 """Smoke checks for Python output and each of its templates."""
 
 import ast
+import tomllib
 
 import pytest
-import tomllib
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, json_members, module_context
 
