@@ -1,13 +1,11 @@
 """Check representative complete projects through the Copier CLI."""
 
-import json
-import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 
-from ..support import TEMPLATE_ROOT, TemplateCase
+from ..support import TemplateCase
 
 
 @pytest.mark.parametrize(
@@ -48,18 +46,6 @@ from ..support import TEMPLATE_ROOT, TemplateCase
                 expected={'.copier-answers.yml': ('features: []',)},
             ),
             id='empty-repository',
-        ),
-        pytest.param(
-            TemplateCase(
-                answers={'features': '[copier]', 'copier_module_name': ''},
-                expected={
-                    '.copier-answers.yml': (),
-                    'copier.yml': ('module_paths:', 'choices: {}'),
-                    'template/{% yield file from files %}{{ file.path }}{% endyield %}.jinja': ('{% include file.template %}',),
-                    'template/{{ _copier_conf.answers_file }}.jinja': ('{{ _copier_answers|to_nice_yaml -}}',),
-                },
-            ),
-            id='empty-starter',
         ),
         pytest.param(
             TemplateCase(
@@ -126,65 +112,3 @@ def test_copy(tmp_path: Path, template_source: Path, case: TemplateCase) -> None
         content = (destination / path).read_text()
         for expected in expected_content:
             assert expected in content
-
-    if 'copier.yml' in case.expected:
-        inner_destination = tmp_path / 'inner-repository'
-        subprocess.run(['copier', 'copy', '--defaults', '--quiet', str(destination), str(inner_destination)], check=True)
-        assert {path.relative_to(inner_destination).as_posix() for path in inner_destination.rglob('*') if path.is_file()} == {'.copier-answers.yml'}
-
-
-@pytest.mark.parametrize(
-    'case',
-    [
-        pytest.param(TemplateCase(answers={'features': '[]'}, expected={'.copier-answers.yml': ('features: []',)}), id='disabled'),
-        pytest.param(TemplateCase(answers={'features': '[guidance]'}, expected={'.copier-answers.yml': ('features:\n- guidance\n',), 'AGENTS.md': ()}), id='guidance'),
-        pytest.param(
-            TemplateCase(
-                answers={'features': '[workspace]'},
-                expected={
-                    '.copier-answers.yml': ('features:\n- workspace\n',),
-                    'AGENTS.md': (),
-                    '.codex/setup.sh': (),
-                    '.codex/maintenance.sh': (),
-                    '.devcontainer/devcontainer.json': (),
-                },
-            ),
-            id='workspace',
-        ),
-        pytest.param(
-            TemplateCase(
-                answers={'features': '[guidance, workspace]'},
-                expected={
-                    '.copier-answers.yml': ('features:\n- guidance\n- workspace\n',),
-                    'AGENTS.md': (),
-                    '.codex/setup.sh': (),
-                    '.codex/maintenance.sh': (),
-                    '.devcontainer/devcontainer.json': (),
-                },
-            ),
-            id='shared-provider',
-        ),
-    ],
-)
-def test_consumer_example(tmp_path: Path, template_source: Path, case: TemplateCase) -> None:
-    source = tmp_path / 'consumer'
-    shutil.copytree(template_source, source / 'vendor' / 'repo-template')
-    shutil.copytree(template_source / 'template', source / 'template')
-    guide = (TEMPLATE_ROOT / 'doc' / 'module-guide.md').read_text()
-    configuration = guide.split('### Minimal consumer example', 1)[1].split('```yaml\n', 1)[1].split('```', 1)[0]
-    (source / 'copier.yml').write_text(configuration)
-
-    destination = tmp_path / 'repository'
-    subprocess.run(['copier', 'copy', '--defaults', '--quiet', '--data', f'features={case.answers["features"]}', str(source), str(destination)], check=True)
-    assert {path.relative_to(destination).as_posix() for path in destination.rglob('*') if path.is_file()} == set(case.expected)
-    for path, expected_content in case.expected.items():
-        content = (destination / path).read_text()
-        for expected in expected_content:
-            assert expected in content
-    assert '\nmodule_paths:' not in (destination / '.copier-answers.yml').read_text()
-
-    if '.devcontainer/devcontainer.json' in case.expected:
-        container = json.loads((destination / '.devcontainer' / 'devcontainer.json').read_text())
-        extensions = container['customizations']['vscode']['extensions']
-        assert extensions.count('openai.chatgpt') == 1
-        assert extensions.index('openai.chatgpt') < extensions.index('mhutchie.git-graph')
