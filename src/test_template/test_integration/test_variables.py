@@ -34,7 +34,7 @@ from ..support import VariableCase, VariablesCheck
                 answers={'features': ['core', 'sphinx', 'gitlab']},
                 expected={
                     'python': {'vars': {'enabled': False}, 'files': [], 'contributions': []},
-                    'pyproject': {'vars': {'enabled': True, 'install': True, 'name': 'my-repository'}},
+                    'pyproject': {'vars': {'enabled': True, 'install': 'dependencies', 'name': 'my-repository'}},
                     'files': [{'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'}],
                     'gitlab': {'vars': {'python_enabled': False, 'has_python_distribution': False, 'pipeline': ['sphinx']}},
                 },
@@ -52,7 +52,7 @@ from ..support import VariableCase, VariablesCheck
                 },
                 expected={
                     'python': {'vars': {'enabled': False}, 'files': [], 'contributions': []},
-                    'pyproject': {'vars': {'install': True, 'python_version': '3.13'}},
+                    'pyproject': {'vars': {'install': 'dependencies', 'python_version': '3.13'}},
                     'sphinx': {'vars': {'needs': True, 'api_packages': []}},
                     'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.13-bookworm'}},
                     'contributions': [
@@ -69,7 +69,7 @@ from ..support import VariableCase, VariablesCheck
             VariableCase(
                 answers={'features': ['python'], 'python_package_name': 'widget', 'python_tools': []},
                 expected={
-                    'pyproject': {'vars': {'name': 'widget', 'version': '', 'install': True}},
+                    'pyproject': {'vars': {'name': 'widget', 'version': '', 'install': 'editable'}},
                     'sphinx': {'files': [], 'contributions': []},
                     'files': [{'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'}],
                 },

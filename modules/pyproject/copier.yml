@@ -4,7 +4,7 @@ pyproject_defaults:
   when: false
   default:
     enabled: true
-    install: false
+    install: none
     name: my-project
     version: '0.0.0'
     python_version: '3.12'
@@ -51,7 +51,7 @@ pyproject:
       {%- endfilter %}
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if vars.enabled and vars.install %}
+      {%- if vars.enabled and vars.install in ['dependencies', 'editable'] %}
       - target: codex.setup
         template: fragments/setup.sh.jinja
       - target: codex.maintenance

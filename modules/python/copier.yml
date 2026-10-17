@@ -120,7 +120,7 @@ python:
       - target: core.gitignore
         template: fragments/gitignore.jinja
       {%- if vars.has_distribution %}
-      - target: pyproject.build_system
+      - target: pyproject.sections
         template: fragments/setuptools.toml.jinja
       {%- endif %}
       {%- for tool in vars.tools %}

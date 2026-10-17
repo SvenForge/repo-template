@@ -1,0 +1,14 @@
+{% set dev_dependencies = contributions | selectattr('target', 'equalto', 'pyproject.dev_dependencies') | list -%}
+{% set dependency_groups = contributions | selectattr('target', 'equalto', 'pyproject.dependency_groups') | list -%}
+{%- if dev_dependencies or dependency_groups %}
+
+[dependency-groups]
+{%- for contribution in dependency_groups %}
+{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
+{%- endfor %}
+dev = [
+{%- for contribution in dev_dependencies %}
+{% filter trim('\r\n') | indent(4, true) %}{% include contribution.template %}{% endfilter %}
+{%- endfor %}
+]
+{%- endif %}

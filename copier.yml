@@ -144,7 +144,7 @@ pyproject_inputs:
   when: false
   default: |
     enabled: {{ python.vars.enabled or sphinx.vars.enabled }}
-    install: {{ sphinx.vars.enabled or (python.vars.enabled and (python.vars.has_distribution or python.vars.tools | length > 0)) }}
+    install: {{ ('editable' if python.vars.has_distribution else 'dependencies' if sphinx.vars.enabled or (python.vars.enabled and python.vars.tools | length > 0) else 'none') | to_json }}
     {% if python.vars.has_distribution %}
     name: {{ python.vars.distribution_name | to_json }}
     version: ''

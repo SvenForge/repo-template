@@ -46,7 +46,7 @@ DEVELOPMENT_CONTEXT = module_context('python', **{**PYTHON_VARIABLES, 'has_distr
                         {'path': 'src/acme_widget/__init__.py', 'template': 'files/package/__init__.py.jinja'},
                         {'path': 'src/test_acme_widget/test_import.py', 'template': 'files/testpackage/test_import.py.jinja'},
                     ],
-                    'contributions': [{'target': 'pyproject.build_system', 'template': 'fragments/setuptools.toml.jinja'}],
+                    'contributions': [{'target': 'pyproject.sections', 'template': 'fragments/setuptools.toml.jinja'}],
                 },
             ),
             id='distribution',
