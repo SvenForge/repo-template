@@ -17,6 +17,7 @@ Start with the repository README if you want to create or update a repository. T
 
 - A feature names a user-facing capability, such as `python`. The host maps selected features to module inputs. One feature can enable several modules, and several features can share a module without exposing it as a choice. Saved feature names remain stable when modules are split or moved.
 - Each generated destination should have one owning module. Other modules extend that file through named contribution targets. Duplicate destinations can overwrite one another; they are not yet rejected automatically.
+- The shared `pyproject` module owns `pyproject.toml` and pip installation support. Python and Sphinx contribute their own configuration and dependencies; the host enables the shared module for either feature.
 - Modules own their settings, templates, and integration fragments. The host owns decisions that connect modules, such as passing repository metadata or declaring that another selected module provides development dependencies.
 - Module templates use their own `<name>.vars` for content. Consumers use another module's `vars` for shared settings or capabilities and its `files` manifest to check whether a file is actually generated.
 

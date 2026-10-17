@@ -1,4 +1,3 @@
-{% if python.vars.has_distribution or python.vars.has_dev_dependencies or python.vars.tools -%}
 {% filter trim -%}
 {%- if python.vars.has_distribution %}
 [build-system]
@@ -26,30 +25,6 @@ authors = [
 ]
 {%- endif %}
 {%- endif %}
-{%- if python.vars.has_dev_dependencies %}
-
-[dependency-groups]
-{%- for contribution in contributions | selectattr('target', 'equalto', 'python.dependency_groups') %}
-{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
-{%- endfor %}
-dev = [
-{%- if 'pytest' in python.vars.tools %}
-    "pytest",
-    "pytest-cov",
-{%- endif %}
-{%- if 'mypy' in python.vars.tools %}
-    "mypy",
-    "mypy-gitlab-code-quality",
-{%- endif %}
-{%- if 'ruff' in python.vars.tools %}
-    "ruff",
-{%- endif %}
-{%- for contribution in contributions | selectattr('target', 'equalto', 'python.dev_dependencies') %}
-{% filter trim('\r\n') | indent(4, true) %}{% include contribution.template %}{% endfilter %}
-{%- endfor %}
-]
-{%- endif %}
-
 {%- if python.vars.has_distribution %}
 
 [tool.setuptools]
@@ -129,4 +104,3 @@ files = ["src"]
 strict = true
 {%- endif %}
 {% endfilter %}
-{% endif -%}

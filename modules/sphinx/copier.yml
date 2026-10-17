@@ -97,7 +97,7 @@ sphinx:
       {%- if vars.enabled %}
       - target: core.gitignore
         template: fragments/gitignore.jinja
-      - target: python.dev_dependencies
+      - target: pyproject.dev_dependencies
         template: fragments/dev_dependencies.toml.jinja
       {%- endif %}
       {%- endfilter %}

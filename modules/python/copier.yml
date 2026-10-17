@@ -18,7 +18,6 @@ python_defaults:
     license: NOASSERTION
     owner_name: ''
     owner_email: ''
-    has_extra_dev_dependencies: false
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
@@ -111,15 +110,12 @@ python:
       testpackage_name=python_testpackage_name,
     ) -%}
     {%- set vars = dict(vars,
-      has_dev_dependencies=python_inputs.has_dev_dependencies if python_inputs.has_dev_dependencies is defined else vars.enabled and (vars.tools | length > 0 or vars.has_extra_dev_dependencies),
       has_distribution=python_inputs.has_distribution if python_inputs.has_distribution is defined else vars.enabled and vars.package_name | length > 0 and vars.distribution_name | length > 0,
     ) -%}
     vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
-      - path: pyproject.toml
-        template: files/pyproject.toml.jinja
       {%- if vars.package_name %}
       - path: src/{{ vars.package_name }}/__init__.py
         template: files/package/__init__.py.jinja
@@ -141,13 +137,13 @@ python:
       {%- if vars.enabled %}
       - target: core.gitignore
         template: fragments/gitignore.jinja
-      {%- if python_inputs.install | default(vars.has_distribution or vars.has_dev_dependencies) %}
-      - target: codex.setup
-        template: fragments/setup.sh.jinja
-      - target: codex.maintenance
-        template: fragments/maintenance.sh.jinja
-      - target: devcontainer.postCreateCommand
-        template: fragments/devcontainer.postCreateCommand.json.jinja
+      {%- if vars.has_distribution or vars.tools %}
+      - target: pyproject.sections
+        template: fragments/pyproject.toml.jinja
+      {%- endif %}
+      {%- if vars.tools %}
+      - target: pyproject.dev_dependencies
+        template: fragments/dev_dependencies.toml.jinja
       {%- endif %}
       {%- endif %}
       {%- endfilter %}

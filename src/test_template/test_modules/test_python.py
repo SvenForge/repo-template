@@ -5,7 +5,7 @@ import tomllib
 
 import pytest
 
-from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, json_members, module_context
+from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module_context, toml_items
 
 PYTHON_VARIABLES = {
     'repository_name': 'Widget',
@@ -15,7 +15,6 @@ PYTHON_VARIABLES = {
     'version': '3.13',
     'tools': ['pytest', 'ruff', 'mypy'],
     'has_distribution': True,
-    'has_dev_dependencies': True,
     'has_readme': True,
     'has_license': True,
     'license': 'MIT',
@@ -32,14 +31,13 @@ DEVELOPMENT_CONTEXT = module_context('python', **{**PYTHON_VARIABLES, 'has_distr
         pytest.param(
             ModuleCase(
                 expected={
-                    'vars': {'has_dev_dependencies': True, 'testpackage_name': 'test_my_repository'},
+                    'vars': {'testpackage_name': 'test_my_repository'},
                     'files': [
-                        {'path': 'pyproject.toml', 'template': 'files/pyproject.toml.jinja'},
                         {'path': 'src/test_my_repository/test_self.py', 'template': 'files/testpackage/test_self.py.jinja'},
                     ],
                     'contributions': [
                         {'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'},
-                        {'target': 'devcontainer.postCreateCommand', 'template': 'fragments/devcontainer.postCreateCommand.json.jinja'},
+                        {'target': 'pyproject.dev_dependencies', 'template': 'fragments/dev_dependencies.toml.jinja'},
                     ],
                 },
             ),
@@ -55,10 +53,18 @@ DEVELOPMENT_CONTEXT = module_context('python', **{**PYTHON_VARIABLES, 'has_distr
                         {'path': 'src/acme_widget/__init__.py', 'template': 'files/package/__init__.py.jinja'},
                         {'path': 'src/test_acme_widget/test_import.py', 'template': 'files/testpackage/test_import.py.jinja'},
                     ],
-                    'contributions': [{'target': 'codex.setup', 'template': 'fragments/setup.sh.jinja'}],
+                    'contributions': [{'target': 'pyproject.sections', 'template': 'fragments/pyproject.toml.jinja'}],
                 },
             ),
             id='distribution',
+        ),
+        pytest.param(
+            ModuleCase(
+                inputs={'enabled': False},
+                answers={'python_package_name': 'previous_package', 'python_tools': ['pytest', 'ruff', 'mypy']},
+                expected={'files': [], 'contributions': []},
+            ),
+            id='disabled-with-previous-answers',
         ),
         pytest.param(
             ModuleCase(
@@ -87,7 +93,6 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
                 expected={
                     'project': {'name': 'acme-widget', 'requires-python': '>=3.13', 'readme': 'README.md'},
                     'build-system': {'build-backend': 'setuptools.build_meta'},
-                    'dependency-groups': {'dev': ['pytest', 'pytest-cov', 'ruff', 'mypy', 'mypy-gitlab-code-quality']},
                 },
             ),
             id='distribution',
@@ -98,15 +103,14 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
                 parse=tomllib.loads,
                 expected={
                     'tool': {'pytest': {'ini_options': {'testpaths': ['src/test_*']}}},
-                    'dependency-groups': {'dev': ['pytest', 'pytest-cov', 'ruff', 'mypy', 'mypy-gitlab-code-quality']},
                 },
             ),
             id='development-only',
         ),
     ],
 )
-def test_pyproject(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/python/files/pyproject.toml.jinja', case)
+def test_pyproject_sections(check_template: TemplateCheck, case: RenderCase) -> None:
+    check_template('modules/python/fragments/pyproject.toml.jinja', case)
 
 
 @pytest.mark.parametrize(
@@ -153,43 +157,13 @@ def test_self_test(check_template: TemplateCheck, case: RenderCase) -> None:
     'case',
     [
         pytest.param(
-            RenderCase(context=PYTHON_CONTEXT, macro='install_commands', contains=('python -m pip install --upgrade pip', 'python -m pip install --editable . --group dev')),
-            id='distribution-and-tools',
+            RenderCase(context=PYTHON_CONTEXT, parse=toml_items, expected=['pytest', 'pytest-cov', 'mypy', 'mypy-gitlab-code-quality', 'ruff']),
+            id='development-tools',
         ),
     ],
 )
-def test_install_helper(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/python/fragments/install.jinja', case)
-
-
-@pytest.mark.parametrize(
-    'case',
-    [
-        pytest.param(RenderCase(context=PYTHON_CONTEXT, contains=('python -m pip install --editable . --group dev',)), id='distribution-and-tools'),
-    ],
-)
-def test_setup(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/python/fragments/setup.sh.jinja', case)
-
-
-@pytest.mark.parametrize(
-    'case',
-    [
-        pytest.param(RenderCase(context=DEVELOPMENT_CONTEXT, contains=('python -m pip install --group dev',)), id='development-only'),
-    ],
-)
-def test_maintenance(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/python/fragments/maintenance.sh.jinja', case)
-
-
-@pytest.mark.parametrize(
-    'case',
-    [
-        pytest.param(RenderCase(context=PYTHON_CONTEXT, parse=json_members, contains=('"setupPython"', 'python -m pip install --editable . --group dev')), id='distribution-and-tools'),
-    ],
-)
-def test_post_create_command(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/python/fragments/devcontainer.postCreateCommand.json.jinja', case)
+def test_dev_dependencies(check_template: TemplateCheck, case: RenderCase) -> None:
+    check_template('modules/python/fragments/dev_dependencies.toml.jinja', case)
 
 
 @pytest.mark.parametrize(

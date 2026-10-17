@@ -1,0 +1,11 @@
+{%- if 'pytest' in python.vars.tools %}
+"pytest",
+"pytest-cov",
+{%- endif %}
+{%- if 'mypy' in python.vars.tools %}
+"mypy",
+"mypy-gitlab-code-quality",
+{%- endif %}
+{%- if 'ruff' in python.vars.tools %}
+"ruff",
+{%- endif %}

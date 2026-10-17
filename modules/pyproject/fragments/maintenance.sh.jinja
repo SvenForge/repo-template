@@ -1,0 +1,3 @@
+{% from module_paths['pyproject'] ~ '/fragments/install.jinja' import install_commands with context -%}
+# Refresh the Python project and/or its development dependency group.
+{{ install_commands() }}

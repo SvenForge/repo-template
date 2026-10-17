@@ -1,0 +1,45 @@
+# Module Defaults
+pyproject_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    has_dev_dependencies: false
+    has_distribution: false
+    python_version: '3.12'
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+pyproject_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Questions
+
+# Module Outputs
+pyproject:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(pyproject_defaults, **pyproject_inputs) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: pyproject.toml
+        template: files/pyproject.toml.jinja
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled and (pyproject_inputs.install | default(vars.has_distribution or vars.has_dev_dependencies)) %}
+      - target: codex.setup
+        template: fragments/setup.sh.jinja
+      - target: codex.maintenance
+        template: fragments/maintenance.sh.jinja
+      - target: devcontainer.postCreateCommand
+        template: fragments/devcontainer.postCreateCommand.json.jinja
+      {%- endif %}
+      {%- endfilter %}

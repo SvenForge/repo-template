@@ -60,11 +60,15 @@ Both lists exist even when empty. A disabled module returns `files: []` and `con
 | A `path` in a `files` record | Generated project root. |
 | A `target` in a `contributions` record | A named extension point, not a file path. |
 
-Jinja imports inside a module also resolve from the host loader root. Use the registered path for a module-owned helper, for example `{% from module_paths['python'] ~ '/fragments/install.jinja' import install_commands with context %}`. A relative helper include or a hardcoded `modules/python` path would break when the module is mounted elsewhere.
+Jinja imports inside a module also resolve from the host loader root. Use the registered path for a module-owned helper, for example `{% from module_paths['pyproject'] ~ '/fragments/install.jinja' import install_commands with context %}`. A relative helper include or a hardcoded `modules/pyproject` path would break when the module is mounted elsewhere.
 
 ### Contributions and extension points
 
 The root aggregator preserves `module_paths` registry order and each module's contribution order. Static include order separately controls provider evaluation. A receiving file selects matching `target` records and includes their templates. The receiver owns the surrounding syntax and separators; a listed fragment must render valid, nonempty content for that slot. A contribution to an absent receiver simply has no rendered destination. Keep the target name and fragment format aligned when either changes.
+
+The shared `pyproject` support module owns `pyproject.toml`. The host enables it for Python or Sphinx and supplies `has_dev_dependencies`, `has_distribution`, and `python_version` from the selected capabilities. Python retains its questions and source/test files; it contributes complete packaging/tool sections to `pyproject.sections` and dependency array items to `pyproject.dev_dependencies`. Sphinx contributes its documentation dependencies to that same array. `pyproject.dependency_groups` accepts additional group assignments inside `[dependency-groups]`; the receiver owns the `dev` group. Emit fragments only when their content is enabled.
+
+The `pyproject` module also owns the shared pip helper and Codex/Dev Container installation contributions. Consumers use its capabilities for installation and the Python runtime, while Python quality jobs still follow the Python feature and selected tools. A host can mount `pyproject` without the Python module by supplying its inputs and contribution fragments. Future environment-manager integrations can contribute their own settings and setup behavior.
 
 ## Working on modules
 
