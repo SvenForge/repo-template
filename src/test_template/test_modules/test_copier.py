@@ -30,7 +30,7 @@ from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module
             id='empty-answer-overrides-input',
         ),
         pytest.param(ModuleCase(inputs={'module_name': ''}, expected={'vars': {'module_name': ''}}), id='empty-input'),
-        pytest.param(ModuleCase(inputs={'enabled': False}, expected={'vars': {'enabled': False}}), id='disabled'),
+        pytest.param(ModuleCase(inputs={'enabled': False}, expected={'vars': {'enabled': False}, 'files': [], 'contributions': []}), id='disabled'),
     ],
 )
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
@@ -48,6 +48,7 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
                     '_subdirectory: template',
                     '!include modules/example/copier.yml',
                     "enabled: {{ 'example' in features }}",
+                    '{%- for module_path in module_paths.values() -%}',
                     "{%- from module_path ~ '/exports.jinja' import output with context -%}",
                     '{{ result.contributions | to_json }}',
                 ),

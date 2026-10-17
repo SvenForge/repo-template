@@ -26,7 +26,7 @@ Use the same pattern in each module test file. Give scenarios readable names and
 
 Define cases directly in each test's `@pytest.mark.parametrize` list as `pytest.param(Case(...), id='scenario')`, using the appropriate record type. Keep short definitions on one line.
 
-The shared checks compare selected mapping fields, require expected list members, and compare scalar values exactly. They allow unrelated output to evolve. For structured output, use JSON, TOML, YAML, or Python syntax parsing; fragments can use the shared container wrappers. Macro-only helpers are rendered by naming their macro in the case.
+The shared checks compare selected mapping fields, require expected list members, and compare scalar values exactly. An empty expected list requires an empty list, such as a disabled module's manifest. They allow unrelated output to evolve. For structured output, use JSON, TOML, YAML, or Python syntax parsing; fragments can use the shared container wrappers. Macro-only helpers are rendered by naming their macro in the case.
 
 End-to-end cases compare the complete generated file set with the keys of `TemplateCase.expected`, then check the listed content anchors. An empty tuple checks only that a file exists.
 

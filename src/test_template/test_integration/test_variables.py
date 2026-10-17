@@ -44,6 +44,27 @@ from ..support import VariableCase, VariablesCheck
         ),
         pytest.param(
             VariableCase(
+                answers={'features': []},
+                expected={'files': [], 'contributions': []},
+            ),
+            id='disabled-modules',
+        ),
+        pytest.param(
+            VariableCase(
+                answers={
+                    'features': ['gitlab', 'devcontainer'],
+                    'codex_inputs': {'enabled': True, 'cloud_integration': False, 'devcontainer_available': True},
+                },
+                expected={
+                    'files': [{'path': 'AGENTS.md', 'template': 'modules/codex/files/AGENTS.md.jinja'}],
+                    'contributions': [{'target': 'devcontainer.features', 'template': 'modules/codex/fragments/devcontainer.features.json.jinja'}],
+                    'codex': {'vars': {'enabled': True, 'cloud_integration': False, 'devcontainer_integration': True}},
+                },
+            ),
+            id='unselected-provider',
+        ),
+        pytest.param(
+            VariableCase(
                 answers={
                     'features': ['core', 'copier', 'python', 'sphinx', 'gitlab', 'codex', 'devcontainer'],
                     'core_repository_name': 'Widget',
