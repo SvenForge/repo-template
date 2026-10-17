@@ -42,7 +42,13 @@ from ..support import VariableCase, VariablesCheck
             ),
             id='core-only',
         ),
-        pytest.param(VariableCase(answers={'features': []}, expected={'files': [], 'contributions': []}), id='disabled-modules'),
+        pytest.param(
+            VariableCase(
+                answers={'features': []},
+                expected={'files': [], 'contributions': []},
+            ),
+            id='disabled-modules',
+        ),
         pytest.param(
             VariableCase(
                 answers={
