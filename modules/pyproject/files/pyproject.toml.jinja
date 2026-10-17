@@ -1,18 +1,45 @@
-{% filter trim -%}
+{% set dev_dependencies = contributions | selectattr('target', 'equalto', 'pyproject.dev_dependencies') | list -%}
+{% set dependency_groups = contributions | selectattr('target', 'equalto', 'pyproject.dependency_groups') | list -%}
+[project]
+name = {{ pyproject.vars.name | tojson }}
+{% if pyproject.vars.version -%}
+version = {{ pyproject.vars.version | tojson }}
+{% else -%}
+dynamic = ["version"]
+{% endif -%}
+requires-python = ">={{ pyproject.vars.python_version }}"
+dependencies = []
+{%- if pyproject.vars.readme %}
+readme = {{ pyproject.vars.readme | tojson }}
+{%- endif %}
+{%- if pyproject.vars.license %}
+license = {% if pyproject.vars.license == 'NONE' %}"LicenseRef-Proprietary"{% else %}{{ pyproject.vars.license | tojson }}{% endif %}
+{%- endif %}
+{%- if pyproject.vars.license_files %}
+license-files = {{ pyproject.vars.license_files | tojson }}
+{%- endif %}
+{%- if pyproject.vars.owner_name or pyproject.vars.owner_email %}
+authors = [
+    { {% if pyproject.vars.owner_name %}name = {{ pyproject.vars.owner_name | tojson }}{% if pyproject.vars.owner_email %}, {% endif %}{% endif %}{% if pyproject.vars.owner_email %}email = {{ pyproject.vars.owner_email | tojson }}{% endif %} },
+]
+{%- endif %}
+{%- for contribution in contributions | selectattr('target', 'equalto', 'pyproject.build_system') %}
+
+{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
+{%- endfor %}
 {%- for contribution in contributions | selectattr('target', 'equalto', 'pyproject.sections') %}
 
 {% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
 {%- endfor %}
-{%- if pyproject.vars.has_dev_dependencies %}
+{%- if dev_dependencies or dependency_groups %}
 
 [dependency-groups]
-{%- for contribution in contributions | selectattr('target', 'equalto', 'pyproject.dependency_groups') %}
+{%- for contribution in dependency_groups %}
 {% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
 {%- endfor %}
 dev = [
-{%- for contribution in contributions | selectattr('target', 'equalto', 'pyproject.dev_dependencies') %}
+{%- for contribution in dev_dependencies %}
 {% filter trim('\r\n') | indent(4, true) %}{% include contribution.template %}{% endfilter %}
 {%- endfor %}
 ]
 {%- endif %}
-{% endfilter %}

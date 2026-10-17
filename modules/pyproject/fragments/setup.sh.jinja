@@ -1,3 +1,7 @@
-{% from module_paths['pyproject'] ~ '/fragments/install.jinja' import install_commands with context -%}
+{% set has_distribution = contributions | selectattr('target', 'equalto', 'pyproject.build_system') | list -%}
+{% set has_dev_dependencies = contributions | selectattr('target', 'in', ['pyproject.dev_dependencies', 'pyproject.dependency_groups']) | list -%}
 # Install the Python project and/or its development dependency group.
-{{ install_commands() }}
+python -m pip install --upgrade pip
+{% if has_distribution or has_dev_dependencies -%}
+python -m pip install{% if has_distribution %} --editable .{% endif %}{% if has_dev_dependencies %} --group dev{% endif %}
+{% endif -%}

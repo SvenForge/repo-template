@@ -1,0 +1,18 @@
+[tool.pytest.ini_options]
+addopts = [
+    "--cov",
+    "--cov-report=term-missing",
+    "--cov-report=xml:coverage.xml",
+    "--junitxml=pytest.xml",
+]
+testpaths = ["src/test_*"{% if not python.vars.testpackage_name.startswith('test_') %}, {{ ('src/' ~ python.vars.testpackage_name) | tojson }}{% endif %}]
+{%- if python.vars.package_name and not python.vars.has_distribution %}
+pythonpath = ["src"]
+{%- endif %}
+
+[tool.coverage.run]
+branch = true
+omit = ["test_*"{% if not python.vars.testpackage_name.startswith('test_') %}, {{ ('src/' ~ python.vars.testpackage_name ~ '/*') | tojson }}{% endif %}]
+
+[tool.coverage.report]
+show_missing = true

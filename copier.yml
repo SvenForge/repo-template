@@ -112,11 +112,6 @@ python_inputs:
   default: |
     enabled: {{ 'python' in features }}
     repository_name: {{ core.vars.repository_name | to_json }}
-    has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
-    has_license: {{ 'LICENSE.md' in core.files | map(attribute='path') }}
-    license: {{ core.vars.license | to_json }}
-    owner_name: {{ core.vars.owner_name | to_json }}
-    owner_email: {{ core.vars.owner_email | to_json }}
 
 ---
 !include modules/sphinx/copier.yml
@@ -149,11 +144,19 @@ pyproject_inputs:
   when: false
   default: |
     enabled: {{ python.vars.enabled or sphinx.vars.enabled }}
-    has_dev_dependencies: {{ sphinx.vars.enabled or (python.vars.enabled and python.vars.tools | length > 0) }}
-    has_distribution: {{ python.vars.enabled and python.vars.has_distribution }}
-    {% if python.vars.enabled %}
-    python_version: {{ python.vars.version | to_json }}
+    install: {{ sphinx.vars.enabled or (python.vars.enabled and (python.vars.has_distribution or python.vars.tools | length > 0)) }}
+    {% if python.vars.has_distribution %}
+    name: {{ python.vars.distribution_name | to_json }}
+    version: ''
+    {% else %}
+    {% set name = core.vars.repository_name | lower | regex_replace('[^a-z0-9]+', '-') | trim('-') %}
+    name: {{ (name or 'my-project') | to_json }}
     {% endif %}
+    readme: {{ ('README.md' if 'README.md' in core.files | map(attribute='path') else '') | to_json }}
+    license: {{ (core.vars.license if 'LICENSE.md' in core.files | map(attribute='path') else '') | to_json }}
+    license_files: {{ (['LICENSE.md'] if 'LICENSE.md' in core.files | map(attribute='path') else []) | to_json }}
+    owner_name: {{ core.vars.owner_name | to_json }}
+    owner_email: {{ core.vars.owner_email | to_json }}
 
 ---
 !include modules/gitlab/copier.yml
@@ -171,7 +174,7 @@ gitlab_inputs:
     python_enabled: {{ python.vars.enabled }}
     python_tools: {{ python.vars.tools | to_json }}
     python_version: {{ pyproject.vars.python_version | to_json }}
-    has_python_distribution: {{ pyproject.vars.has_distribution }}
+    has_python_distribution: {{ python.vars.has_distribution }}
     sphinx_enabled: {{ sphinx.vars.enabled }}
 
 ---

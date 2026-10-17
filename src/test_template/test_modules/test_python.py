@@ -10,16 +10,9 @@ from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module
 PYTHON_VARIABLES = {
     'repository_name': 'Widget',
     'package_name': 'acme_widget',
-    'distribution_name': 'acme-widget',
     'testpackage_name': 'test_acme_widget',
-    'version': '3.13',
     'tools': ['pytest', 'ruff', 'mypy'],
     'has_distribution': True,
-    'has_readme': True,
-    'has_license': True,
-    'license': 'MIT',
-    'owner_name': 'Example Owner',
-    'owner_email': 'owner@example.com',
 }
 PYTHON_CONTEXT = module_context('python', **PYTHON_VARIABLES)
 DEVELOPMENT_CONTEXT = module_context('python', **{**PYTHON_VARIABLES, 'has_distribution': False, 'package_name': ''})
@@ -46,14 +39,14 @@ DEVELOPMENT_CONTEXT = module_context('python', **{**PYTHON_VARIABLES, 'has_distr
         pytest.param(
             ModuleCase(
                 inputs={'repository_name': 'Widget'},
-                answers={'python_package_name': 'acme_widget', 'python_version': '3.13'},
+                answers={'python_package_name': 'acme_widget'},
                 expected={
-                    'vars': {'distribution_name': 'acme-widget', 'has_distribution': True, 'version': '3.13', 'testpackage_name': 'test_acme_widget'},
+                    'vars': {'distribution_name': 'acme-widget', 'has_distribution': True, 'testpackage_name': 'test_acme_widget'},
                     'files': [
                         {'path': 'src/acme_widget/__init__.py', 'template': 'files/package/__init__.py.jinja'},
                         {'path': 'src/test_acme_widget/test_import.py', 'template': 'files/testpackage/test_import.py.jinja'},
                     ],
-                    'contributions': [{'target': 'pyproject.sections', 'template': 'fragments/pyproject.toml.jinja'}],
+                    'contributions': [{'target': 'pyproject.build_system', 'template': 'fragments/setuptools.toml.jinja'}],
                 },
             ),
             id='distribution',
@@ -87,30 +80,43 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     'case',
     [
         pytest.param(
-            RenderCase(
-                context=PYTHON_CONTEXT,
-                parse=tomllib.loads,
-                expected={
-                    'project': {'name': 'acme-widget', 'requires-python': '>=3.13', 'readme': 'README.md'},
-                    'build-system': {'build-backend': 'setuptools.build_meta'},
-                },
-            ),
+            RenderCase(context=PYTHON_CONTEXT, parse=tomllib.loads, expected={'build-system': {'build-backend': 'setuptools.build_meta'}, 'tool': {'setuptools': {'package-dir': {'': 'src'}}}}),
             id='distribution',
-        ),
-        pytest.param(
-            RenderCase(
-                context=DEVELOPMENT_CONTEXT,
-                parse=tomllib.loads,
-                expected={
-                    'tool': {'pytest': {'ini_options': {'testpaths': ['src/test_*']}}},
-                },
-            ),
-            id='development-only',
         ),
     ],
 )
-def test_pyproject_sections(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/python/fragments/pyproject.toml.jinja', case)
+def test_setuptools(check_template: TemplateCheck, case: RenderCase) -> None:
+    check_template('modules/python/fragments/setuptools.toml.jinja', case)
+
+
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(RenderCase(context=DEVELOPMENT_CONTEXT, parse=tomllib.loads, expected={'tool': {'pytest': {'ini_options': {'testpaths': ['src/test_*']}}}}), id='development-only'),
+    ],
+)
+def test_pytest(check_template: TemplateCheck, case: RenderCase) -> None:
+    check_template('modules/python/fragments/pytest.toml.jinja', case)
+
+
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(RenderCase(parse=tomllib.loads, expected={'tool': {'ruff': {'src': ['src'], 'line-length': 200}}}), id='ruff-settings'),
+    ],
+)
+def test_ruff(check_template: TemplateCheck, case: RenderCase) -> None:
+    check_template('modules/python/fragments/ruff.toml.jinja', case)
+
+
+@pytest.mark.parametrize(
+    'case',
+    [
+        pytest.param(RenderCase(parse=tomllib.loads, expected={'tool': {'mypy': {'files': ['src'], 'strict': True}}}), id='mypy-settings'),
+    ],
+)
+def test_mypy(check_template: TemplateCheck, case: RenderCase) -> None:
+    check_template('modules/python/fragments/mypy.toml.jinja', case)
 
 
 @pytest.mark.parametrize(

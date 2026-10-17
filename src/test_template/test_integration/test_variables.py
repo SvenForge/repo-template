@@ -34,7 +34,7 @@ from ..support import VariableCase, VariablesCheck
                 answers={'features': ['core', 'sphinx', 'gitlab']},
                 expected={
                     'python': {'vars': {'enabled': False}, 'files': [], 'contributions': []},
-                    'pyproject': {'vars': {'enabled': True, 'has_dev_dependencies': True, 'has_distribution': False}},
+                    'pyproject': {'vars': {'enabled': True, 'install': True, 'name': 'my-repository'}},
                     'files': [{'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'}],
                     'gitlab': {'vars': {'python_enabled': False, 'has_python_distribution': False, 'pipeline': ['sphinx']}},
                 },
@@ -52,12 +52,12 @@ from ..support import VariableCase, VariablesCheck
                 },
                 expected={
                     'python': {'vars': {'enabled': False}, 'files': [], 'contributions': []},
-                    'pyproject': {'vars': {'has_dev_dependencies': True, 'has_distribution': False, 'python_version': '3.12'}},
+                    'pyproject': {'vars': {'install': True, 'python_version': '3.13'}},
                     'sphinx': {'vars': {'needs': True, 'api_packages': []}},
-                    'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.12-bookworm'}},
+                    'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.13-bookworm'}},
                     'contributions': [
                         {'target': 'codex.setup', 'template': 'modules/pyproject/fragments/setup.sh.jinja'},
-                        {'target': 'codex.maintenance', 'template': 'modules/pyproject/fragments/maintenance.sh.jinja'},
+                        {'target': 'codex.maintenance', 'template': 'modules/pyproject/fragments/setup.sh.jinja'},
                         {'target': 'devcontainer.postCreateCommand', 'template': 'modules/pyproject/fragments/devcontainer.postCreateCommand.json.jinja'},
                     ],
                     'gitlab': {'vars': {'python_enabled': False, 'has_python_distribution': False}},
@@ -69,7 +69,7 @@ from ..support import VariableCase, VariablesCheck
             VariableCase(
                 answers={'features': ['python'], 'python_package_name': 'widget', 'python_tools': []},
                 expected={
-                    'pyproject': {'vars': {'has_distribution': True, 'has_dev_dependencies': False}},
+                    'pyproject': {'vars': {'name': 'widget', 'version': '', 'install': True}},
                     'sphinx': {'files': [], 'contributions': []},
                     'files': [{'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'}],
                 },

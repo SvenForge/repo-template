@@ -6,8 +6,28 @@ import pytest
 
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, json_members, module_context
 
-DEVELOPMENT_CONTEXT = module_context('pyproject', has_distribution=False, has_dev_dependencies=True)
-DISTRIBUTION_CONTEXT = module_context('pyproject', has_distribution=True, has_dev_dependencies=True)
+PYPROJECT_VARIABLES = {
+    'name': 'widget',
+    'version': '0.0.0',
+    'python_version': '3.13',
+    'readme': 'README.md',
+    'license': 'MIT',
+    'license_files': ['LICENSE.md'],
+    'owner_name': 'Example Owner',
+    'owner_email': 'owner@example.com',
+}
+PROJECT_CONTEXT = module_context('pyproject', **PYPROJECT_VARIABLES)
+DEVELOPMENT_CONTEXT = {
+    **PROJECT_CONTEXT,
+    'contributions': [{'target': 'pyproject.dev_dependencies', 'template': 'modules/sphinx/fragments/dev_dependencies.toml.jinja'}],
+}
+DISTRIBUTION_CONTEXT = {
+    **DEVELOPMENT_CONTEXT,
+    'contributions': [
+        {'target': 'pyproject.build_system', 'template': 'modules/python/fragments/setuptools.toml.jinja'},
+        *DEVELOPMENT_CONTEXT['contributions'],
+    ],
+}
 SPHINX_CONTEXT = {
     **DEVELOPMENT_CONTEXT,
     'sphinx': {'vars': {'needs': False}},
@@ -24,12 +44,13 @@ SPHINX_CONTEXT = {
         ),
         pytest.param(
             ModuleCase(
-                inputs={'has_dev_dependencies': True},
+                inputs={'install': True},
+                answers={'python_version': '3.13'},
                 expected={
-                    'vars': {'has_dev_dependencies': True, 'has_distribution': False, 'python_version': '3.12'},
+                    'vars': {'install': True, 'python_version': '3.13'},
                     'contributions': [
                         {'target': 'codex.setup', 'template': 'fragments/setup.sh.jinja'},
-                        {'target': 'codex.maintenance', 'template': 'fragments/maintenance.sh.jinja'},
+                        {'target': 'codex.maintenance', 'template': 'fragments/setup.sh.jinja'},
                         {'target': 'devcontainer.postCreateCommand', 'template': 'fragments/devcontainer.postCreateCommand.json.jinja'},
                     ],
                 },
@@ -37,7 +58,7 @@ SPHINX_CONTEXT = {
             id='dependencies-and-installation',
         ),
         pytest.param(
-            ModuleCase(inputs={'enabled': False, 'has_dev_dependencies': True, 'has_distribution': True}, expected={'files': [], 'contributions': []}),
+            ModuleCase(inputs={'enabled': False, 'install': True}, expected={'files': [], 'contributions': []}),
             id='disabled',
         ),
     ],
@@ -50,6 +71,10 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     'case',
     [
         pytest.param(
+            RenderCase(context=PROJECT_CONTEXT, parse=tomllib.loads, expected={'project': {'name': 'widget', 'version': '0.0.0', 'requires-python': '>=3.13', 'readme': 'README.md', 'license': 'MIT', 'license-files': ['LICENSE.md'], 'authors': [{'name': 'Example Owner', 'email': 'owner@example.com'}]}}),
+            id='project-metadata-without-contributions',
+        ),
+        pytest.param(
             RenderCase(context=SPHINX_CONTEXT, parse=tomllib.loads, expected={'dependency-groups': {'dev': ['furo', 'myst-parser', 'sphinx>=8.2']}}),
             id='sphinx-without-python',
         ),
@@ -60,7 +85,7 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
                     'sphinx': {'vars': {'needs': True}},
                     'python': {'vars': {'has_distribution': False, 'tools': ['ruff']}},
                     'contributions': [
-                        {'target': 'pyproject.sections', 'template': 'modules/python/fragments/pyproject.toml.jinja'},
+                        {'target': 'pyproject.sections', 'template': 'modules/python/fragments/ruff.toml.jinja'},
                         {'target': 'pyproject.dev_dependencies', 'template': 'modules/python/fragments/dev_dependencies.toml.jinja'},
                         *SPHINX_CONTEXT['contributions'],
                     ],
@@ -82,40 +107,16 @@ def test_pyproject(check_template: TemplateCheck, case: RenderCase) -> None:
 @pytest.mark.parametrize(
     'case',
     [
+        pytest.param(RenderCase(context=DISTRIBUTION_CONTEXT, contains=('python -m pip install --editable . --group dev',)), id='distribution-and-tools'),
+        pytest.param(RenderCase(context=DEVELOPMENT_CONTEXT, contains=('python -m pip install --group dev',)), id='dependencies-only'),
         pytest.param(
-            RenderCase(context=DISTRIBUTION_CONTEXT, macro='install_commands', contains=('python -m pip install --upgrade pip', 'python -m pip install --editable . --group dev')),
-            id='distribution-and-tools',
-        ),
-        pytest.param(RenderCase(context=DEVELOPMENT_CONTEXT, macro='install_commands', contains=('python -m pip install --group dev',)), id='dependencies-only'),
-        pytest.param(
-            RenderCase(context=module_context('pyproject', has_distribution=True, has_dev_dependencies=False), macro='install_commands', contains=('python -m pip install --editable .',)),
+            RenderCase(context={**PROJECT_CONTEXT, 'contributions': [DISTRIBUTION_CONTEXT['contributions'][0]]}, contains=('python -m pip install --editable .',)),
             id='distribution-only',
         ),
     ],
 )
-def test_install_helper(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/pyproject/fragments/install.jinja', case)
-
-
-@pytest.mark.parametrize(
-    'case',
-    [
-        pytest.param(RenderCase(context=DISTRIBUTION_CONTEXT, contains=('python -m pip install --editable . --group dev',)), id='distribution-and-tools'),
-        pytest.param(RenderCase(context=DEVELOPMENT_CONTEXT, contains=('python -m pip install --group dev',)), id='dependencies-only'),
-    ],
-)
 def test_setup(check_template: TemplateCheck, case: RenderCase) -> None:
     check_template('modules/pyproject/fragments/setup.sh.jinja', case)
-
-
-@pytest.mark.parametrize(
-    'case',
-    [
-        pytest.param(RenderCase(context=DEVELOPMENT_CONTEXT, contains=('python -m pip install --group dev',)), id='dependencies-only'),
-    ],
-)
-def test_maintenance(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/pyproject/fragments/maintenance.sh.jinja', case)
 
 
 @pytest.mark.parametrize(

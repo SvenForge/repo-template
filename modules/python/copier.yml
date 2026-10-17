@@ -10,14 +10,8 @@ python_defaults:
       - pytest
       - ruff
       - mypy
-    version: '3.12'
     testpackage_name: test_project
     repository_name: My Repository
-    has_readme: false
-    has_license: false
-    license: NOASSERTION
-    owner_name: ''
-    owner_email: ''
 
 # Module Inputs
 # To be overwritten by template, otherwise defaults will be used
@@ -85,17 +79,6 @@ python_testpackage_name:
     {% endif %}
   when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) and 'pytest' in python_tools }}"
 
-python_version:
-  type: str
-  help: "[Python] What is the minimum supported Python version?"
-  qmark: "🐍"
-  default: "{{ python_inputs.version | default(python_defaults.version) }}"
-  validator: >-
-    {% if not (python_version | regex_search('^[0-9]+[.][0-9]+$')) %}
-    Use a numeric Python major and minor version, such as 3.12.
-    {% endif %}
-  when: "{{ (python_inputs.enabled | default(python_defaults.enabled)) }}"
-
 # Module Outputs
 python:
   type: yaml
@@ -106,11 +89,10 @@ python:
       package_name=python_package_name,
       distribution_name=python_distribution_name,
       tools=python_tools,
-      version=python_version,
       testpackage_name=python_testpackage_name,
     ) -%}
     {%- set vars = dict(vars,
-      has_distribution=python_inputs.has_distribution if python_inputs.has_distribution is defined else vars.enabled and vars.package_name | length > 0 and vars.distribution_name | length > 0,
+      has_distribution=vars.enabled and vars.package_name | length > 0 and vars.distribution_name | length > 0,
     ) -%}
     vars: {{ vars | to_json }}
     files:
@@ -137,10 +119,14 @@ python:
       {%- if vars.enabled %}
       - target: core.gitignore
         template: fragments/gitignore.jinja
-      {%- if vars.has_distribution or vars.tools %}
-      - target: pyproject.sections
-        template: fragments/pyproject.toml.jinja
+      {%- if vars.has_distribution %}
+      - target: pyproject.build_system
+        template: fragments/setuptools.toml.jinja
       {%- endif %}
+      {%- for tool in vars.tools %}
+      - target: pyproject.sections
+        template: fragments/{{ tool }}.toml.jinja
+      {%- endfor %}
       {%- if vars.tools %}
       - target: pyproject.dev_dependencies
         template: fragments/dev_dependencies.toml.jinja
