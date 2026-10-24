@@ -7,7 +7,9 @@ from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck, module
 
 GITLAB_CONTEXT = module_context(
     'gitlab',
-    repository_host='gitlab.example.com',
+    repository_host='gitlab.com',
+    development_repository_host='gitlab.example.com',
+    development_repository_path='team/widget',
     copier_version='9.17.2',
     python_version='3.13',
     python_tools=['pytest', 'ruff', 'mypy'],
@@ -22,7 +24,7 @@ GITLAB_CONTEXT = module_context(
         pytest.param(
             ModuleCase(
                 expected={
-                    'vars': {'pipeline': ['copier', 'demo']},
+                    'vars': {'pipeline': ['copier', 'demo'], 'development_repository_host': 'gitlab.com', 'development_repository_path': ''},
                     'files': [
                         {'path': '.gitlab/issue_templates/default.md', 'template': 'files/issue.md.jinja'},
                         {'path': '.gitlab/merge_request_templates/default.md', 'template': 'files/merge_request.md.jinja'},
@@ -39,7 +41,7 @@ GITLAB_CONTEXT = module_context(
                 inputs={'python_enabled': True, 'python_tools': ['pytest'], 'sphinx_enabled': True, 'has_readme': True, 'repository_path': 'group/widget'},
                 answers={'gitlab_pipeline': ['python', 'sphinx']},
                 expected={
-                    'vars': {'pipeline': ['python', 'sphinx'], 'pages_url': 'https://group.gitlab.io/widget/'},
+                    'vars': {'pipeline': ['python', 'sphinx'], 'pages_url': 'https://group.gitlab.io/widget/', 'development_repository_host': 'gitlab.com', 'development_repository_path': 'group/widget'},
                     'files': [
                         {'path': '.gitlab/ci/python.yml', 'template': 'files/ci/python.yml.jinja'},
                         {'path': '.gitlab/ci/sphinx.yml', 'template': 'files/ci/sphinx.yml.jinja'},
@@ -167,7 +169,14 @@ def test_merge_request_template(check_template: TemplateCheck, case: RenderCase)
 @pytest.mark.parametrize(
     'case',
     [
-        pytest.param(RenderCase(contains=('## GitLab development workflow', 'plan', 'create', 'verify', 'deploy')), id='workflow-guidance'),
+        pytest.param(
+            RenderCase(context=GITLAB_CONTEXT, contains=('## GitLab development workflow', '[gitlab.example.com/team/widget](https://gitlab.example.com/team/widget)', 'Inspect both fetch and push URLs', '--repo')),
+            id='development-project',
+        ),
+        pytest.param(
+            RenderCase(context=module_context('gitlab', development_repository_path=''), contains=('If the target is unknown, ask before making remote changes.',)),
+            id='unspecified-development-project',
+        ),
     ],
 )
 def test_agents_fragment(check_template: TemplateCheck, case: RenderCase) -> None:
@@ -178,7 +187,7 @@ def test_agents_fragment(check_template: TemplateCheck, case: RenderCase) -> Non
     'case',
     [
         pytest.param(
-            RenderCase(context=GITLAB_CONTEXT, contains=('GITLAB_TOKEN must be provided', 'readonly GITLAB_HOST="gitlab.example.com"', 'glab auth login', 'sha256sum --check')),
+            RenderCase(context=GITLAB_CONTEXT, contains=('GITLAB_TOKEN must be provided', "readonly GITLAB_HOST='gitlab.example.com'", 'glab auth login', 'sha256sum --check')),
             id='persisted-authentication',
         ),
     ],
@@ -190,7 +199,7 @@ def test_setup_fragment(check_template: TemplateCheck, case: RenderCase) -> None
 @pytest.mark.parametrize(
     'case',
     [
-        pytest.param(RenderCase(context=GITLAB_CONTEXT, contains=('readonly GITLAB_HOST="gitlab.example.com"', 'glab auth status')), id='authentication-check'),
+        pytest.param(RenderCase(context=GITLAB_CONTEXT, contains=("readonly GITLAB_HOST='gitlab.example.com'", 'glab auth status')), id='authentication-check'),
     ],
 )
 def test_maintenance_fragment(check_template: TemplateCheck, case: RenderCase) -> None:

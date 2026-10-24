@@ -27,6 +27,7 @@
 ../testing
 ../documentation
 ../api
+Agent instructions <../../AGENTS>
 ```
 
 ```{toctree}

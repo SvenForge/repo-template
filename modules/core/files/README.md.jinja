@@ -14,6 +14,11 @@ _TODO: Show a minimal usage example and the expected result._
 
 ### Development
 
+{% if core.vars.development_repository_url and (core.vars.development_repository_host | lower, core.vars.development_repository_path) != (core.vars.repository_host | lower, core.vars.repository_path) -%}
+{% set development_url = core.vars.development_repository_url if core.vars.development_repository_url.startswith(('https://', 'http://')) else 'https://' ~ core.vars.development_repository_host ~ '/' ~ core.vars.development_repository_path -%}
+Use the [development repository]({{ development_url }}) to obtain development changes and contribute branches.
+
+{% endif -%}
 _TODO: Explain development setup and how to run checks._
 
 ## Documentation

@@ -151,9 +151,39 @@ from ..support import VariableCase, VariablesCheck
         pytest.param(
             VariableCase(
                 answers={
+                    'features': ['core', 'sphinx', 'gitlab', 'codex'],
+                    'core_repository_url': 'https://gitlab.com/public/widget.git',
+                    'core_development_repository_url': 'git@gitlab.example.com:team/widget.git',
+                },
+                expected={
+                    'gitlab': {'vars': {
+                        'repository_host': 'gitlab.com', 'repository_path': 'public/widget',
+                        'development_repository_host': 'gitlab.example.com', 'development_repository_path': 'team/widget',
+                        'pages_url': 'https://public.gitlab.io/widget/',
+                    }},
+                },
+            ),
+            id='separate-development-and-publication',
+        ),
+        pytest.param(
+            VariableCase(
+                answers={
+                    'features': ['core', 'sphinx', 'gitlab'],
+                    'core_repository_url': 'https://github.com/public/widget',
+                    'core_development_repository_url': 'https://gitlab.com/team/widget',
+                },
+                expected={'gitlab': {'vars': {'repository_host': 'github.com', 'development_repository_host': 'gitlab.com', 'development_repository_path': 'team/widget', 'pages_url': ''}}},
+            ),
+            id='github-publication-with-gitlab-development',
+        ),
+        pytest.param(
+            VariableCase(
+                answers={
                     'features': ['core', 'copier', 'python', 'sphinx', 'gitlab', 'codex', 'claude', 'devcontainer'],
                     'core_repository_name': 'Widget',
                     'core_repository_url': 'https://gitlab.com/example/widget.git',
+                    'core_development_repository_url': 'https://gitlab.example.com/team/widget',
+                    'gitlab_pages_url': 'https://docs.example.com/widget/',
                     'python_package_name': 'acme_widget',
                     'python_version': '3.13',
                     'sphinx_needs': True,
@@ -175,7 +205,7 @@ from ..support import VariableCase, VariablesCheck
                     ],
                     'python': {'vars': {'distribution_name': 'acme-widget', 'has_distribution': True}},
                     'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.13-bookworm'}},
-                    'gitlab': {'vars': {'pages_url': 'https://example.gitlab.io/widget/', 'has_python_distribution': True}},
+                    'gitlab': {'vars': {'pages_url': 'https://docs.example.com/widget/', 'has_python_distribution': True, 'development_repository_host': 'gitlab.example.com', 'development_repository_path': 'team/widget'}},
                     'sphinx': {'vars': {'repository_name': 'Widget', 'api_packages': ['acme_widget', 'test_acme_widget']}},
                     'codex': {'vars': {'devcontainer_integration': True}},
                     'claude': {'vars': {'devcontainer_integration': True}},

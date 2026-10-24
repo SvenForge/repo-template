@@ -1,3 +1,9 @@
 # Authentication and glab are persisted in the cached environment by setup.sh.
-readonly GITLAB_HOST="{{ gitlab.vars.repository_host }}"
+readonly GITLAB_HOST='{{ gitlab.vars.development_repository_host | replace("'", "'\"'\"'") }}'
+case "${GITLAB_HOST%%:*}" in
+    github.com | www.github.com)
+        printf '%s\n' 'maintenance: GitLab tooling requires a GitLab development repository; set core_development_repository_url to its URL.' >&2
+        exit 1
+        ;;
+esac
 glab auth status --hostname "$GITLAB_HOST" >/dev/null
