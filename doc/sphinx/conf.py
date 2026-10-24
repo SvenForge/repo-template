@@ -23,6 +23,7 @@ extensions = [
 
 root_doc = 'doc/sphinx/index'
 needs_sphinx = '8.2'
+myst_heading_anchors = 3
 exclude_patterns = [
     '.*',
     '**/.*',
@@ -40,6 +41,8 @@ exclude_patterns.extend(
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = 'furo'
+html_static_path = ['_static']
+html_css_files = ['tables.css']
 
 html_context = {
     'body': '<meta http-equiv="refresh" content="0; url=doc/sphinx/index.html">',
