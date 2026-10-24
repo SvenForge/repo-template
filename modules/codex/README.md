@@ -1,43 +1,70 @@
 # Codex
 
-Provide optional Codex setup/maintenance scripts and Dev Container tooling. Codex is optional in the bundled template, which also activates [Agents][agents] to generate shared instructions.
+Provide optional environment setup/maintenance scripts and Dev Container tooling for Codex. The host supplies activation, available integrations, and any shared agent instructions.
 
 ## Questions and choices
 
 | Answer | Decision |
 | --- | --- |
 | `codex_cloud` | Whether to generate environment setup and maintenance scripts; defaults to true when enabled. This creates files, rather than provisioning a cloud environment. |
-| `codex_devcontainer` | Whether to add Codex tooling to an available Dev Container; defaults to true when one is available. |
+| `codex_devcontainer` | Whether to add Codex tooling to an available Dev Container; defaults to true when available. |
 
 ## After generation
 
-Review contributed setup steps before configuring an environment to run `bash .codex/setup.sh` or `bash .codex/maintenance.sh`. They contain only the integrations supplied by selected modules. The generated scripts implement the template's existing integration; confirm that your current environment supports the repository provider and setup/maintenance commands before using them. Environment provisioning and provider compatibility are not configured by this module.
+Review contributed setup steps before configuring an environment to run `bash .codex/setup.sh` or `bash .codex/maintenance.sh`. They contain only the integrations supplied by the host. Confirm that your current environment supports the repository provider and setup/maintenance commands before using them; environment provisioning and provider compatibility are not configured by this module.
 
-Review `AGENTS.md` and any Dev Container integration. Configure the credentials required by contributing modules through the environment's secret settings, following their setup instructions.
+Review any host-supplied agent guidance and container configuration. Configure credentials required by contributing integrations through the environment's secret settings.
 
 ## Reuse reference
 
-Supply `codex_inputs` after including the module; see the [module guide][module-guide] for shared rules.
+Supply `codex_inputs` after including the module. See the [module guide][module-guide] for precedence, path rules, and manifest conventions.
+
+### Input variables
 
 | Input | Type | Standalone fallback and role |
 | --- | --- | --- |
-| `enabled` | bool | `true`; direct activation. The bundled host uses the Codex feature. |
+| `enabled` | bool | `true`; direct activation. |
 | `cloud_integration` | bool | `true` when enabled; default for `codex_cloud`. |
-| `devcontainer_available` | bool | `false`; direct capability supplied by the host. |
+| `devcontainer_available` | bool | `false`; host-supplied capability. |
 | `devcontainer_integration` | bool | `true` when a container is available; default for `codex_devcontainer`. |
 
-`codex.vars` exports merged settings with effective `cloud_integration` (enabled and answered true) and `devcontainer_integration` (also requiring container availability). These effective values determine manifests.
+### Output variables
 
-Cloud integration owns `.codex/setup.sh` and `.codex/maintenance.sh`. Container integration emits feature, mount, extension, and post-create command fragments to the corresponding [Dev Container targets][devcontainer]. Shared `AGENTS.md` belongs to Agents; a custom host must activate that provider separately.
+Fields in `codex.vars`:
 
-| Receiving target | Destination and fragment contract |
-| --- | --- |
-| `codex.setup` | `.codex/setup.sh` after its Bash header and `set -euo pipefail`: complete shell statements. |
-| `codex.maintenance` | `.codex/maintenance.sh` after the same header: complete shell statements for a cached environment. |
+| Variable | Type | Meaning |
+| --- | --- | --- |
+| `enabled` | bool | Effective activation. |
+| `cloud_integration` | bool | Effective script generation: module enabled and answer true. |
+| `devcontainer_available` | bool | Host-supplied container availability. |
+| `devcontainer_integration` | bool | Effective integration: module enabled, container available, and answer true. |
 
-Receivers join fragments with newlines in aggregate contribution order. Fragments share one shell scope, must tolerate strict Bash mode, and should avoid conflicting variable/function names. The targets have no rendered destination when cloud integration is disabled.
+### Generated files
+
+| Path | Condition | Purpose |
+| --- | --- | --- |
+| `.codex/setup.sh` | Effective cloud integration. | Bash environment setup script assembled from contributions. |
+| `.codex/maintenance.sh` | Effective cloud integration. | Bash refresh script for a cached environment. |
+
+### Receiving targets
+
+| Target | Destination | Fragment contract |
+| --- | --- | --- |
+| `codex.setup` | `.codex/setup.sh` after its header and `set -euo pipefail`. | Complete Bash statements joined by newlines in aggregate order. |
+| `codex.maintenance` | `.codex/maintenance.sh` after the same header. | Complete Bash statements for a cached environment, joined by newlines in aggregate order. |
+
+Fragments share one shell scope, must tolerate strict Bash mode, and should avoid conflicting variable/function names. These targets require cloud integration to generate their receiving files.
+
+### Emitted contributions
+
+| Target | Condition | Content |
+| --- | --- | --- |
+| `devcontainer.features` | Effective container integration. | JSON members selecting Codex tooling. |
+| `devcontainer.mounts` | Effective container integration. | JSON mount items for persisted tool state. |
+| `devcontainer.extensions` | Effective container integration. | JSON extension-ID string items. |
+| `devcontainer.postCreateCommand` | Effective container integration. | Named JSON setup command members. |
+
+These contributions require matching receiving files/targets in the host. JSON fragments omit enclosing containers and trailing commas.
 
 <!-- module-docs-links -->
 [module-guide]: ../../doc/module-guide.md
-[agents]: ../agents/README.md
-[devcontainer]: ../devcontainer/README.md

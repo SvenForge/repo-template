@@ -18,10 +18,10 @@ The default selection includes Core, Python, Sphinx, GitLab, and Dev Container. 
 
 ### Installation
 
-You need Git and Python 3.12 or newer. Install Copier 9.17.2 or newer:
+You need Git and Python 3.12 or newer. Install Copier 9.17 or newer:
 
 ```shell
-python -m pip install "copier>=9.17.2"
+python -m pip install "copier>=9.17"
 ```
 
 ### Usage

@@ -14,7 +14,7 @@ Keep the documentation short enough to read and maintain alongside the code. Rea
 | Location | Content |
 | --- | --- |
 | `README.md` | Purpose, prerequisites, canonical copy/update quick start, development setup, and links to the three reader paths. It is also the Sphinx landing page. |
-| `doc/features.md` | Selection guidance, default/optional capabilities, and the index of module pages. |
+| `doc/features.md` | Selection guidance, the mapping from features to modules, and the index of module pages. |
 | `modules/<name>/README.md` | Module purpose, questions, work after generation, and the current input/output/target reference. |
 | `doc/reuse.md` | Starter and pinned-submodule walkthroughs, including reusing documentation. |
 | `doc/module-guide.md` | Shared module mechanics and change/add/remove recipes. |
@@ -27,9 +27,19 @@ Link to the owning page instead of copying its explanation. Link official tool d
 
 ## Write and update module pages
 
-Use the same order: purpose/activation, **Questions and choices**, **After generation**, then **Reuse reference**. A short sentence suffices when there are no questions or follow-up tasks. Lead with decisions and useful outcomes; keep manifests and contracts in the reference section.
+Use the same order: purpose/activation, **Questions and choices**, **After generation**, then **Reuse reference**. Questions use an **Answer / Decision** table. If a module has no questions, use a short note instead. Lead with decisions and useful outcomes; keep manifests and contracts in the reference section.
 
-List accepted inputs with types, defaults or calculations, and whether they supply question defaults or direct settings. Separate persisted answers and effective outputs. Distinguish standalone defaults from bundled-host wiring. Describe conditional files and contributions, and document each receiving target's format and separators in its owning module. Link providers to those contracts.
+Under **Reuse reference**, use these subheadings and table layouts in order. If a table would be empty, retain the subheading with a short note instead.
+
+| Subheading | Columns |
+| --- | --- |
+| Input variables | Input / Type / Standalone fallback and role |
+| Output variables | Variable / Type / Meaning |
+| Generated files | Path / Condition / Purpose |
+| Receiving targets | Target / Destination / Fragment contract |
+| Emitted contributions | Target / Condition / Content |
+
+List accepted inputs with types, defaults or calculations, and whether they supply question defaults or direct settings. Separate persisted answers and effective outputs. Describe conditional files and contributions, and document each receiving target's format and separators in its owning module. Keep host activation policies in the feature chooser. Module pages should describe their own contracts and generic requirements on the host; limit references to other modules to those necessary for understanding.
 
 Use ordinary Markdown and reference links for cross-page dependencies. Put link definitions after `<!-- module-docs-links -->` so a consuming template can include the text and supply its own destinations, as shown in [Reuse modules](./reuse.md#reuse-module-documentation). Keep each page readable on its own.
 

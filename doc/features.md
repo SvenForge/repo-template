@@ -1,21 +1,21 @@
 # Choose features
 
-Choose capabilities in Copier's checklist with Space, then confirm with Enter. All features are optional; selecting none generates only `.copier-answers.yml`. The default selection is a starting point you can change for your project.
+Choose capabilities in Copier's checklist with Space, then confirm with Enter. All features are optional; selecting none generates only `.copier-answers.yml`.
 
 Follow the README's Usage section on the documentation landing page to generate a repository. Use the module pages below while answering questions and completing setup afterward.
 
-| Feature | Default | Choose it for | Main result |
+| Feature | Choose it for | Main result | Modules |
 | --- | --- | --- | --- |
-| [Core](../modules/core/README.md) | Selected | Repository documentation and metadata | README, license, and gitignore choices. |
-| [Python](../modules/python/README.md) | Selected | Python packages, tests, or code checks | Optional package/test scaffolding and selected tool configuration. |
-| [Sphinx](../modules/sphinx/README.md) | Selected | Project documentation, with optional API or requirements tracking | Documentation sources and build configuration. |
-| [GitLab](../modules/gitlab/README.md) | Selected | CI/CD and a contribution workflow on GitLab | Selected pipelines and issue/MR templates. |
-| [Dev Container](../modules/devcontainer/README.md) | Selected | A consistent development environment | Container configuration with selected integrations. |
-| [Copier](../modules/copier/README.md) | Optional | Building another Copier template | A minimal template host and optional starter module. |
-| [Codex](../modules/codex/README.md) | Optional | Agent guidance and Codex integration files | Shared instructions, optional scripts and container tooling. |
-| [Claude Code](../modules/claude/README.md) | Optional | Agent guidance and Claude Code container tooling | Shared instructions, `CLAUDE.md`, and optional container integration. |
+| Core | Repository documentation and metadata | README, license, and gitignore choices. | [core](../modules/core/README.md) |
+| Python | Python packages, tests, or code checks | Optional package/test scaffolding and selected tool configuration. | [python](../modules/python/README.md), [pyproject](../modules/pyproject/README.md) |
+| Sphinx | Project documentation, with optional API or requirements tracking | Documentation sources and build configuration. | [sphinx](../modules/sphinx/README.md), [pyproject](../modules/pyproject/README.md) |
+| GitLab | CI/CD and a contribution workflow on GitLab | Selected pipelines and issue/MR templates. | [gitlab](../modules/gitlab/README.md) |
+| Dev Container | A consistent development environment | Container configuration with selected integrations. | [devcontainer](../modules/devcontainer/README.md) |
+| Copier | Building another Copier template | A minimal template host and optional starter module. | [copier](../modules/copier/README.md) |
+| Codex | Agent guidance and Codex integration files | Shared instructions, optional scripts and container tooling. | [codex](../modules/codex/README.md), [agents](../modules/agents/README.md) |
+| Claude Code | Agent guidance and Claude Code container tooling | Shared instructions, `CLAUDE.md`, and optional container integration. | [claude](../modules/claude/README.md), [agents](../modules/agents/README.md) |
 
-Two support modules are activated by these choices: [Pyproject](../modules/pyproject/README.md) supplies `pyproject.toml` for Python or Sphinx; [Agents](../modules/agents/README.md) supplies shared `AGENTS.md` for Codex or Claude Code. They have no separate checklist choices. Sphinx works without Python application scaffolding. Python can provide tests and tools without a production package. Agent container integrations are offered when Dev Container is selected.
+Sphinx works without Python application scaffolding. Python can provide tests and tools without a production package. Agent container integrations are offered when Dev Container is selected.
 
 ## After generation and later updates
 
@@ -35,13 +35,6 @@ Keep the saved answers file. To change choices or adopt template updates later, 
 ../modules/copier/README
 ../modules/codex/README
 ../modules/claude/README
-```
-
-```{toctree}
-:hidden:
-:maxdepth: 1
-:caption: Shared support modules
-
 ../modules/pyproject/README
 ../modules/agents/README
 ```

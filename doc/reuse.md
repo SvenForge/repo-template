@@ -35,7 +35,7 @@ The two copied files are the generic yield template and Copier answers template.
 Save the following as the host's `copier.yml`. It offers shared agent guidance or a development workspace using Codex and Dev Container. Both features share the instruction provider; the workspace also enables Codex and Dev Container and defaults to Cloud integration. The feature IDs differ from the module IDs. Keep static includes and path registrations aligned. The input blocks follow their includes, and the two aggregators match the root configuration.
 
 ```yaml
-_min_copier_version: "9.17.2"
+_min_copier_version: "9.17"
 _subdirectory: template
 
 module_paths:

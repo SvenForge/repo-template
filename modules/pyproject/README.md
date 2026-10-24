@@ -1,18 +1,22 @@
 # Pyproject
 
-Own `pyproject.toml`, shared Python-version selection, and installation contributions. This support module is activated by Python or Sphinx in the bundled template; it has no separate feature choice. A documentation-only project can therefore install its dependencies without generating Python application scaffolding.
+Generate `pyproject.toml`, select the shared Python version, and contribute installation commands. Host inputs supply project metadata, dependency-group availability, and installation policy. A dependency-only setup can be used without application scaffolding.
 
 ## Questions and choices
 
-`python_version` is the minimum Python major/minor version, such as `3.12` (the default). The bundled host also uses it for CI images and the Dev Container image.
+| Answer | Decision |
+| --- | --- |
+| `python_version` | Minimum Python major/minor version, such as `3.12` (the default). The host can also use this output for runtime/tool configuration. |
 
 ## After generation
 
-Review project metadata and contributed sections in `pyproject.toml`. The bundled host selects editable installation for an installable Python distribution, dependency installation when providers add development dependencies, or no project/dependency installation otherwise. Install the generated `dev` group with `python -m pip install --group dev` when present; add `--editable .` for a distribution. Contributed Codex/Dev Container setup commands perform the applicable installation automatically when those integrations are generated.
+Review project metadata and contributed sections in `pyproject.toml`. Install the generated `dev` group with `python -m pip install --group dev` when present; add `--editable .` for an installable distribution. Generated environment integrations run the contributed installation commands when the host supplies their receivers.
 
 ## Reuse reference
 
-Supply `pyproject_inputs` after including the module. See the [module guide][module-guide] for shared precedence and output rules.
+Supply `pyproject_inputs` after including the module. See the [module guide][module-guide] for precedence, path rules, and manifest conventions.
+
+### Input variables
 
 | Input | Type | Standalone fallback and role |
 | --- | --- | --- |
@@ -25,19 +29,48 @@ Supply `pyproject_inputs` after including the module. See the [module guide][mod
 | `license_files` | list[str] | Empty; optional license-file paths. |
 | `owner_name`, `owner_email` | str | Empty; optional author metadata. |
 
-The bundled host supplies activation, metadata, dependency-group availability, and install mode from provider outputs. `pyproject.vars` exports merged settings with the answered Python version; a dynamic version requires a suitable version provider, such as Python's distribution contribution.
+### Output variables
 
-When enabled, `files` owns `pyproject.toml`. The module contributes project metadata to its own `pyproject.sections`, and adds the dependency section when `has_dependency_groups` is true. For `dependencies` or `editable` install modes it also emits shell fragments to [Codex's `codex.setup`/`codex.maintenance`][codex] and a named setup command to [Dev Container's `devcontainer.postCreateCommand`][devcontainer]. The installers inspect emitted dependency contributions to decide whether to install the `dev` group.
+Fields in `pyproject.vars`:
 
-| Receiving target | Destination and fragment contract |
-| --- | --- |
-| `pyproject.sections` | `pyproject.toml`: complete TOML sections. The receiver separates blocks with blank lines. Providers must avoid duplicate tables/keys. |
-| `pyproject.dependency_groups` | Inside `[dependency-groups]`, before `dev`: complete named group assignments, without another table header. Separate groups with newlines; do not redefine `dev`. |
-| `pyproject.dev_dependencies` | Inside the `dev` array: quoted dependency entries with trailing commas. The receiver supplies indentation and newlines, not commas. |
+| Variable | Type | Meaning |
+| --- | --- | --- |
+| `enabled` | bool | Effective activation. |
+| `python_version` | str | Answered minimum Python version. |
+| `has_dependency_groups` | bool | Whether the dependency-group section is emitted. |
+| `install` | str | Effective installation mode. |
+| `name`, `version` | str | Effective project name and version; empty version requires a version provider. |
+| `readme`, `license` | str | Effective optional metadata settings. |
+| `license_files` | list[str] | Effective license-file paths. |
+| `owner_name`, `owner_email` | str | Effective author metadata. |
 
-All preserve aggregate contribution order. The last two targets exist only when the dependency section is enabled. Keep `has_dependency_groups` aligned with the host's emitted dependency contributions.
+### Generated files
+
+| Path | Condition | Purpose |
+| --- | --- | --- |
+| `pyproject.toml` | Enabled. | Project configuration assembled from contributed sections. |
+
+### Receiving targets
+
+| Target | Destination | Fragment contract |
+| --- | --- | --- |
+| `pyproject.sections` | `pyproject.toml`. | Complete TOML sections, separated by blank lines. Providers must avoid duplicate tables/keys. |
+| `pyproject.dependency_groups` | Inside `[dependency-groups]`, before `dev`. | Complete named group assignments without another table header. Separate groups with newlines; do not redefine `dev`. |
+| `pyproject.dev_dependencies` | Inside the `dev` array. | Quoted dependency entries with trailing commas. The receiver adds indentation/newlines, not commas. |
+
+All preserve aggregate contribution order. The last two targets exist only when the dependency section is enabled. Keep `has_dependency_groups` aligned with emitted dependency contributions.
+
+### Emitted contributions
+
+| Target | Condition | Content |
+| --- | --- | --- |
+| `pyproject.sections` | Enabled. | Project metadata TOML section. |
+| `pyproject.sections` | Enabled and `has_dependency_groups` is true. | Dependency-group TOML section containing its own receiving targets. |
+| `codex.setup` | Enabled and install mode is `dependencies` or `editable`. | Bash package/dependency installation statements. |
+| `codex.maintenance` | Enabled and install mode is `dependencies` or `editable`. | The same installation statements for refresh. |
+| `devcontainer.postCreateCommand` | Enabled and install mode is `dependencies` or `editable`. | Named JSON installation command member, without an enclosing object or trailing comma. |
+
+Installers inspect emitted dependency contributions to decide whether to install the `dev` group. External contributions require matching receivers in the host.
 
 <!-- module-docs-links -->
 [module-guide]: ../../doc/module-guide.md
-[codex]: ../codex/README.md
-[devcontainer]: ../devcontainer/README.md

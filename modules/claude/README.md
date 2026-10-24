@@ -1,31 +1,60 @@
 # Claude Code
 
-Generate `CLAUDE.md` and optionally add Claude Code tooling to the Dev Container. This feature is optional in the bundled template. The host also activates [Agents][agents], which owns the shared instructions imported by `CLAUDE.md`.
+Generate `CLAUDE.md` and optionally contribute Claude Code tooling to a Dev Container. The host must also provide the `AGENTS.md` file imported by `CLAUDE.md`.
 
 ## Questions and choices
 
-`claude_devcontainer` asks whether to add Claude Code to the Dev Container, defaulting to true when a container is available. It is asked only when both the module and container availability are enabled.
+| Answer | Decision |
+| --- | --- |
+| `claude_devcontainer` | Whether to add Claude Code tooling to a Dev Container. Asked only when the module is enabled and a container is available; defaults to true when available. |
 
 ## After generation
 
-Review shared `AGENTS.md` guidance and the `CLAUDE.md` import. If using the container integration, review its tooling, mounts, and environment configuration, and complete the tool's normal authentication in your environment. This module does not create credentials or provision an account.
+Review the `CLAUDE.md` import and the shared `AGENTS.md` guidance supplied by your host. If using the container integration, review its tooling, mounts, and environment configuration, and complete the tool's normal authentication in your environment.
 
 ## Reuse reference
 
-Supply `claude_inputs` after including the module. See the [module guide][module-guide] for precedence and manifest conventions.
+Supply `claude_inputs` after including the module. See the [module guide][module-guide] for precedence, path rules, and manifest conventions.
+
+### Input variables
 
 | Input | Type | Standalone fallback and role |
 | --- | --- | --- |
-| `enabled` | bool | `true`; direct activation. The bundled host uses the Claude feature. |
-| `devcontainer_available` | bool | `false`; direct capability supplied by the host. |
+| `enabled` | bool | `true`; direct activation. |
+| `devcontainer_available` | bool | `false`; host-supplied capability. |
 | `devcontainer_integration` | bool | `true` when a container is available; default for `claude_devcontainer`. |
 
-`claude.vars` exports merged settings with effective `devcontainer_integration` (enabled, available, and answered true).
+### Output variables
 
-When enabled, `files` owns `CLAUDE.md`, whose contents import `AGENTS.md`; the custom host must activate Agents separately. The module emits Claude ignore patterns to [Core's `core.gitignore`][core]. With container integration, it contributes features, mounts, environment members, and post-create commands to the corresponding [Dev Container targets][devcontainer]. It has no receiving targets.
+Fields in `claude.vars`:
+
+| Variable | Type | Meaning |
+| --- | --- | --- |
+| `enabled` | bool | Effective activation. |
+| `devcontainer_available` | bool | Host-supplied container availability. |
+| `devcontainer_integration` | bool | Effective integration: module enabled, container available, and answer true. |
+
+### Generated files
+
+| Path | Condition | Purpose |
+| --- | --- | --- |
+| `CLAUDE.md` | Enabled. | Imports `AGENTS.md`, which the host must supply separately. |
+
+### Receiving targets
+
+There are no receiving targets.
+
+### Emitted contributions
+
+| Target | Condition | Content |
+| --- | --- | --- |
+| `core.gitignore` | Enabled. | Claude ignore-pattern/comment lines. |
+| `devcontainer.features` | Effective container integration. | JSON members selecting Claude Code tooling. |
+| `devcontainer.mounts` | Effective container integration. | JSON mount items for persisted tool state. |
+| `devcontainer.containerEnv` | Effective container integration. | JSON environment-variable members. |
+| `devcontainer.postCreateCommand` | Effective container integration. | Named JSON setup command members. |
+
+These contributions require matching receiving files/targets in the host. JSON fragments omit enclosing containers and trailing commas.
 
 <!-- module-docs-links -->
 [module-guide]: ../../doc/module-guide.md
-[agents]: ../agents/README.md
-[core]: ../core/README.md
-[devcontainer]: ../devcontainer/README.md
