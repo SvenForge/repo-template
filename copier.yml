@@ -184,6 +184,8 @@ gitlab_inputs:
     enabled: {{ 'gitlab' in features }}
     repository_host: {{ core.vars.repository_host | to_json }}
     repository_path: {{ core.vars.repository_path | to_json }}
+    development_repository_host: {{ core.vars.development_repository_host | to_json }}
+    development_repository_path: {{ core.vars.development_repository_path | to_json }}
     has_readme: {{ 'README.md' in core.files | map(attribute='path') }}
     copier_version: {{ copier.vars.version | to_json }}
     python_enabled: {{ python.vars.enabled }}

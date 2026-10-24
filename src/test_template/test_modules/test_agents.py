@@ -5,6 +5,7 @@ import pytest
 from ..support import ModuleCase, ModuleCheck, RenderCase, TemplateCheck
 
 AGENTS_CONTEXT = {
+    'gitlab': {'vars': {'development_repository_path': ''}},
     'contributions': [
         {'target': 'agents.sections', 'template': 'modules/agents/fragments/guidelines.md.jinja'},
         {'target': 'agents.sections', 'template': 'modules/agents/fragments/safety.md.jinja'},

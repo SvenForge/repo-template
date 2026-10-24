@@ -7,15 +7,17 @@ Generate GitLab issue/MR templates and selected CI/CD pipelines. Host inputs det
 | Answer | Decision |
 | --- | --- |
 | `gitlab_pipeline` | Select Copier update checks, a demonstration job, Python checks when tools are configured, and Sphinx build/publication when documentation is enabled. Available jobs are selected by default. Clear all choices to generate only issue/MR templates. |
-| `gitlab_pages_url` | Optional documentation URL, asked when the Sphinx pipeline and a README are present. On `gitlab.com`, the default is derived from the repository path; review it for your project's actual Pages configuration. |
+| `gitlab_pages_url` | Optional documentation URL, asked when the Sphinx pipeline and a README are present. On `gitlab.com`, the default is derived from the publication repository path; review it for your project's actual Pages configuration. An explicit answer overrides the default. |
 
 ## After generation
 
 Push to the intended GitLab development project and check that runners can execute the selected jobs. Review issue/MR templates and any contributed workflow guidance. Adapt template TODOs when opening issues and merge requests.
 
+The host supplies separate development metadata when publication uses another project. Agent guidance names the development project and requires explicit project targeting in plugin/CLI operations. Match Git remotes by their fetch and push destinations, regardless of names such as `origin`; the only remote in a checkout can still be a publication mirror. If no development project is configured, identify it from the task/environment before making remote changes. These integrations do not rewrite Git remotes.
+
 The documentation pipeline publishes from the default branch; confirm the actual Pages URL and access settings. Copier checks need access to the saved template source. The demonstration job is optional. Ruff, mypy, and Copier checks are generated with `allow_failure`; review their results even when the pipeline succeeds.
 
-If the host renders the environment setup integration, its GitLab fragment expects `GITLAB_TOKEN` in secret configuration and installs/authenticates the pinned `glab` CLI. Configure credentials through the environment, then verify access; never add their values to repository files.
+If the host renders the environment setup integration, its GitLab fragment expects `GITLAB_TOKEN` in secret configuration and installs/authenticates the pinned `glab` CLI against the development host. Configure credentials through the environment, then verify access; never add their values to repository files. GitLab tooling requires a GitLab development project, including self-hosted instances. A GitHub publication mirror is supported when the development metadata identifies GitLab; setup reports a known incompatible development host before authentication.
 
 ## Reuse reference
 
@@ -28,7 +30,8 @@ Supply `gitlab_inputs` after including the module. See the [module guide][module
 | `enabled` | bool | `true`; direct activation. |
 | `pipeline` | list[str] | `copier`, `demo`, plus `python`/`sphinx` when available; question default override. |
 | `pages_url` | str | Derived for `gitlab.com` plus a repository path, otherwise empty; question default override. |
-| `repository_host`, `repository_path` | str | `gitlab.com`, empty; direct integration metadata. |
+| `repository_host`, `repository_path` | str | `gitlab.com`, empty; publication metadata for the Pages default. |
+| `development_repository_host`, `development_repository_path` | str | Inherit the corresponding publication metadata when omitted; direct development location for authentication and agent guidance. An explicit empty path leaves the project unspecified. |
 | `has_readme` | bool | `false`; controls Pages URL question visibility. |
 | `copier_version` | str | `9.17` series; version installed by the Copier job. |
 | `python_enabled` | bool | `false`; enables the Python pipeline choice with nonempty tools. |
@@ -46,7 +49,8 @@ Fields in `gitlab.vars`:
 | `enabled` | bool | Effective activation. |
 | `pipeline` | list[str] | Answered pipeline selection. |
 | `pages_url` | str | Answered documentation URL. |
-| `repository_host`, `repository_path` | str | Effective repository location for integrations. |
+| `repository_host`, `repository_path` | str | Publication location used for the Pages default. |
+| `development_repository_host`, `development_repository_path` | str | Effective development location for authentication and project targeting. |
 | `has_readme` | bool | Host-supplied README availability. |
 | `copier_version` | str | Copier version installed by the update-check job. |
 | `python_enabled` | bool | Host-supplied Python-check availability. |

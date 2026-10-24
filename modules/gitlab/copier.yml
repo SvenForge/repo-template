@@ -84,6 +84,8 @@ gitlab:
     {%- set vars = dict(vars,
       pipeline=gitlab_pipeline,
       pages_url=gitlab_pages_url,
+      development_repository_host=gitlab_inputs.development_repository_host | default(vars.repository_host),
+      development_repository_path=gitlab_inputs.development_repository_path | default(vars.repository_path),
     ) -%}
     vars: {{ vars | to_json }}
     files:

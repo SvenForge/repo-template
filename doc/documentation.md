@@ -45,6 +45,8 @@ Use ordinary Markdown and reference links for cross-page dependencies. Put link 
 
 Use American English, brief paragraphs, and consistent terms. Document necessary decisions, contracts, and user actions; leave issue history, debugging notes, exhaustive combinations, and incidental implementation details in issues or source. Update affected pages with behavior changes. Preserve useful paths and anchors when moving content, leaving short pointers when practical.
 
+While this template is in early development and is not widely used, variable changes do not yet require migration or update guidance for existing repositories. Keep the current module contracts documented.
+
 ## Navigation and checks
 
 Preserve the README's section order and toctree markers. Its Sphinx wrapper orders the paths: feature chooser with nested module pages, reuse and shared contract, then structure, testing, this guide, and test-support API. Module pages have one parent; other paths link to them. Keep License reachable. New module pages need both an index link and a toctree entry.

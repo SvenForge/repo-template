@@ -2,9 +2,15 @@
 
 * Follow these workflow stages in order: **plan**, **create**, **verify**, and **deploy**.
 * Keep the issue's workflow label synchronized with its current stage by replacing the previous label with `workflow::plan`, `workflow::create`, `workflow::verify`, or `workflow::deploy`. Also apply one appropriate `type::*` label and one `priority::*` label.
-* Treat the GitLab project linked in the title of `README.md` as the authoritative source of truth. Push branches and commits only to this remote.
-* Use other remotes, such as GitHub mirrors, only to clone the repository. Do not push to or make changes on those services.
+{% if gitlab.vars.development_repository_path -%}
+* Use [{{ gitlab.vars.development_repository_host }}/{{ gitlab.vars.development_repository_path }}](https://{{ gitlab.vars.development_repository_host }}/{{ gitlab.vars.development_repository_path }}) as the authoritative development project for issues, merge requests, and contribution pushes.
+{% else -%}
+* Use the development project explicitly identified by the task or environment. If the target is unknown, ask before making remote changes.
+{% endif -%}
+* Match Git remotes to the development project's host and path before fetching development changes or pushing. Inspect both fetch and push URLs; names such as `origin` do not establish purpose.
+* README publication links and mirrors do not determine where to contribute. Use mirrors only to obtain content; do not push branches or change issues or merge requests there.
 * Use the native `@GitLab` plugin for GitLab interactions when available. Otherwise, use the `glab` CLI if installed. If neither is available, interact only with the local Git repository, remain in the current workflow stage, and report which required GitLab actions could not be completed.
+* Target the development project explicitly in project-scoped plugin calls and CLI commands. With `glab`, use `--repo <host/group/project>` where supported; for `glab api`, specify `--hostname <host>` and the project's explicit API path instead of checkout-derived placeholders.
 * Before every local commit created autonomously by an agent, retrieve the authenticated GitLab user's `name` and `commit_email` through the selected interface (the native `@GitLab` plugin when available, otherwise `glab api user`). If either value is unavailable or empty, stop and report the blocker. Apply the values only to that commit with command-scoped configuration, for example `git -c user.name="<name>" -c user.email="<commit_email>" commit ...`; do not change the stored repository or global Git identity.
 
 ### Workflow stage transitions

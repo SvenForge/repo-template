@@ -6,6 +6,7 @@ core_defaults:
     enabled: true
     repository_name: My Repository
     repository_url: ''
+    development_repository_url: ''
     repository_host: gitlab.com
     repository_path: ''
     owner_name: ''
@@ -32,9 +33,21 @@ core_repository_name:
 
 core_repository_url:
   type: str
-  help: "[Core] What is the repository URL? (optional)"
+  help: |-
+    [Core] Repository URL for users? (optional)
+    Used for the README and, by default, development. Prefer an HTTPS link.
   qmark: "📁"
   default: "{{ core_inputs.repository_url | default(core_defaults.repository_url) }}"
+  when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
+
+core_development_repository_url:
+  type: str
+  help: |-
+    [Core] Different development repository URL? (optional)
+    Leave empty to use the URL above.
+    Development pulls, pushes, issues, and merge requests use this project.
+  qmark: "📁"
+  default: "{{ core_inputs.development_repository_url | default(core_defaults.development_repository_url) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 
 core_repository_host:
@@ -46,7 +59,7 @@ core_repository_host:
     {%- elif core_repository_url -%}
     {{ (core_repository_url.split('://', 1)[1].rsplit('@', 1)[-1].split('/', 1)[0]
       if '://' in core_repository_url
-      else core_repository_url.rsplit('@', 1)[-1].split(':', 1)[0].split('/', 1)[0]) }}
+      else core_repository_url.rsplit('@', 1)[-1].split(':', 1)[0].split('/', 1)[0]) | lower }}
     {%- else -%}
     {{ core_defaults.repository_host }}
     {%- endif -%}
@@ -59,11 +72,43 @@ core_repository_path:
     {%- if core_inputs.repository_path is defined -%}
     {{ core_inputs.repository_path }}
     {%- elif core_repository_url -%}
-    {%- set path = core_repository_url.split(core_repository_host, 1)[1]
-      .lstrip(':/').split('?', 1)[0].split('#', 1)[0].rstrip('/') -%}
+    {%- set location = core_repository_url.split('://', 1)[-1].rsplit('@', 1)[-1] -%}
+    {%- set path = (location.partition('/')[2] if '://' in core_repository_url
+      else location.partition(':')[2] if ':' in location else location.partition('/')[2])
+      .split('?', 1)[0].split('#', 1)[0].rstrip('/') -%}
     {{ path[:-4] if path.endswith('.git') else path }}
     {%- else -%}
     {{ core_defaults.repository_path }}
+    {%- endif -%}
+  when: false
+
+core_development_repository_host:
+  type: str
+  default: |
+    {%- if core_inputs.development_repository_host is defined -%}
+    {{ core_inputs.development_repository_host }}
+    {%- elif core_development_repository_url -%}
+    {{ (core_development_repository_url.split('://', 1)[1].rsplit('@', 1)[-1].split('/', 1)[0]
+      if '://' in core_development_repository_url
+      else core_development_repository_url.rsplit('@', 1)[-1].split(':', 1)[0].split('/', 1)[0]) | lower }}
+    {%- else -%}
+    {{ core_repository_host }}
+    {%- endif -%}
+  when: false
+
+core_development_repository_path:
+  type: str
+  default: |
+    {%- if core_inputs.development_repository_path is defined -%}
+    {{ core_inputs.development_repository_path }}
+    {%- elif core_development_repository_url -%}
+    {%- set location = core_development_repository_url.split('://', 1)[-1].rsplit('@', 1)[-1] -%}
+    {%- set path = (location.partition('/')[2] if '://' in core_development_repository_url
+      else location.partition(':')[2] if ':' in location else location.partition('/')[2])
+      .split('?', 1)[0].split('#', 1)[0].rstrip('/') -%}
+    {{ path[:-4] if path.endswith('.git') else path }}
+    {%- else -%}
+    {{ core_repository_path }}
     {%- endif -%}
   when: false
 
@@ -130,6 +175,9 @@ core:
       repository_url=core_repository_url,
       repository_host=core_repository_host,
       repository_path=core_repository_path,
+      development_repository_url=core_development_repository_url or core_repository_url,
+      development_repository_host=core_development_repository_host,
+      development_repository_path=core_development_repository_path,
       owner_name=core_owner_name,
       owner_email=core_owner_email,
       owner_user=core_owner_user,
