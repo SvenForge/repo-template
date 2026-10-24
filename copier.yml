@@ -53,8 +53,10 @@ module_paths:
     pyproject: modules/pyproject
     python: modules/python
     sphinx: modules/sphinx
+    agents: modules/agents
     gitlab: modules/gitlab
     codex: modules/codex
+    claude: modules/claude
     devcontainer: modules/devcontainer
 
 # Feature Selector
@@ -70,6 +72,7 @@ features:
     Sphinx (documentation): sphinx
     GitLab (CI/CD, issue and merge request templates): gitlab
     Codex (agent guidance and integrations): codex
+    Claude Code (agent guidance and integrations): claude
     Dev Container (development environment): devcontainer
   default:
     - core
@@ -161,6 +164,16 @@ pyproject_inputs:
     owner_email: {{ core.vars.owner_email | to_json }}
 
 ---
+!include modules/agents/copier.yml
+---
+agents_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'codex' in features or 'claude' in features }}
+
+---
 !include modules/gitlab/copier.yml
 ---
 gitlab_inputs:
@@ -188,6 +201,17 @@ codex_inputs:
   when: false
   default: |
     enabled: {{ 'codex' in features }}
+    devcontainer_available: {{ 'devcontainer' in features }}
+
+---
+!include modules/claude/copier.yml
+---
+claude_inputs:
+  type: yaml
+  help: Which inputs should be used for the module?
+  when: false
+  default: |
+    enabled: {{ 'claude' in features }}
     devcontainer_available: {{ 'devcontainer' in features }}
 
 ---

@@ -25,6 +25,8 @@ from ..support import VariableCase, VariablesCheck
                     'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.12-bookworm'}},
                     'sphinx': {'vars': {'api_packages': ['test_my_repository']}},
                     'gitlab': {'vars': {'pipeline': ['python', 'sphinx']}},
+                    'agents': {'files': [], 'contributions': []},
+                    'claude': {'files': [], 'contributions': []},
                 },
             ),
             id='defaults',
@@ -102,20 +104,54 @@ from ..support import VariableCase, VariablesCheck
             VariableCase(
                 answers={
                     'features': ['gitlab', 'devcontainer'],
-                    'codex_inputs': {'enabled': True, 'cloud_integration': False, 'devcontainer_available': True},
+                    'agents_inputs': {'enabled': True},
                 },
                 expected={
-                    'files': [{'path': 'AGENTS.md', 'template': 'modules/codex/files/AGENTS.md.jinja'}],
-                    'contributions': [{'target': 'devcontainer.features', 'template': 'modules/codex/fragments/devcontainer.features.json.jinja'}],
-                    'codex': {'vars': {'enabled': True, 'cloud_integration': False, 'devcontainer_integration': True}},
+                    'files': [{'path': 'AGENTS.md', 'template': 'modules/agents/files/AGENTS.md.jinja'}],
+                    'contributions': [{'target': 'agents.sections', 'template': 'modules/gitlab/fragments/AGENTS.md.jinja'}],
+                    'agents': {'vars': {'enabled': True}},
+                    'codex': {'files': [], 'contributions': []},
                 },
             ),
             id='unselected-provider',
         ),
         pytest.param(
             VariableCase(
+                answers={'features': ['codex']},
+                expected={
+                    'files': [
+                        {'path': 'AGENTS.md', 'template': 'modules/agents/files/AGENTS.md.jinja'},
+                        {'path': '.codex/setup.sh', 'template': 'modules/codex/files/setup.sh.jinja'},
+                    ],
+                    'core': {'files': []},
+                    'claude': {'files': [], 'contributions': []},
+                },
+            ),
+            id='codex-without-core',
+        ),
+        pytest.param(
+            VariableCase(
+                answers={'features': ['claude', 'gitlab', 'devcontainer']},
+                expected={
+                    'files': [
+                        {'path': 'AGENTS.md', 'template': 'modules/agents/files/AGENTS.md.jinja'},
+                        {'path': 'CLAUDE.md', 'template': 'modules/claude/files/CLAUDE.md.jinja'},
+                    ],
+                    'contributions': [
+                        {'target': 'agents.sections', 'template': 'modules/gitlab/fragments/AGENTS.md.jinja'},
+                        {'target': 'devcontainer.containerEnv', 'template': 'modules/claude/fragments/devcontainer.containerEnv.json.jinja'},
+                    ],
+                    'core': {'files': []},
+                    'codex': {'files': [], 'contributions': []},
+                    'claude': {'vars': {'devcontainer_integration': True}},
+                },
+            ),
+            id='claude-without-core',
+        ),
+        pytest.param(
+            VariableCase(
                 answers={
-                    'features': ['core', 'copier', 'python', 'sphinx', 'gitlab', 'codex', 'devcontainer'],
+                    'features': ['core', 'copier', 'python', 'sphinx', 'gitlab', 'codex', 'claude', 'devcontainer'],
                     'core_repository_name': 'Widget',
                     'core_repository_url': 'https://gitlab.com/example/widget.git',
                     'python_package_name': 'acme_widget',
@@ -128,18 +164,21 @@ from ..support import VariableCase, VariablesCheck
                         {'path': 'src/acme_widget/__init__.py', 'template': 'modules/python/files/package/__init__.py.jinja'},
                         {'path': 'doc/requirements.md', 'template': 'modules/sphinx/files/requirements.md.jinja'},
                         {'path': '.gitlab/ci/sphinx.yml', 'template': 'modules/gitlab/files/ci/sphinx.yml.jinja'},
-                        {'path': 'AGENTS.md', 'template': 'modules/codex/files/AGENTS.md.jinja'},
+                        {'path': 'AGENTS.md', 'template': 'modules/agents/files/AGENTS.md.jinja'},
+                        {'path': 'CLAUDE.md', 'template': 'modules/claude/files/CLAUDE.md.jinja'},
                     ],
                     'contributions': [
                         {'target': 'core.readme.documentation', 'template': 'modules/gitlab/fragments/readme.documentation.md.jinja'},
                         {'target': 'devcontainer.features', 'template': 'modules/codex/fragments/devcontainer.features.json.jinja'},
                         {'target': 'codex.setup', 'template': 'modules/pyproject/fragments/setup.sh.jinja'},
+                        {'target': 'devcontainer.features', 'template': 'modules/claude/fragments/devcontainer.features.json.jinja'},
                     ],
                     'python': {'vars': {'distribution_name': 'acme-widget', 'has_distribution': True}},
                     'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.13-bookworm'}},
                     'gitlab': {'vars': {'pages_url': 'https://example.gitlab.io/widget/', 'has_python_distribution': True}},
                     'sphinx': {'vars': {'repository_name': 'Widget', 'api_packages': ['acme_widget', 'test_acme_widget']}},
                     'codex': {'vars': {'devcontainer_integration': True}},
+                    'claude': {'vars': {'devcontainer_integration': True}},
                 },
             ),
             id='all-modules',

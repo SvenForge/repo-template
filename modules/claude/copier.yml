@@ -1,0 +1,59 @@
+# Module Defaults
+claude_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    devcontainer_available: false
+    devcontainer_integration: true
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+claude_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Questions
+claude_devcontainer:
+  type: bool
+  help: "[Claude] Add Claude Code to the Dev Container?"
+  qmark: "✳️"
+  default: "{{ claude_inputs.devcontainer_integration | default((claude_inputs.devcontainer_available | default(claude_defaults.devcontainer_available)) and claude_defaults.devcontainer_integration) }}"
+  when: "{{ (claude_inputs.enabled | default(claude_defaults.enabled)) and (claude_inputs.devcontainer_available | default(claude_defaults.devcontainer_available)) }}"
+
+# Module Outputs
+claude:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(claude_defaults, **claude_inputs) -%}
+    {%- set vars = dict(vars,
+      devcontainer_integration=vars.enabled and vars.devcontainer_available and claude_devcontainer,
+    ) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: CLAUDE.md
+        template: files/CLAUDE.md.jinja
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - target: core.gitignore
+        template: fragments/gitignore.jinja
+      {%- endif %}
+      {%- if vars.devcontainer_integration %}
+      - target: devcontainer.features
+        template: fragments/devcontainer.features.json.jinja
+      - target: devcontainer.mounts
+        template: fragments/devcontainer.mounts.json.jinja
+      - target: devcontainer.containerEnv
+        template: fragments/devcontainer.containerEnv.json.jinja
+      - target: devcontainer.postCreateCommand
+        template: fragments/devcontainer.postCreateCommand.json.jinja
+      {%- endif %}
+      {%- endfilter %}

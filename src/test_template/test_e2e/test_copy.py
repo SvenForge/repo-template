@@ -50,7 +50,7 @@ from ..support import TemplateCase
         pytest.param(
             TemplateCase(
                 answers={
-                    'features': '[core, copier, python, sphinx, gitlab, codex, devcontainer]',
+                    'features': '[core, copier, python, sphinx, gitlab, codex, claude, devcontainer]',
                     'core_repository_name': 'Widget',
                     'core_repository_url': 'https://gitlab.com/example/widget.git',
                     'python_package_name': 'acme_widget',
@@ -60,8 +60,8 @@ from ..support import TemplateCase
                     '.codex/maintenance.sh': ('glab auth status',),
                     '.codex/setup.sh': ('glab auth login', 'python -m pip install --editable . --group dev'),
                     '.copier-answers.yml': ('python_package_name: acme_widget',),
-                    '.devcontainer/devcontainer.json': ('openai.chatgpt', '"setupCodex"', '"setupPython"'),
-                    '.gitignore': (),
+                    '.devcontainer/devcontainer.json': ('openai.chatgpt', 'claude-code:1.0', '"setupCodex"', '"setupPython"', '"setupClaude"', 'CLAUDE_CONFIG_DIR'),
+                    '.gitignore': ('CLAUDE.local.md', '.claude/settings.local.json'),
                     '.gitlab-ci.yml': (),
                     '.gitlab/ci/copier.yml': (),
                     '.gitlab/ci/demo.yml': (),
@@ -70,6 +70,7 @@ from ..support import TemplateCase
                     '.gitlab/issue_templates/default.md': (),
                     '.gitlab/merge_request_templates/default.md': (),
                     'AGENTS.md': ('## GitLab development workflow',),
+                    'CLAUDE.md': ('@AGENTS.md',),
                     'LICENSE.md': (),
                     'README.md': ('# [Widget](https://gitlab.com/example/widget.git)', '[GitLab Pages](https://example.gitlab.io/widget/)'),
                     'copier.yml': ('_subdirectory: template', '!include modules/custom/copier.yml'),

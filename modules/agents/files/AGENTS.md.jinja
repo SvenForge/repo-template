@@ -1,0 +1,7 @@
+{% filter trim -%}
+# AGENTS.md
+{%- for contribution in contributions | selectattr('target', 'equalto', 'agents.sections') %}
+
+{% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
+{%- endfor %}
+{% endfilter %}

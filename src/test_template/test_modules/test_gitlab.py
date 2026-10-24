@@ -29,7 +29,7 @@ GITLAB_CONTEXT = module_context(
                         {'path': '.gitlab-ci.yml', 'template': 'files/gitlab-ci.yml.jinja'},
                         {'path': '.gitlab/ci/copier.yml', 'template': 'files/ci/copier.yml.jinja'},
                     ],
-                    'contributions': [{'target': 'codex.agents', 'template': 'fragments/AGENTS.md.jinja'}],
+                    'contributions': [{'target': 'agents.sections', 'template': 'fragments/AGENTS.md.jinja'}],
                 },
             ),
             id='defaults',

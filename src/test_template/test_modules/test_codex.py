@@ -15,7 +15,6 @@ CODEX_CONTEXT = module_context('codex')
                 expected={
                     'vars': {'cloud_integration': True},
                     'files': [
-                        {'path': 'AGENTS.md', 'template': 'files/AGENTS.md.jinja'},
                         {'path': '.codex/setup.sh', 'template': 'files/setup.sh.jinja'},
                         {'path': '.codex/maintenance.sh', 'template': 'files/maintenance.sh.jinja'},
                     ],
@@ -30,7 +29,7 @@ CODEX_CONTEXT = module_context('codex')
                 answers={'codex_cloud': False},
                 expected={
                     'vars': {'cloud_integration': False, 'devcontainer_integration': True},
-                    'files': [{'path': 'AGENTS.md', 'template': 'files/AGENTS.md.jinja'}],
+                    'files': [],
                     'contributions': [
                         {'target': 'devcontainer.features', 'template': 'fragments/devcontainer.features.json.jinja'},
                         {'target': 'devcontainer.mounts', 'template': 'fragments/devcontainer.mounts.json.jinja'},
@@ -41,20 +40,21 @@ CODEX_CONTEXT = module_context('codex')
             ),
             id='devcontainer',
         ),
+        pytest.param(
+            ModuleCase(
+                inputs={'enabled': False, 'cloud_integration': True, 'devcontainer_available': True},
+                expected={
+                    'vars': {'cloud_integration': False, 'devcontainer_integration': False},
+                    'files': [],
+                    'contributions': [],
+                },
+            ),
+            id='disabled',
+        ),
     ],
 )
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     check_module('codex', case)
-
-
-@pytest.mark.parametrize(
-    'case',
-    [
-        pytest.param(RenderCase(context=CODEX_CONTEXT, contains=('## General guidelines', '## Safety and boundaries', 'Do not edit or publish any secrets')), id='agent-instructions'),
-    ],
-)
-def test_agents(check_template: TemplateCheck, case: RenderCase) -> None:
-    check_template('modules/codex/files/AGENTS.md.jinja', case)
 
 
 @pytest.mark.parametrize(

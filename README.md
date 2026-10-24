@@ -10,7 +10,7 @@ Select the parts you need:
 
 * README and license files; Sphinx documentation.
 * Python testing and code checks; GitLab CI/CD.
-* Dev Containers, Codex support, or a starter for another Copier template.
+* Dev Containers, Codex or Claude Code support, or a starter for another Copier template.
 
 The default selection includes Core, Python, Sphinx, GitLab, and Dev Container. This template is in early development; feedback on setup and documentation is welcome.
 
