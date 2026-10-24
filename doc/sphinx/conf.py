@@ -23,6 +23,7 @@ extensions = [
 
 root_doc = 'doc/sphinx/index'
 needs_sphinx = '8.2'
+myst_heading_anchors = 3
 exclude_patterns = [
     '.*',
     '**/.*',

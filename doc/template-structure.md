@@ -7,9 +7,9 @@ Start with the repository README if you want to create or update a repository. T
 | Path | Responsibility |
 | --- | --- |
 | `copier.yml` | Defines feature choices, module locations, static includes, host input wiring, and the two output aggregators. |
-| `modules/<name>/` | Owns a module's questions, output, file templates, and contribution fragments. |
+| `modules/<name>/` | Owns a module's questions, output, file templates, contribution fragments, and its `README.md` user guide and reference. |
 | `template/` | Holds the generic yield template that renders the aggregated files and the template that saves Copier answers. |
-| `doc/` | Holds these Markdown pages; `doc/sphinx/index.md` wraps the README and inserts the documentation table of contents. |
+| `doc/` | Holds the feature chooser, reuse walkthrough, and shared developer guides. `doc/sphinx/index.md` wraps the README and orders the documentation, including module pages. See [Writing documentation](./documentation.md) for placement rules. |
 | `src/test_template/` | Tests module outputs and rendered projects. |
 | `.gitlab-ci.yml` and `.gitlab/ci/` | Define repository checks, including the Sphinx build. |
 
@@ -39,4 +39,4 @@ The root configuration statically includes every module's `copier.yml`, even whe
 
 ## Generated project
 
-A manifest record separates source from destination: `template: files/AGENTS.md.jinja` is relative to its module, while `path: AGENTS.md` is relative to the generated project. The module directories and root configuration are template sources; only the selected manifest files and Copier's answers file appear in the generated project. See the [module guide](./module-guide.md) for the path rules and a working consumer example.
+A manifest record separates source from destination: `template: files/AGENTS.md.jinja` is relative to its module, while `path: AGENTS.md` is relative to the generated project. The module directories and root configuration are template sources; only the selected manifest files and Copier's answers file appear in the generated project. See the [module guide](./module-guide.md) for path rules and [Reuse modules](./reuse.md) for a working consumer example.

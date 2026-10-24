@@ -18,13 +18,15 @@ The default selection includes Core, Python, Sphinx, GitLab, and Dev Container. 
 
 ### Installation
 
-You need Git and Python 3.12 or newer. Install Copier 9.17 or newer:
+You need Git and Python 3.12 or newer. Install Copier 9.17.2 or newer:
 
 ```shell
-python -m pip install "copier>=9.17"
+python -m pip install "copier>=9.17.2"
 ```
 
 ### Usage
+
+Use [Choose features](./doc/features.md) to decide which parts to select and find guidance on their questions and setup.
 
 Generate a project and answer Copier's questions:
 
@@ -35,7 +37,7 @@ cd path/to/new-project
 
 With default choices, you get `README.md`, `LICENSE.md`, `pyproject.toml`, documentation under `doc/`, Dev Container and GitLab configuration, and saved answers in `.copier-answers.yml`.
 
-Review and customize the generated README, license, and configuration, then initialize Git and commit:
+Review the selected modules' **After generation** instructions and customize the generated README, license, and configuration. Initialize Git, run the generated project's checks, and commit the reviewed files:
 
 ```shell
 git init
@@ -52,7 +54,7 @@ copier update
 
 Review any conflicts before committing. Copier normally uses the latest tagged template release; see its [update guide](https://copier.readthedocs.io/en/stable/updating/) for details and version selection.
 
-To build your own template or reuse modules, see [Template structure](./doc/template-structure.md) and the [Module guide](./doc/module-guide.md).
+To build another template, start with [Reuse modules](./doc/reuse.md). It covers the template starter and composition from a pinned Git submodule.
 
 ### Development
 
@@ -62,12 +64,16 @@ Use the provided [development container](./.devcontainer/devcontainer.json) or p
 python -m pip install --group dev
 ```
 
-See [Testing](./doc/testing.md) for the checks to run.
+To develop this template, use [Template structure](./doc/template-structure.md), the [Module guide](./doc/module-guide.md), and [Testing](./doc/testing.md). See [Writing documentation](./doc/documentation.md) when changing the guides or module pages.
 
 ## Documentation
 
 <!-- toctree-start -->
 The documentation is available on [GitLab Pages](https://svenforge.gitlab.io/repo-template/).
+
+* **Use this template:** [Choose features](./doc/features.md), then follow the selected modules' questions and setup instructions.
+* **Build another template:** [Reuse modules](./doc/reuse.md) and the shared [Module guide](./doc/module-guide.md).
+* **Develop this template:** [Template structure](./doc/template-structure.md), [Testing](./doc/testing.md), and [Writing documentation](./doc/documentation.md).
 
 For Copier commands and concepts, see the [Copier documentation](https://copier.readthedocs.io/en/stable/).
 <!-- toctree-end -->

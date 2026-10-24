@@ -8,6 +8,7 @@ Each module has the same small layout:
 
 ```text
 modules/<name>/
+├── README.md        # User guidance and module reference
 ├── copier.yml       # Defaults, inputs, questions, and one output
 ├── exports.jinja    # Exposes that output to the host
 ├── files/           # Templates for files the module owns
@@ -18,14 +19,7 @@ modules/<name>/
 
 ### Generate a template starter
 
-Select the Copier feature to scaffold another template:
-
-```shell
-copier copy --defaults --data 'features=[copier]' https://gitlab.com/svenforge/repo-template.git my-template
-copier copy --defaults my-template my-project
-```
-
-The `copier_module_name` answer defaults to `custom`; pass `--data copier_module_name=example` to rename it or `--data copier_module_name=` to skip it. The starter initially renders only its answers file. Add files and contributions through its module manifest.
+See [Reuse modules](./reuse.md#generate-a-template-starter) to scaffold a new template and choose its initial module.
 
 ## Module interface
 
@@ -33,7 +27,7 @@ The `copier_module_name` answer defaults to `custom`; pass `--data copier_module
 
 `<name>_defaults` supplies module-owned fallback values. A host defines a sparse `<name>_inputs` mapping after the module's static include; omitted keys retain their defaults. An ordinary question may prompt the user and save its answer, while a hidden question can calculate a value needed by later questions.
 
-Keep activation and other feature-dependent settings together in this host input block. One feature can enable several modules, and a shared module can be enabled by several features. Modules consume their namespaced inputs instead of reading the host's `features`. Explicitly supply `enabled` for optional modules, since standalone defaults may enable them. The consumer example below shows shared activation and feature-dependent integration defaults.
+Keep activation and other feature-dependent settings together in this host input block. One feature can enable several modules, and a shared module can be enabled by several features. Modules consume their namespaced inputs instead of reading the host's `features`. Explicitly supply `enabled` for optional modules, since standalone defaults may enable them. The [consumer example](./reuse.md#minimal-consumer-example) shows shared activation and feature-dependent integration defaults.
 
 For an effective field, precedence is **saved or new question answer → supplied input → applicable calculation → module default**. For a question, the lower-priority values determine its prompt default. An explicit `false`, empty string, or zero is a supplied value, not a missing key. Keep input, default, and output field names consistent where they represent the same setting. Renaming a persisted question can affect existing Copier answers.
 
@@ -86,117 +80,4 @@ Use local Jinja controls with Copier's default settings. Preserve content indent
 
 ## Reuse in another template
 
-### Git submodule setup
-
-Today the supported reuse path is to mount this repository as a Git submodule. In a new host template repository, run:
-
-```shell
-mkdir consumer-template
-cd consumer-template
-git init
-git submodule add https://gitlab.com/svenforge/repo-template.git vendor/repo-template
-mkdir -p template
-cp vendor/repo-template/template/*.jinja template/
-```
-
-The two copied files are the generic yield template and Copier answers template. The host must supply its own root `copier.yml`. The checked-out submodule commit becomes pinned when the host commits its gitlink. To select or update to a reviewed revision, run `git -C vendor/repo-template checkout <commit-sha>`, then stage and commit `vendor/repo-template` in the host. A fresh clone restores that revision with `git submodule update --init --recursive`.
-
-### Minimal consumer example
-
-Save the following as the host's `copier.yml`. It offers shared agent guidance or a development workspace using Codex and Dev Container. Both features share the instruction provider; the workspace also enables Codex and Dev Container and defaults to Cloud integration. The feature IDs differ from the module IDs. Keep static includes and path registrations aligned. The input blocks follow their includes, and the two aggregators match the root configuration.
-
-```yaml
-_min_copier_version: "9.17.2"
-_subdirectory: template
-
-module_paths:
-  type: yaml
-  when: false
-  default:
-    agents: vendor/repo-template/modules/agents
-    codex: vendor/repo-template/modules/codex
-    devcontainer: vendor/repo-template/modules/devcontainer
-
-features:
-  type: str
-  multiselect: true
-  choices:
-    Agent guidance: guidance
-    Development workspace: workspace
-  default:
-    - workspace
-
----
-!include vendor/repo-template/modules/agents/copier.yml
----
-agents_inputs:
-  type: yaml
-  when: false
-  default: |
-    enabled: {{ 'guidance' in features or 'workspace' in features }}
-
----
-!include vendor/repo-template/modules/codex/copier.yml
----
-codex_inputs:
-  type: yaml
-  when: false
-  default: |
-    enabled: {{ 'workspace' in features }}
-    cloud_integration: {{ 'workspace' in features }}
-    devcontainer_available: {{ 'workspace' in features }}
-
----
-!include vendor/repo-template/modules/devcontainer/copier.yml
----
-devcontainer_inputs:
-  type: yaml
-  when: false
-  default: |
-    enabled: {{ 'workspace' in features }}
-
----
-files:
-  type: yaml
-  when: false
-  default: |
-    {%- set result = namespace(files=[]) -%}
-    {%- for module_path in module_paths.values() -%}
-      {%- from module_path ~ '/exports.jinja' import output with context -%}
-      {%- for file in output.files -%}
-        {%- set result.files = result.files + [{
-          'path': file.path,
-          'template': module_path ~ '/' ~ file.template,
-        }] -%}
-      {%- endfor -%}
-    {%- endfor -%}
-    {{ result.files | to_json }}
-
-contributions:
-  type: yaml
-  when: false
-  default: |
-    {%- set result = namespace(contributions=[]) -%}
-    {%- for module_path in module_paths.values() -%}
-      {%- from module_path ~ '/exports.jinja' import output with context -%}
-      {%- for contribution in output.contributions -%}
-        {%- set result.contributions = result.contributions + [{
-          'target': contribution.target,
-          'template': module_path ~ '/' ~ contribution.template,
-        }] -%}
-      {%- endfor -%}
-    {%- endfor -%}
-    {{ result.contributions | to_json }}
-```
-
-Commit the host configuration and its submodule pin, then render:
-
-```shell
-git add .gitmodules vendor/repo-template copier.yml template
-git commit -m "Add reusable template modules"
-copier copy --defaults . ../generated-project
-```
-
-### Verify the render
-
-With Copier 9.17.2 and the default workspace selected, the generated project contains `AGENTS.md`, `.codex/setup.sh`, `.codex/maintenance.sh`, `.devcontainer/devcontainer.json`, and `.copier-answers.yml`. The Dev Container JSON includes Codex's contributions. Guidance alone defaults to only `AGENTS.md` and the answers file. Selecting both still emits each module's output once; selecting neither emits only the answers file. This example needs no custom Jinja extension or `--trust`. It uses a fixed Git submodule revision once the host commits the gitlink.
+Follow [Reuse modules](./reuse.md) for the pinned-submodule walkthrough and documentation inclusion example. Consult the module pages indexed by [Choose features](./features.md) for current inputs, outputs, and receiving targets.

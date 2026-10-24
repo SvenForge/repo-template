@@ -6,9 +6,32 @@
 
 ```{toctree}
 :maxdepth: 2
-:glob:
+:caption: Use this template
 
-../*
+../features
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: Build another template
+
+../reuse
+../module-guide
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: Develop this template
+
+../template-structure
+../testing
+../documentation
+../api
+```
+
+```{toctree}
+:maxdepth: 1
+
 License <../../LICENSE>
 ```
 

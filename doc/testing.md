@@ -15,6 +15,8 @@ Prefer positive assertions. Check an omission only when its presence would cause
 
 Keep the existing self-test as a discovery check.
 
+Keep the few existing CLI end-to-end scenarios minimal. Documentation changes normally need review and a strict Sphinx build, without new end-to-end cases. Check a new documentation inclusion example in a temporary Sphinx project when needed.
+
 ## Shared setup and cases
 
 Use the same pattern in each module test file. Give scenarios readable names and use the records in `support.py`:
