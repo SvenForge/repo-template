@@ -26,8 +26,6 @@ python -m pip install "copier>=9.17.2"
 
 ### Usage
 
-Use [Choose features](./doc/features.md) to decide which parts to select and find guidance on their questions and setup.
-
 Generate a project and answer Copier's questions:
 
 ```shell
@@ -35,9 +33,10 @@ copier copy https://gitlab.com/svenforge/repo-template.git path/to/new-project
 cd path/to/new-project
 ```
 
+You can use [Choose features](./doc/features.md) to decide which parts to select and to find guidance on their questions and setup.
 With default choices, you get `README.md`, `LICENSE.md`, `pyproject.toml`, documentation under `doc/`, Dev Container and GitLab configuration, and saved answers in `.copier-answers.yml`.
 
-Review the selected modules' **After generation** instructions and customize the generated README, license, and configuration. Initialize Git, run the generated project's checks, and commit the reviewed files:
+Review the instruction of the selected modules and customize the generated README, license, and configuration. Initialize Git, run the generated project's checks, and commit the reviewed files:
 
 ```shell
 git init
@@ -54,7 +53,7 @@ copier update
 
 Review any conflicts before committing. Copier normally uses the latest tagged template release; see its [update guide](https://copier.readthedocs.io/en/stable/updating/) for details and version selection.
 
-To build another template, start with [Reuse modules](./doc/reuse.md). It covers the template starter and composition from a pinned Git submodule.
+To build your own template, start with [Reuse modules](./doc/reuse.md). It covers the template starter and composition from a pinned Git submodule.
 
 ### Development
 
