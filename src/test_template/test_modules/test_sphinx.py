@@ -30,7 +30,7 @@ MINIMAL_CONTEXT = module_context('sphinx', **{**SPHINX_VARIABLES, 'has_readme': 
                         {'path': 'doc/notes.md', 'template': 'files/notes.md.jinja'},
                     ],
                     'contributions': [
-                        {'target': 'python.dev_dependencies', 'template': 'fragments/dev_dependencies.toml.jinja'},
+                        {'target': 'pyproject.dev_dependencies', 'template': 'fragments/dev_dependencies.toml.jinja'},
                         {'target': 'core.gitignore', 'template': 'fragments/gitignore.jinja'},
                     ],
                 },

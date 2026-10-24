@@ -1,0 +1,71 @@
+# Module Defaults
+pyproject_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+    has_dependency_groups: false
+    install: none
+    name: my-project
+    version: '0.0.0'
+    python_version: '3.12'
+    readme: ''
+    license: ''
+    license_files: []
+    owner_name: ''
+    owner_email: ''
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+pyproject_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Questions
+python_version:
+  type: str
+  help: "[Pyproject] What is the minimum required Python version?"
+  qmark: "🐍"
+  default: "{{ pyproject_inputs.python_version | default(pyproject_defaults.python_version) }}"
+  validator: >-
+    {% if not (python_version | regex_search('^[0-9]+[.][0-9]+$')) %}
+    Use a numeric Python major and minor version, such as 3.12.
+    {% endif %}
+  when: "{{ pyproject_inputs.enabled | default(pyproject_defaults.enabled) }}"
+
+# Module Outputs
+pyproject:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(pyproject_defaults, **pyproject_inputs) -%}
+    {%- set vars = dict(vars, python_version=python_version) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: pyproject.toml
+        template: files/pyproject.toml.jinja
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - target: pyproject.sections
+        template: fragments/project.toml.jinja
+      {%- if vars.has_dependency_groups %}
+      - target: pyproject.sections
+        template: fragments/dependency.toml.jinja
+      {%- endif %}
+      {%- if vars.install in ['dependencies', 'editable'] %}
+      - target: codex.setup
+        template: fragments/setup.sh.jinja
+      - target: codex.maintenance
+        template: fragments/setup.sh.jinja
+      - target: devcontainer.postCreateCommand
+        template: fragments/devcontainer.postCreateCommand.json.jinja
+      {%- endif %}
+      {%- endif %}
+      {%- endfilter %}

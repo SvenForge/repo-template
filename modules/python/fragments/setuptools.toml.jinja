@@ -1,0 +1,17 @@
+[build-system]
+requires = [
+    "setuptools>=84",
+    "setuptools-scm>=10",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["test_*"{% if 'pytest' in python.vars.tools and not python.vars.testpackage_name.startswith('test_') %}, {{ python.vars.testpackage_name | tojson }}, {{ (python.vars.testpackage_name ~ '.*') | tojson }}{% endif %}]
+namespaces = false
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0"

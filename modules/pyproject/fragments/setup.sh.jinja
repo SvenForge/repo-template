@@ -1,0 +1,6 @@
+{% set has_dev_dependencies = contributions | selectattr('target', 'in', ['pyproject.dev_dependencies', 'pyproject.dependency_groups']) | list -%}
+# Install the Python project and/or its development dependency group.
+python -m pip install --upgrade pip
+{% if pyproject.vars.install == 'editable' or has_dev_dependencies -%}
+python -m pip install{% if pyproject.vars.install == 'editable' %} --editable .{% endif %}{% if has_dev_dependencies %} --group dev{% endif %}
+{% endif -%}

@@ -60,7 +60,7 @@ Both lists exist even when empty. A disabled module returns `files: []` and `con
 | A `path` in a `files` record | Generated project root. |
 | A `target` in a `contributions` record | A named extension point, not a file path. |
 
-Jinja imports inside a module also resolve from the host loader root. Use the registered path for a module-owned helper, for example `{% from module_paths['python'] ~ '/fragments/install.jinja' import install_commands with context %}`. A relative helper include or a hardcoded `modules/python` path would break when the module is mounted elsewhere.
+Jinja imports inside a module also resolve from the host loader root. Use a registered module path for a module-owned helper, such as `module_paths['custom'] ~ '/fragments/helper.jinja'`. A relative helper include or a hardcoded `modules/custom` path would break when the module is mounted elsewhere.
 
 ### Contributions and extension points
 

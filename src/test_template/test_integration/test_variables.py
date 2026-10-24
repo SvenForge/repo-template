@@ -14,13 +14,13 @@ from ..support import VariableCase, VariablesCheck
                     'files': [
                         {'path': 'README.md', 'template': 'modules/core/files/README.md.jinja'},
                         {'path': '.devcontainer/devcontainer.json', 'template': 'modules/devcontainer/files/devcontainer.json.jinja'},
-                        {'path': 'pyproject.toml', 'template': 'modules/python/files/pyproject.toml.jinja'},
+                        {'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'},
                         {'path': 'doc/api.md', 'template': 'modules/sphinx/files/api.md.jinja'},
                     ],
                     'contributions': [
                         {'target': 'core.gitignore', 'template': 'modules/python/fragments/gitignore.jinja'},
-                        {'target': 'python.dev_dependencies', 'template': 'modules/sphinx/fragments/dev_dependencies.toml.jinja'},
-                        {'target': 'devcontainer.postCreateCommand', 'template': 'modules/python/fragments/devcontainer.postCreateCommand.json.jinja'},
+                        {'target': 'pyproject.dev_dependencies', 'template': 'modules/sphinx/fragments/dev_dependencies.toml.jinja'},
+                        {'target': 'devcontainer.postCreateCommand', 'template': 'modules/pyproject/fragments/devcontainer.postCreateCommand.json.jinja'},
                     ],
                     'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.12-bookworm'}},
                     'sphinx': {'vars': {'api_packages': ['test_my_repository']}},
@@ -28,6 +28,55 @@ from ..support import VariableCase, VariablesCheck
                 },
             ),
             id='defaults',
+        ),
+        pytest.param(
+            VariableCase(
+                answers={'features': ['core', 'sphinx', 'gitlab']},
+                expected={
+                    'python': {'vars': {'enabled': False}, 'files': [], 'contributions': []},
+                    'pyproject': {'vars': {'enabled': True, 'has_dependency_groups': True, 'install': 'dependencies', 'name': 'my-repository'}},
+                    'files': [{'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'}],
+                    'contributions': [
+                        {'target': 'pyproject.sections', 'template': 'modules/pyproject/fragments/project.toml.jinja'},
+                        {'target': 'pyproject.sections', 'template': 'modules/pyproject/fragments/dependency.toml.jinja'},
+                    ],
+                    'gitlab': {'vars': {'python_enabled': False, 'has_python_distribution': False, 'pipeline': ['sphinx']}},
+                },
+            ),
+            id='sphinx-without-python',
+        ),
+        pytest.param(
+            VariableCase(
+                answers={
+                    'features': ['core', 'sphinx', 'gitlab', 'codex', 'devcontainer'],
+                    'sphinx_needs': True,
+                    'python_version': '3.13',
+                },
+                expected={
+                    'python': {'vars': {'enabled': False}, 'files': [], 'contributions': []},
+                    'pyproject': {'vars': {'install': 'dependencies', 'python_version': '3.13'}},
+                    'sphinx': {'vars': {'needs': True, 'api_packages': []}},
+                    'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.13-bookworm'}},
+                    'contributions': [
+                        {'target': 'codex.setup', 'template': 'modules/pyproject/fragments/setup.sh.jinja'},
+                        {'target': 'codex.maintenance', 'template': 'modules/pyproject/fragments/setup.sh.jinja'},
+                        {'target': 'devcontainer.postCreateCommand', 'template': 'modules/pyproject/fragments/devcontainer.postCreateCommand.json.jinja'},
+                    ],
+                    'gitlab': {'vars': {'python_enabled': False, 'has_python_distribution': False}},
+                },
+            ),
+            id='sphinx-integrations',
+        ),
+        pytest.param(
+            VariableCase(
+                answers={'features': ['python'], 'python_package_name': 'widget', 'python_tools': []},
+                expected={
+                    'pyproject': {'vars': {'name': 'widget', 'version': '', 'has_dependency_groups': False, 'install': 'editable'}},
+                    'sphinx': {'files': [], 'contributions': []},
+                    'files': [{'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'}],
+                },
+            ),
+            id='python-distribution-without-sphinx-or-tools',
         ),
         pytest.param(
             VariableCase(
@@ -45,7 +94,7 @@ from ..support import VariableCase, VariablesCheck
         pytest.param(
             VariableCase(
                 answers={'features': []},
-                expected={'files': [], 'contributions': []},
+                expected={'files': [], 'contributions': [], 'pyproject': {'vars': {'enabled': False}, 'files': [], 'contributions': []}},
             ),
             id='disabled-modules',
         ),
@@ -84,7 +133,7 @@ from ..support import VariableCase, VariablesCheck
                     'contributions': [
                         {'target': 'core.readme.documentation', 'template': 'modules/gitlab/fragments/readme.documentation.md.jinja'},
                         {'target': 'devcontainer.features', 'template': 'modules/codex/fragments/devcontainer.features.json.jinja'},
-                        {'target': 'codex.setup', 'template': 'modules/python/fragments/setup.sh.jinja'},
+                        {'target': 'codex.setup', 'template': 'modules/pyproject/fragments/setup.sh.jinja'},
                     ],
                     'python': {'vars': {'distribution_name': 'acme-widget', 'has_distribution': True}},
                     'devcontainer': {'vars': {'image': 'mcr.microsoft.com/devcontainers/python:3-3.13-bookworm'}},

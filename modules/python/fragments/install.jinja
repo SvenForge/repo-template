@@ -1,3 +1,0 @@
-{% macro install_commands(separator='\n') -%}
-python -m pip install --upgrade pip{{ separator }}python -m pip install{% if python.vars.has_distribution %} --editable .{% endif %}{% if python.vars.has_dev_dependencies %} --group dev{% endif %}
-{%- endmacro %}
