@@ -10,6 +10,9 @@
         {{- render_contributions('devcontainer.features') }}
     },
     "remoteUser": "vscode",
+    "containerEnv": {
+        {{- render_contributions('devcontainer.containerEnv') }}
+    },
     "mounts": [
         {{- render_contributions('devcontainer.mounts') }}
     ],

@@ -106,7 +106,7 @@ gitlab:
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
       {%- if vars.enabled %}
-      - target: codex.agents
+      - target: agents.sections
         template: fragments/AGENTS.md.jinja
       - target: codex.setup
         template: fragments/setup.sh.jinja

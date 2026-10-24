@@ -49,7 +49,7 @@ The module output always has these keys:
 | `files` | A list of `{path, template}` records for files this module owns. |
 | `contributions` | A list of `{target, template}` records for fragments included by receiving files. |
 
-Both lists exist even when empty. A disabled module returns `files: []` and `contributions: []`; the host aggregates every registered module without repeating activation logic. For example, Codex can own `AGENTS.md` with `template: files/AGENTS.md.jinja` and contribute `fragments/devcontainer.extensions.json.jinja` to `devcontainer.extensions`. A consumer that needs to know whether `AGENTS.md` exists should check the provider's `files` paths, not infer it from an input flag.
+Both lists exist even when empty. A disabled module returns `files: []` and `contributions: []`; the host aggregates every registered module without repeating activation logic. For example, the shared `agents` module owns `AGENTS.md` with `template: files/AGENTS.md.jinja`, while Codex contributes `fragments/devcontainer.extensions.json.jinja` to `devcontainer.extensions`. A consumer that needs to know whether `AGENTS.md` exists should check the provider's `files` paths, not infer it from an input flag.
 
 ### Path conventions
 
@@ -103,7 +103,7 @@ The two copied files are the generic yield template and Copier answers template.
 
 ### Minimal consumer example
 
-Save the following as the host's `copier.yml`. It offers agent guidance or a development workspace using Codex and Dev Container. Both features share Codex; only the workspace enables Dev Container and defaults to Cloud integration. The feature IDs differ from the module IDs. Keep static includes and path registrations aligned. The input blocks follow their includes, and the two aggregators match the root configuration.
+Save the following as the host's `copier.yml`. It offers shared agent guidance or a development workspace using Codex and Dev Container. Both features share the instruction provider; the workspace also enables Codex and Dev Container and defaults to Cloud integration. The feature IDs differ from the module IDs. Keep static includes and path registrations aligned. The input blocks follow their includes, and the two aggregators match the root configuration.
 
 ```yaml
 _min_copier_version: "9.17.2"
@@ -113,6 +113,7 @@ module_paths:
   type: yaml
   when: false
   default:
+    agents: vendor/repo-template/modules/agents
     codex: vendor/repo-template/modules/codex
     devcontainer: vendor/repo-template/modules/devcontainer
 
@@ -126,13 +127,22 @@ features:
     - workspace
 
 ---
+!include vendor/repo-template/modules/agents/copier.yml
+---
+agents_inputs:
+  type: yaml
+  when: false
+  default: |
+    enabled: {{ 'guidance' in features or 'workspace' in features }}
+
+---
 !include vendor/repo-template/modules/codex/copier.yml
 ---
 codex_inputs:
   type: yaml
   when: false
   default: |
-    enabled: {{ 'guidance' in features or 'workspace' in features }}
+    enabled: {{ 'workspace' in features }}
     cloud_integration: {{ 'workspace' in features }}
     devcontainer_available: {{ 'workspace' in features }}
 

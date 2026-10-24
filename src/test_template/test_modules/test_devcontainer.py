@@ -35,6 +35,31 @@ def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:
     [
         pytest.param(
             RenderCase(
+                context={
+                    **CONTAINER_CONTEXT,
+                    'contributions': [
+                        *CONTAINER_CONTEXT['contributions'],
+                        {'target': 'devcontainer.features', 'template': 'modules/codex/fragments/devcontainer.features.json.jinja'},
+                        {'target': 'devcontainer.features', 'template': 'modules/claude/fragments/devcontainer.features.json.jinja'},
+                        {'target': 'devcontainer.mounts', 'template': 'modules/claude/fragments/devcontainer.mounts.json.jinja'},
+                        {'target': 'devcontainer.containerEnv', 'template': 'modules/claude/fragments/devcontainer.containerEnv.json.jinja'},
+                    ],
+                },
+                parse=json.loads,
+                expected={
+                    'features': {
+                        'ghcr.io/devcontainers/features/node:2': {},
+                        'ghcr.io/dirien/devcontainer-feature-codex/codex:0': {},
+                        'ghcr.io/anthropics/devcontainer-features/claude-code:1.0': {},
+                    },
+                    'mounts': ['source=claude-config-${devcontainerId},target=/home/vscode/.claude,type=volume'],
+                    'containerEnv': {'CLAUDE_CONFIG_DIR': '/home/vscode/.claude'},
+                },
+            ),
+            id='combined-agent-contributions',
+        ),
+        pytest.param(
+            RenderCase(
                 context=CONTAINER_CONTEXT,
                 parse=json.loads,
                 expected={

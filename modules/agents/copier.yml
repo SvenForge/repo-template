@@ -1,0 +1,38 @@
+# Module Defaults
+agents_defaults:
+  type: yaml
+  when: false
+  default:
+    enabled: true
+
+# Module Inputs
+# To be overwritten by template, otherwise defaults will be used
+agents_inputs:
+  type: yaml
+  help: Which inputs shall be used for the module?
+  when: false
+  default: {}
+
+# Module Outputs
+agents:
+  type: yaml
+  when: false
+  default: |
+    {%- set vars = dict(agents_defaults, **agents_inputs) -%}
+    vars: {{ vars | to_json }}
+    files:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - path: AGENTS.md
+        template: files/AGENTS.md.jinja
+      {%- endif %}
+      {%- endfilter %}
+    contributions:
+      {% filter trim | default('[]', true) | indent(2, true) %}
+      {%- if vars.enabled %}
+      - target: agents.sections
+        template: fragments/guidelines.md.jinja
+      - target: agents.sections
+        template: fragments/safety.md.jinja
+      {%- endif %}
+      {%- endfilter %}

@@ -44,15 +44,11 @@ codex:
     vars: {{ vars | to_json }}
     files:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if vars.enabled %}
-      - path: AGENTS.md
-        template: files/AGENTS.md.jinja
       {%- if vars.cloud_integration %}
       - path: .codex/setup.sh
         template: files/setup.sh.jinja
       - path: .codex/maintenance.sh
         template: files/maintenance.sh.jinja
-      {%- endif %}
       {%- endif %}
       {%- endfilter %}
     contributions:
