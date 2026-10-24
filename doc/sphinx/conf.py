@@ -41,6 +41,8 @@ exclude_patterns.extend(
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = 'furo'
+html_static_path = ['_static']
+html_css_files = ['tables.css']
 
 html_context = {
     'body': '<meta http-equiv="refresh" content="0; url=doc/sphinx/index.html">',
