@@ -33,19 +33,14 @@ core_repository_name:
 
 core_repository_url:
   type: str
-  help: |-
-    [Core] Repository URL for users? (optional)
-    Used for the README and, by default, development. Prefer an HTTPS link.
+  help: "[Core] What is the repository URL? (optional)"
   qmark: "📁"
   default: "{{ core_inputs.repository_url | default(core_defaults.repository_url) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
 
 core_development_repository_url:
   type: str
-  help: |-
-    [Core] Different development repository URL? (optional)
-    Leave empty to use the URL above.
-    Development pulls, pushes, issues, and merge requests use this project.
+  help: "[Core] Is there a different repository URL for development? (optional)"
   qmark: "📁"
   default: "{{ core_inputs.development_repository_url | default(core_defaults.development_repository_url) }}"
   when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"

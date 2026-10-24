@@ -57,7 +57,7 @@ To build your own template, start with [Reuse modules](./doc/reuse.md). It cover
 
 ### Development
 
-Development takes place in [sventerprise/repo-template](https://gitlab.com/sventerprise/repo-template). The [public GitLab repository](https://gitlab.com/svenforge/repo-template) is the preferred source for template users; a [secondary mirror is available on GitHub](https://github.com/SvenForge/repo-template).
+Development takes place in a [private GitLab repository](https://gitlab.com/sventerprise/repo-template). The [public GitLab repository](https://gitlab.com/svenforge/repo-template) is the preferred source for template users; a [secondary mirror is available on GitHub](https://github.com/SvenForge/repo-template).
 
 Use the provided [development container](./.devcontainer/devcontainer.json) or preconfigured [Codex Cloud](https://chatgpt.com/codex/cloud) environment. For local development of this template, install the `dev` dependency group:
 
@@ -81,7 +81,7 @@ For Copier commands and concepts, see the [Copier documentation](https://copier.
 
 ## Contributing
 
-Questions, setup problems, documentation gaps, and proposed improvements are welcome in the [development issue tracker](https://gitlab.com/sventerprise/repo-template/-/issues). For contributions, follow the workflow in [AGENTS.md](https://gitlab.com/sventerprise/repo-template/-/blob/main/AGENTS.md). The development project requires access; contact the maintainer below if needed.
+Questions, setup problems, documentation gaps, and proposed improvements are welcome in the [issue tracker](https://gitlab.com/svenforge/repo-template/-/issues). For contributions, follow the workflow in [AGENTS.md](./AGENTS.md).
 
 ### Maintainer
 
