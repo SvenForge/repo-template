@@ -66,12 +66,6 @@ Jinja imports inside a module also resolve from the host loader root. Use a regi
 
 The root aggregator preserves `module_paths` registry order and each module's contribution order. Static include order separately controls provider evaluation. A receiving file selects matching `target` records and includes their templates. The receiver owns the surrounding syntax and separators; a listed fragment must render valid, nonempty content for that slot. A contribution to an absent receiver simply has no rendered destination. Keep the target name and fragment format aligned when either changes.
 
-The shared `pyproject` support module owns `pyproject.toml`. Its file template assembles the initial `[project]` table from `project.toml.jinja`, contributed sections, and dependency groups from `dependency.toml.jinja`. The host enables it for Python or Sphinx and supplies available project metadata. The minimum Python version question lives here and retains the saved `python_version` answer key. The `version` input defaults to `0.0.0`; an empty value delegates version calculation to the selected build backend.
-
-Python retains its package/tool questions and source/test files. Its manifest selects separate setuptools, pytest, Ruff, and mypy fragments. `pyproject.sections` receives both build-backend and tool sections, and `pyproject.dev_dependencies` receives dependency array items from Python and Sphinx. `pyproject.dependency_groups` accepts additional group assignments inside `[dependency-groups]`; the receiver owns the `dev` group. Dependency groups are inferred from these contributions.
-
-The `install` input selects `none` (the default), `dependencies`, or `editable` independently of file emission. The host chooses the mode from the selected capabilities; another environment-manager integration can leave it as `none` and supply its own setup. Editable mode adds the project install, and dependency contributions determine whether to install the `dev` group. Codex setup and maintenance reuse the same shell fragment, and Dev Container setup contains the equivalent explicit commands. Runtime consumers use `pyproject.vars.python_version`, while Python quality jobs still follow the Python feature and selected tools.
-
 ## Working on modules
 
 ### Modify an existing module

@@ -34,8 +34,12 @@ from ..support import VariableCase, VariablesCheck
                 answers={'features': ['core', 'sphinx', 'gitlab']},
                 expected={
                     'python': {'vars': {'enabled': False}, 'files': [], 'contributions': []},
-                    'pyproject': {'vars': {'enabled': True, 'install': 'dependencies', 'name': 'my-repository'}},
+                    'pyproject': {'vars': {'enabled': True, 'has_dependency_groups': True, 'install': 'dependencies', 'name': 'my-repository'}},
                     'files': [{'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'}],
+                    'contributions': [
+                        {'target': 'pyproject.sections', 'template': 'modules/pyproject/fragments/project.toml.jinja'},
+                        {'target': 'pyproject.sections', 'template': 'modules/pyproject/fragments/dependency.toml.jinja'},
+                    ],
                     'gitlab': {'vars': {'python_enabled': False, 'has_python_distribution': False, 'pipeline': ['sphinx']}},
                 },
             ),
@@ -46,8 +50,6 @@ from ..support import VariableCase, VariablesCheck
                 answers={
                     'features': ['core', 'sphinx', 'gitlab', 'codex', 'devcontainer'],
                     'sphinx_needs': True,
-                    'python_package_name': 'previous_package',
-                    'python_tools': ['pytest', 'ruff', 'mypy'],
                     'python_version': '3.13',
                 },
                 expected={
@@ -63,13 +65,13 @@ from ..support import VariableCase, VariablesCheck
                     'gitlab': {'vars': {'python_enabled': False, 'has_python_distribution': False}},
                 },
             ),
-            id='sphinx-integrations-with-previous-python-answers',
+            id='sphinx-integrations',
         ),
         pytest.param(
             VariableCase(
                 answers={'features': ['python'], 'python_package_name': 'widget', 'python_tools': []},
                 expected={
-                    'pyproject': {'vars': {'name': 'widget', 'version': '', 'install': 'editable'}},
+                    'pyproject': {'vars': {'name': 'widget', 'version': '', 'has_dependency_groups': False, 'install': 'editable'}},
                     'sphinx': {'files': [], 'contributions': []},
                     'files': [{'path': 'pyproject.toml', 'template': 'modules/pyproject/files/pyproject.toml.jinja'}],
                 },

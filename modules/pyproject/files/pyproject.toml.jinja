@@ -1,9 +1,6 @@
 {% filter trim -%}
-{% include module_paths['pyproject'] ~ '/fragments/project.toml.jinja' %}
-{%- for contribution in contributions | selectattr('target', 'equalto', 'pyproject.sections') %}
+{% for contribution in contributions | selectattr('target', 'equalto', 'pyproject.sections') %}
 
 {% filter trim('\r\n') %}{% include contribution.template %}{% endfilter %}
 {%- endfor %}
-
-{% filter trim('\r\n') %}{% include module_paths['pyproject'] ~ '/fragments/dependency.toml.jinja' %}{% endfilter %}
 {% endfilter %}

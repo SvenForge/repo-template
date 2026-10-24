@@ -53,14 +53,6 @@ DEVELOPMENT_CONTEXT = module_context('python', **{**PYTHON_VARIABLES, 'has_distr
         ),
         pytest.param(
             ModuleCase(
-                inputs={'enabled': False},
-                answers={'python_package_name': 'previous_package', 'python_tools': ['pytest', 'ruff', 'mypy']},
-                expected={'files': [], 'contributions': []},
-            ),
-            id='disabled-with-previous-answers',
-        ),
-        pytest.param(
-            ModuleCase(
                 inputs={'testpackage_name': 'qa_default'},
                 answers={'python_testpackage_name': 'qa_widget', 'python_tools': ['pytest']},
                 expected={

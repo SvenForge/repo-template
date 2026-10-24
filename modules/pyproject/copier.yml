@@ -4,6 +4,7 @@ pyproject_defaults:
   when: false
   default:
     enabled: true
+    has_dependency_groups: false
     install: none
     name: my-project
     version: '0.0.0'
@@ -51,12 +52,20 @@ pyproject:
       {%- endfilter %}
     contributions:
       {% filter trim | default('[]', true) | indent(2, true) %}
-      {%- if vars.enabled and vars.install in ['dependencies', 'editable'] %}
+      {%- if vars.enabled %}
+      - target: pyproject.sections
+        template: fragments/project.toml.jinja
+      {%- if vars.has_dependency_groups %}
+      - target: pyproject.sections
+        template: fragments/dependency.toml.jinja
+      {%- endif %}
+      {%- if vars.install in ['dependencies', 'editable'] %}
       - target: codex.setup
         template: fragments/setup.sh.jinja
       - target: codex.maintenance
         template: fragments/setup.sh.jinja
       - target: devcontainer.postCreateCommand
         template: fragments/devcontainer.postCreateCommand.json.jinja
+      {%- endif %}
       {%- endif %}
       {%- endfilter %}

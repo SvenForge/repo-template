@@ -50,9 +50,9 @@ module_paths:
   default:
     core: modules/core
     copier: modules/copier
+    pyproject: modules/pyproject
     python: modules/python
     sphinx: modules/sphinx
-    pyproject: modules/pyproject
     gitlab: modules/gitlab
     codex: modules/codex
     devcontainer: modules/devcontainer
@@ -143,8 +143,10 @@ pyproject_inputs:
   help: Which inputs should be used for the module?
   when: false
   default: |
+    {% set dependencies = (python.contributions + sphinx.contributions) | selectattr('target', 'in', ['pyproject.dev_dependencies', 'pyproject.dependency_groups']) | list %}
     enabled: {{ python.vars.enabled or sphinx.vars.enabled }}
-    install: {{ ('editable' if python.vars.has_distribution else 'dependencies' if sphinx.vars.enabled or (python.vars.enabled and python.vars.tools | length > 0) else 'none') | to_json }}
+    has_dependency_groups: {{ dependencies | length > 0 }}
+    install: {{ ('editable' if python.vars.has_distribution else 'dependencies' if dependencies else 'none') | to_json }}
     {% if python.vars.has_distribution %}
     name: {{ python.vars.distribution_name | to_json }}
     version: ''
