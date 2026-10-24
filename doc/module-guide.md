@@ -17,10 +17,6 @@ modules/<name>/
 
 `files/` and `fragments/` contain only the templates a module needs. `exports.jinja` names the module output, for example `{% set output = codex %}`. The host imports that export with context; modules do not need their own rendering extension.
 
-### Generate a template starter
-
-See [Reuse modules](./reuse.md#generate-a-template-starter) to scaffold a new template and choose its initial module.
-
 ## Module interface
 
 ### Defaults, inputs, and questions

@@ -9,7 +9,7 @@ Start with the repository README if you want to create or update a repository. T
 | `copier.yml` | Defines feature choices, module locations, static includes, host input wiring, and the two output aggregators. |
 | `modules/<name>/` | Owns a module's questions, output, file templates, contribution fragments, and its `README.md` user guide and reference. |
 | `template/` | Holds the generic yield template that renders the aggregated files and the template that saves Copier answers. |
-| `doc/` | Holds the feature chooser, reuse walkthrough, and shared developer guides. `doc/sphinx/index.md` wraps the README and orders the documentation, including module pages. See [Writing documentation](./documentation.md) for placement rules. |
+| `doc/` | Holds these Markdown pages; `doc/sphinx/index.md` wraps the README and orders the documentation, including module pages. See [Writing documentation](./documentation.md) for placement rules. |
 | `src/test_template/` | Tests module outputs and rendered projects. |
 | `.gitlab-ci.yml` and `.gitlab/ci/` | Define repository checks, including the Sphinx build. |
 

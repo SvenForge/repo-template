@@ -126,10 +126,6 @@ git commit -m "Add reusable template modules"
 copier copy --defaults . ../generated-project
 ```
 
-### Verify the render
-
-With Copier 9.17.2 and the default workspace selected, the generated project contains `AGENTS.md`, `.codex/setup.sh`, `.codex/maintenance.sh`, `.devcontainer/devcontainer.json`, and `.copier-answers.yml`. The Dev Container JSON includes Codex's contributions. Guidance alone defaults to only `AGENTS.md` and the answers file. Selecting both still emits each module's output once; selecting neither emits only the answers file. This example needs no custom Jinja extension or `--trust`. It uses a fixed Git submodule revision once the host commits the gitlink.
-
 ## Reuse module documentation
 
 The module README files are canonical Markdown pages beside their source. A host can include a selected page from its pinned submodule using MyST, without copying its contents or importing all upstream pages.
