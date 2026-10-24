@@ -36,7 +36,7 @@ cd path/to/new-project
 You can use [Choose features](./doc/features.md) to decide which parts to select and to find guidance on their questions and setup.
 With default choices, you get `README.md`, `LICENSE.md`, `pyproject.toml`, documentation under `doc/`, Dev Container and GitLab configuration, and saved answers in `.copier-answers.yml`.
 
-Review the instruction of the selected modules and customize the generated README, license, and configuration. Initialize Git, run the generated project's checks, and commit the reviewed files:
+Review the instruction of the selected modules and customize the generated README, license, and configuration. Then, initialize Git (if not already done) and commit the reviewed files:
 
 ```shell
 git init
