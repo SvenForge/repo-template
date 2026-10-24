@@ -43,7 +43,7 @@ core_development_repository_url:
   help: "[Core] Is there a different repository URL for development? (optional)"
   qmark: "📁"
   default: "{{ core_inputs.development_repository_url | default(core_defaults.development_repository_url) }}"
-  when: "{{ core_inputs.enabled | default(core_defaults.enabled) }}"
+  when: "{{ (core_inputs.enabled | default(core_defaults.enabled)) and core_repository_url }}"
 
 core_repository_host:
   type: str

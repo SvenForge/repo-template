@@ -15,7 +15,7 @@ from ..support import TemplateCase
             TemplateCase(
                 answers={},
                 expected={
-                    '.copier-answers.yml': ('features:', "core_development_repository_url: ''"),
+                    '.copier-answers.yml': ('features:', "core_repository_url: ''"),
                     '.devcontainer/devcontainer.json': ('python -m pip install --group dev',),
                     '.gitignore': (),
                     '.gitlab-ci.yml': (),

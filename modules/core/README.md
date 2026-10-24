@@ -8,7 +8,7 @@ Create a project's README, license, and `.gitignore`. The host supplies activati
 | --- | --- |
 | `core_repository_name` | Display name used in project documentation and available to host integrations. |
 | `core_repository_url` | Optional repository URL for users, used for the README title and publication metadata. Also used for development unless overridden below. Prefer an HTTPS project link. |
-| `core_development_repository_url` | Optional development repository URL for contribution pushes, development pulls, and issues/MRs. Leave empty when it is the same repository. |
+| `core_development_repository_url` | Optional development repository URL for contribution pushes, development pulls, and issues/MRs. Asked only when a repository URL is supplied above. Leave empty when it is the same repository. |
 | `core_owner_name` | Optional owner name for documentation and licensing. |
 | `core_owner_email` | Optional contact email, asked when an owner name is supplied. |
 | `core_owner_user` | Optional username on the repository host, asked when an owner name is supplied. |
