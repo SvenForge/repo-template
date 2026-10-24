@@ -97,7 +97,7 @@ def test_post_create_command(check_template: TemplateCheck, case: RenderCase) ->
 @pytest.mark.parametrize(
     'case',
     [
-        pytest.param(RenderCase(contains=('CLAUDE.local.md', '.claude/settings.local.json')), id='local-configuration'),
+        pytest.param(RenderCase(contains=('### Claude ###', 'CLAUDE.local.md', '.claude/settings.local.json')), id='local-configuration'),
     ],
 )
 def test_gitignore(check_template: TemplateCheck, case: RenderCase) -> None:

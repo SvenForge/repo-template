@@ -40,6 +40,17 @@ CODEX_CONTEXT = module_context('codex')
             ),
             id='devcontainer',
         ),
+        pytest.param(
+            ModuleCase(
+                inputs={'enabled': False, 'cloud_integration': True, 'devcontainer_available': True},
+                expected={
+                    'vars': {'cloud_integration': False, 'devcontainer_integration': False},
+                    'files': [],
+                    'contributions': [],
+                },
+            ),
+            id='disabled',
+        ),
     ],
 )
 def test_output(check_module: ModuleCheck, case: ModuleCase) -> None:

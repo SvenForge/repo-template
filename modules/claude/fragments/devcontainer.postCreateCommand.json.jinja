@@ -1,1 +1,2 @@
+{# Make the configuration volume writable by the non-root remote user. #}
 "setupClaude": "set -eu; config_dir=\"$CLAUDE_CONFIG_DIR\"; mkdir -p \"$config_dir\"; sudo chown -R \"$(id -u):$(id -g)\" \"$config_dir\"; chmod 700 \"$config_dir\""
