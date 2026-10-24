@@ -27,7 +27,6 @@ myst_heading_anchors = 3
 exclude_patterns = [
     '.*',
     '**/.*',
-    'AGENTS.md',
     'README.md',
     'doc/sphinx/_build',
     'template',

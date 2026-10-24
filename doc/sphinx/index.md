@@ -23,6 +23,7 @@
 :maxdepth: 1
 :caption: Develop this template
 
+Agent instructions <../../AGENTS>
 ../template-structure
 ../testing
 ../documentation
